@@ -31,7 +31,9 @@
     <!-- Top Bar -->
     <header class="h-16 flex items-center justify-between px-6 border-b border-border bg-surface shrink-0">
         <div class="flex items-center gap-4">
-            <a href="https://textnexus.me" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border text-textMuted hover:text-textMain hover:bg-surfaceHover transition-colors text-sm font-medium"><i class="ph ph-arrow-left text-base"></i> Back to Nexus</a>
+            <a href="https://textnexus.me" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border text-textMuted hover:text-textMain hover:bg-surfaceHover transition-colors text-sm font-medium">
+                <i class="ph ph-arrow-left text-base"></i> Back to Nexus
+            </a>
             <span class="font-medium text-sm text-textMain">Nexus Creator Workspace</span>
         </div>
         <div class="flex items-center gap-4">
@@ -44,15 +46,39 @@
     <!-- Main Workspace Split View -->
     <div class="flex-1 flex overflow-hidden">
         
-        <!-- Left Panel: AI Prompt & Chat History -->
+        <!-- Left Panel: Model Selector, AI Prompt & History -->
         <div class="w-96 border-r border-border bg-surface flex flex-col shrink-0">
             <div id="chatHistory" class="flex-1 p-5 overflow-y-auto flex flex-col gap-4 text-sm">
                 <div class="p-3.5 rounded-xl bg-surfaceHover border border-border text-textMuted leading-relaxed">
-                    Welcome to the Creator Workspace! Describe your website, enter your subdomain, and generate a custom AI site. Each build costs <span class="text-textMain font-semibold">1,000 credits</span> and remains active for 7 days.
+                    Welcome to the Creator Workspace! Pick your model, describe your website, enter your subdomain, and generate your custom AI site. Each build costs <span class="text-textMain font-semibold">1,000 credits</span>.
                 </div>
             </div>
 
             <div class="p-4 border-t border-border bg-background flex flex-col gap-3">
+                <!-- Model Selector -->
+                <div class="flex flex-col gap-1">
+                    <label class="text-[11px] text-textMuted font-medium">AI Model:</label>
+                    <select id="modelSelect" class="w-full bg-surface border border-border rounded-lg px-3 py-2 text-xs text-textMain outline-none">
+                        <optgroup label="OpenAI Series">
+                            <option value="openai/gpt-6.1-sol" selected>GPT-6.1 Sol</option>
+                            <option value="openai/gpt-6-astra">GPT-6 Astra</option>
+                            <option value="openai/gpt-6-sol">GPT-6 Sol</option>
+                            <option value="openai/gpt-5.6-sol">GPT-5.6 Sol</option>
+                        </optgroup>
+                        <optgroup label="Anthropic Claude">
+                            <option value="anthropic/claude-opus-5.5">Claude Opus 5.5</option>
+                            <option value="anthropic/claude-sonnet-4.5">Claude Sonnet 4.5</option>
+                        </optgroup>
+                        <optgroup label="Google Gemini">
+                            <option value="google/gemini-3.8-flash">Gemini 3.8 Flash</option>
+                            <option value="google/gemini-3.1-pro">Gemini 3.1 Pro</option>
+                        </optgroup>
+                        <optgroup label="xAI Grok">
+                            <option value="x-ai/grok-4.7">Grok 4.7</option>
+                        </optgroup>
+                    </select>
+                </div>
+
                 <input type="text" id="subdomainInput" placeholder="Subdomain (e.g. mysite)" class="w-full bg-surface border border-border rounded-lg px-3.5 py-2.5 text-sm text-textMain focus:outline-none focus:border-zinc-500 placeholder:text-zinc-600">
                 <textarea id="promptInput" rows="3" placeholder="What kind of website do you want to build?" class="w-full bg-surface border border-border rounded-lg px-3.5 py-2.5 text-sm text-textMain focus:outline-none focus:border-zinc-500 placeholder:text-zinc-600 resize-none"></textarea>
                 <button onclick="startBuild()" class="w-full bg-textMain text-background font-semibold py-2.5 rounded-lg text-sm hover:bg-zinc-200 transition-colors">
@@ -113,7 +139,6 @@
                 return;
             }
 
-            // Sync credits live with Firebase (connected with admin.html)
             const userRef = ref(db, `textnexus/users/${user.uid}`);
             onValue(userRef, (snapshot) => {
                 const data = snapshot.val();
@@ -137,6 +162,7 @@
 
             const subdomain = document.getElementById('subdomainInput').value.trim();
             const prompt = document.getElementById('promptInput').value.trim();
+            const selectedModel = document.getElementById('modelSelect').value;
             const chatContainer = document.getElementById('chatHistory');
             const previewPlaceholder = document.getElementById('previewPlaceholder');
             const previewFrame = document.getElementById('previewFrame');
@@ -151,7 +177,7 @@
                 return;
             }
 
-            chatContainer.innerHTML += `<div class="p-3 rounded-xl bg-surface border border-border text-textMain self-end max-w-[85%]">Building: "${prompt}" (${subdomain}.textnexus.me)</div>`;
+            chatContainer.innerHTML += `<div class="p-3 rounded-xl bg-surface border border-border text-textMain self-end max-w-[85%]">Building: "${prompt}" (${subdomain}.textnexus.me)<span class="text-[10px] text-textMuted block mt-1">Model: ${selectedModel}</span></div>`;
             chatContainer.innerHTML += `<div id="loadingMsg" class="p-3 rounded-xl bg-surfaceHover border border-border text-textMuted">Configuring DNS, building repo, and setting up site...</div>`;
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
@@ -159,42 +185,40 @@
                 const response = await fetch(WORKER_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt, subdomain, userCredits })
+                    body: JSON.stringify({ prompt, subdomain, userCredits, model: selectedModel })
                 });
 
                 const data = await response.json();
                 if (document.getElementById('loadingMsg')) document.getElementById('loadingMsg').remove();
 
                 if (response.ok) {
-                    // Deduct 1,000 credits and update Firebase
                     userCredits -= 1000;
                     await update(ref(db, `textnexus/users/${user.uid}`), { credits: userCredits });
 
-                    // Save Site Entry to User Sites
                     const userSitesRef = ref(db, `users/${user.uid}/sites`);
                     const newSiteRef = push(userSitesRef);
                     set(newSiteRef, {
                         subdomain: subdomain,
                         url: data.siteUrl,
                         prompt: prompt,
+                        model: selectedModel,
                         createdAt: Date.now(),
                         expiresAt: Date.now() + (7 * 24 * 60 * 60 * 1000)
                     });
 
-                    // Log to textnexus/ai_sites for admin.html
                     const adminSitesRef = ref(db, 'textnexus/ai_sites');
                     push(adminSitesRef, {
                         userEmail: user.email,
                         subdomain: subdomain,
                         prompt: prompt,
+                        model: selectedModel,
                         createdAt: Date.now()
                     });
 
-                    // Store Active Session Info
                     activeSubdomain = subdomain;
                     activeRepo = `nexus-${subdomain}`;
 
-                    chatContainer.innerHTML += `<div class="p-3 rounded-xl bg-surfaceHover border border-border text-textMain">Success! Your site is live at <a href="${data.siteUrl}" target="_blank" class="text-blue-400 underline">${data.siteUrl}</a>.<br><span class="text-xs text-textMuted mt-1 block">Active for 7 days. To renew, email nexus.web.solutions@outlook.com</span></div>`;
+                    chatContainer.innerHTML += `<div class="p-3 rounded-xl bg-surfaceHover border border-border text-textMain">Success! Your site is live at <a href="${data.siteUrl}" target="_blank" class="text-blue-400 underline">${data.siteUrl}</a>.</div>`;
 
                     previewPlaceholder.classList.add('hidden');
                     previewFrame.classList.remove('hidden');
@@ -216,6 +240,7 @@
         // 2. Iterative AI Code Update
         window.updateSite = async () => {
             const editPrompt = document.getElementById('editPromptInput').value.trim();
+            const selectedModel = document.getElementById('modelSelect').value;
             if (!editPrompt || !activeSubdomain || !activeRepo) return;
 
             const editInput = document.getElementById('editPromptInput');
@@ -236,14 +261,15 @@
                     body: JSON.stringify({ 
                         prompt: editPrompt, 
                         subdomain: activeSubdomain,
-                        repoName: activeRepo 
+                        repoName: activeRepo,
+                        model: selectedModel
                     })
                 });
 
                 const data = await response.json();
                 
                 if (response.ok) {
-                    chatContainer.innerHTML += `<div class="p-3 rounded-xl bg-surfaceHover border border-border text-emerald-400">Update successful! Refreshing live preview...</div>`;
+                    chatContainer.innerHTML += `<div class="p-3 rounded-xl bg-surfaceHover border border-border text-emerald-400">Update successful! Refreshing preview...</div>`;
                     document.getElementById('previewFrame').src = `https://${activeSubdomain}.textnexus.me?t=${Date.now()}`;
                 } else {
                     chatContainer.innerHTML += `<div class="p-3 rounded-xl bg-red-950/40 border border-red-900/50 text-red-300">Update failed: ${data.error || 'Could not update site.'}</div>`;
