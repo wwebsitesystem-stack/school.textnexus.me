@@ -46,37 +46,75 @@
     <!-- Main Workspace Split View -->
     <div class="flex-1 flex overflow-hidden">
         
-        <!-- Left Panel: Model Selector, AI Prompt & History -->
+        <!-- Left Panel: Scrollable Model Selector, AI Prompt & History -->
         <div class="w-96 border-r border-border bg-surface flex flex-col shrink-0">
             <div id="chatHistory" class="flex-1 p-5 overflow-y-auto flex flex-col gap-4 text-sm">
                 <div class="p-3.5 rounded-xl bg-surfaceHover border border-border text-textMuted leading-relaxed">
-                    Welcome to the Creator Workspace! Pick your model, describe your website, enter your subdomain, and generate your custom AI site. Each build costs <span class="text-textMain font-semibold">1,000 credits</span>.
+                    Welcome to the Creator Workspace! Choose your model from the scrollable selector below, describe your website, and generate your custom AI site. Each build costs <span class="text-textMain font-semibold">1,000 credits</span>.
                 </div>
             </div>
 
-            <div class="p-4 border-t border-border bg-background flex flex-col gap-3">
-                <!-- Model Selector -->
-                <div class="flex flex-col gap-1">
+            <div class="p-4 border-t border-border bg-background flex flex-col gap-3 relative">
+                <!-- Custom Scrollable Model Selector with Logos -->
+                <div class="flex flex-col gap-1 relative">
                     <label class="text-[11px] text-textMuted font-medium">AI Model:</label>
-                    <select id="modelSelect" class="w-full bg-surface border border-border rounded-lg px-3 py-2 text-xs text-textMain outline-none">
-                        <optgroup label="OpenAI Series">
-                            <option value="openai/gpt-6.1-sol" selected>GPT-6.1 Sol</option>
-                            <option value="openai/gpt-6-astra">GPT-6 Astra</option>
-                            <option value="openai/gpt-6-sol">GPT-6 Sol</option>
-                            <option value="openai/gpt-5.6-sol">GPT-5.6 Sol</option>
-                        </optgroup>
-                        <optgroup label="Anthropic Claude">
-                            <option value="anthropic/claude-opus-5.5">Claude Opus 5.5</option>
-                            <option value="anthropic/claude-sonnet-4.5">Claude Sonnet 4.5</option>
-                        </optgroup>
-                        <optgroup label="Google Gemini">
-                            <option value="google/gemini-3.8-flash">Gemini 3.8 Flash</option>
-                            <option value="google/gemini-3.1-pro">Gemini 3.1 Pro</option>
-                        </optgroup>
-                        <optgroup label="xAI Grok">
-                            <option value="x-ai/grok-4.7">Grok 4.7</option>
-                        </optgroup>
-                    </select>
+                    <div class="relative">
+                        <button type="button" onclick="toggleModelDropdown()" id="modelSelectBtn" class="w-full bg-surface border border-border rounded-lg px-3 py-2.5 text-xs text-textMain flex items-center justify-between outline-none hover:border-zinc-500 transition-colors">
+                            <span class="flex items-center gap-2" id="currentModelLabel">
+                                <span class="w-5 h-5 rounded flex items-center justify-center bg-emerald-500/10 text-emerald-400 font-bold text-[10px]">O</span> GPT-6.1 Sol
+                            </span>
+                            <i class="ph ph-caret-down text-textMuted"></i>
+                        </button>
+
+                        <!-- Scrollable Dropdown List -->
+                        <div id="modelDropdownList" class="absolute bottom-full mb-2 left-0 w-full bg-surface border border-border rounded-xl shadow-2xl max-h-56 overflow-y-auto hidden z-50 p-1.5 flex flex-col gap-1">
+                            
+                            <div class="px-2 py-1 text-[10px] font-semibold text-textMuted uppercase tracking-wider">OpenAI Series</div>
+                            <div onclick="selectModel('openai/gpt-6.1-sol', 'GPT-6.1 Sol', 'O', 'text-emerald-400', 'bg-emerald-500/10')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-surfaceHover cursor-pointer text-xs transition-colors">
+                                <span class="w-5 h-5 rounded flex items-center justify-center bg-emerald-500/10 text-emerald-400 font-bold text-[10px]">O</span>
+                                <div><div class="font-medium">GPT-6.1 Sol</div><div class="text-[10px] text-textMuted">Flagship reasoning model</div></div>
+                            </div>
+                            <div onclick="selectModel('openai/gpt-6-astra', 'GPT-6 Astra', 'O', 'text-emerald-400', 'bg-emerald-500/10')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-surfaceHover cursor-pointer text-xs transition-colors">
+                                <span class="w-5 h-5 rounded flex items-center justify-center bg-emerald-500/10 text-emerald-400 font-bold text-[10px]">O</span>
+                                <div><div class="font-medium">GPT-6 Astra</div><div class="text-[10px] text-textMuted">Demanding end-to-end work</div></div>
+                            </div>
+                            <div onclick="selectModel('openai/gpt-6-sol', 'GPT-6 Sol', 'O', 'text-emerald-400', 'bg-emerald-500/10')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-surfaceHover cursor-pointer text-xs transition-colors">
+                                <span class="w-5 h-5 rounded flex items-center justify-center bg-emerald-500/10 text-emerald-400 font-bold text-[10px]">O</span>
+                                <div><div class="font-medium">GPT-6 Sol</div><div class="text-[10px] text-textMuted">High-end cost-efficient</div></div>
+                            </div>
+                            <div onclick="selectModel('openai/gpt-5.6-sol', 'GPT-5.6 Sol', 'O', 'text-emerald-400', 'bg-emerald-500/10')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-surfaceHover cursor-pointer text-xs transition-colors">
+                                <span class="w-5 h-5 rounded flex items-center justify-center bg-emerald-500/10 text-emerald-400 font-bold text-[10px]">O</span>
+                                <div><div class="font-medium">GPT-5.6 Sol</div><div class="text-[10px] text-textMuted">Multi-step coding & logic</div></div>
+                            </div>
+
+                            <div class="px-2 py-1 text-[10px] font-semibold text-textMuted uppercase tracking-wider mt-1">Anthropic Claude</div>
+                            <div onclick="selectModel('anthropic/claude-opus-5.5', 'Claude Opus 5.5', 'A', 'text-orange-400', 'bg-orange-500/10')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-surfaceHover cursor-pointer text-xs transition-colors">
+                                <span class="w-5 h-5 rounded flex items-center justify-center bg-orange-500/10 text-orange-400 font-bold text-[10px]">A</span>
+                                <div><div class="font-medium">Claude Opus 5.5</div><div class="text-[10px] text-textMuted">Demanding agentic work</div></div>
+                            </div>
+                            <div onclick="selectModel('anthropic/claude-sonnet-4.5', 'Claude Sonnet 4.5', 'A', 'text-orange-400', 'bg-orange-500/10')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-surfaceHover cursor-pointer text-xs transition-colors">
+                                <span class="w-5 h-5 rounded flex items-center justify-center bg-orange-500/10 text-orange-400 font-bold text-[10px]">A</span>
+                                <div><div class="font-medium">Claude Sonnet 4.5</div><div class="text-[10px] text-textMuted">Balanced speed & coding</div></div>
+                            </div>
+
+                            <div class="px-2 py-1 text-[10px] font-semibold text-textMuted uppercase tracking-wider mt-1">Google Gemini</div>
+                            <div onclick="selectModel('google/gemini-3.8-flash', 'Gemini 3.8 Flash', 'G', 'text-blue-400', 'bg-blue-500/10')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-surfaceHover cursor-pointer text-xs transition-colors">
+                                <span class="w-5 h-5 rounded flex items-center justify-center bg-blue-500/10 text-blue-400 font-bold text-[10px]">G</span>
+                                <div><div class="font-medium">Gemini 3.8 Flash</div><div class="text-[10px] text-textMuted">Software engineering & reasoning</div></div>
+                            </div>
+                            <div onclick="selectModel('google/gemini-3.1-pro', 'Gemini 3.1 Pro', 'G', 'text-blue-400', 'bg-blue-500/10')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-surfaceHover cursor-pointer text-xs transition-colors">
+                                <span class="w-5 h-5 rounded flex items-center justify-center bg-blue-500/10 text-blue-400 font-bold text-[10px]">G</span>
+                                <div><div class="font-medium">Gemini 3.1 Pro</div><div class="text-[10px] text-textMuted">Reasoning-first flagship</div></div>
+                            </div>
+
+                            <div class="px-2 py-1 text-[10px] font-semibold text-textMuted uppercase tracking-wider mt-1">xAI Grok</div>
+                            <div onclick="selectModel('x-ai/grok-4.7', 'Grok 4.7', 'X', 'text-zinc-200', 'bg-zinc-800')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-surfaceHover cursor-pointer text-xs transition-colors">
+                                <span class="w-5 h-5 rounded flex items-center justify-center bg-zinc-800 text-zinc-200 font-bold text-[10px]">X</span>
+                                <div><div class="font-medium">Grok 4.7</div><div class="text-[10px] text-textMuted">Long-running software tasks</div></div>
+                            </div>
+
+                        </div>
+                    </div>
                 </div>
 
                 <input type="text" id="subdomainInput" placeholder="Subdomain (e.g. mysite)" class="w-full bg-surface border border-border rounded-lg px-3.5 py-2.5 text-sm text-textMain focus:outline-none focus:border-zinc-500 placeholder:text-zinc-600">
@@ -130,6 +168,28 @@
         let activeSubdomain = "";
         let activeRepo = "";
         let userCredits = 10000;
+        let selectedModelId = "openai/gpt-6.1-sol";
+
+        // Custom Dropdown Toggle & Selection Logic
+        window.toggleModelDropdown = () => {
+            const list = document.getElementById('modelDropdownList');
+            list.classList.toggle('hidden');
+        };
+
+        window.selectModel = (id, name, letter, textColor, bgColor) => {
+            selectedModelId = id;
+            document.getElementById('currentModelLabel').innerHTML = `<span class="w-5 h-5 rounded flex items-center justify-center ${bgColor} ${textColor} font-bold text-[10px]">${letter}</span> ${name}`;
+            document.getElementById('modelDropdownList').classList.add('hidden');
+        };
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', (e) => {
+            const btn = document.getElementById('modelSelectBtn');
+            const list = document.getElementById('modelDropdownList');
+            if (btn && list && !btn.contains(e.target) && !list.contains(e.target)) {
+                list.classList.add('hidden');
+            }
+        });
 
         // Check Authentication & Real-time Firebase Credits on Load
         onAuthStateChanged(auth, (user) => {
@@ -162,7 +222,6 @@
 
             const subdomain = document.getElementById('subdomainInput').value.trim();
             const prompt = document.getElementById('promptInput').value.trim();
-            const selectedModel = document.getElementById('modelSelect').value;
             const chatContainer = document.getElementById('chatHistory');
             const previewPlaceholder = document.getElementById('previewPlaceholder');
             const previewFrame = document.getElementById('previewFrame');
@@ -177,7 +236,7 @@
                 return;
             }
 
-            chatContainer.innerHTML += `<div class="p-3 rounded-xl bg-surface border border-border text-textMain self-end max-w-[85%]">Building: "${prompt}" (${subdomain}.textnexus.me)<span class="text-[10px] text-textMuted block mt-1">Model: ${selectedModel}</span></div>`;
+            chatContainer.innerHTML += `<div class="p-3 rounded-xl bg-surface border border-border text-textMain self-end max-w-[85%]">Building: "${prompt}" (${subdomain}.textnexus.me)<span class="text-[10px] text-textMuted block mt-1">Model: ${selectedModelId}</span></div>`;
             chatContainer.innerHTML += `<div id="loadingMsg" class="p-3 rounded-xl bg-surfaceHover border border-border text-textMuted">Configuring DNS, building repo, and setting up site...</div>`;
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
@@ -185,7 +244,7 @@
                 const response = await fetch(WORKER_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt, subdomain, userCredits, model: selectedModel })
+                    body: JSON.stringify({ prompt, subdomain, userCredits, model: selectedModelId })
                 });
 
                 const data = await response.json();
@@ -201,7 +260,7 @@
                         subdomain: subdomain,
                         url: data.siteUrl,
                         prompt: prompt,
-                        model: selectedModel,
+                        model: selectedModelId,
                         createdAt: Date.now(),
                         expiresAt: Date.now() + (7 * 24 * 60 * 60 * 1000)
                     });
@@ -211,7 +270,7 @@
                         userEmail: user.email,
                         subdomain: subdomain,
                         prompt: prompt,
-                        model: selectedModel,
+                        model: selectedModelId,
                         createdAt: Date.now()
                     });
 
@@ -240,7 +299,6 @@
         // 2. Iterative AI Code Update
         window.updateSite = async () => {
             const editPrompt = document.getElementById('editPromptInput').value.trim();
-            const selectedModel = document.getElementById('modelSelect').value;
             if (!editPrompt || !activeSubdomain || !activeRepo) return;
 
             const editInput = document.getElementById('editPromptInput');
@@ -262,7 +320,7 @@
                         prompt: editPrompt, 
                         subdomain: activeSubdomain,
                         repoName: activeRepo,
-                        model: selectedModel
+                        model: selectedModelId
                     })
                 });
 
