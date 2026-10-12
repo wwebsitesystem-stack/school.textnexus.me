@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+	<title>Jeo Unblocked Games — Play 500+ Free Games, No Downloads</title>
+	<meta name="description" content="Jeo is a free unblocked games site with 500+ browser, Flash, and retro games. No downloads, no sign-ups — just play instantly at school or anywhere." />
+	<link rel="canonical" href="https://jeoweb.app/" />
+	<meta name="theme-color" content="#0c0b14" />
+
+	<!-- Optional serverless backend (see backend/README.md). Leave these
+	     placeholders until the Cloudflare Worker is deployed — the site
+	     degrades gracefully to fully static when they aren't configured.
+	     jeo-backend    = the deployed Worker URL
+	     jeo-score-key  = optional HMAC key for signed score submission
+	     jeo-vapid-key  = optional VAPID public key for daily-reminder push -->
+	<meta name="jeo-backend" content="REPLACE_WITH_YOUR_WORKER_URL" />
+	<meta name="jeo-score-key" content="REPLACE_WITH_YOUR_SCORE_KEY" />
+	<meta name="jeo-vapid-key" content="REPLACE_WITH_YOUR_VAPID_PUBLIC_KEY" />
+
+	<!-- PWA: makes the site installable to the home screen. -->
+	<link rel="manifest" href="manifest.json" />
+	<link rel="icon" href="icon.svg" type="image/svg+xml" />
+	<link rel="apple-touch-icon" href="icon.svg" />
+
+	<!-- Open Graph / Twitter: rich link previews when the site is shared. -->
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="Jeo Unblocked Games" />
+	<meta property="og:title" content="Jeo Unblocked Games — Play 500+ Free Games" />
+	<meta property="og:description" content="500+ browser, Flash, and retro games. No downloads, no sign-ups — just play instantly." />
+	<meta property="og:url" content="https://jeoweb.app/" />
+	<meta property="og:image" content="https://jeoweb.app/og-image.svg" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Jeo Unblocked Games — Play 500+ Free Games" />
+	<meta name="twitter:description" content="500+ browser, Flash, and retro games. No downloads, no sign-ups — just play instantly." />
+	<meta name="twitter:image" content="https://jeoweb.app/og-image.svg" />
+
+	<!-- Structured data: helps search engines understand the site. -->
+	<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "WebSite",
+		"name": "Jeo Unblocked Games",
+		"url": "https://jeoweb.app/",
+		"description": "Free unblocked games portal with 500+ browser, Flash, and retro games. No downloads, no sign-ups."
+	}
+	</script>
+
+	<link rel="preload" href="/games_catalog.json" as="fetch" crossorigin>
+	<link rel="preload" href="/app.js" as="script">
+	<link rel="preload" href="/styles.css" as="style">
+
+	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+	<!-- Design tokens shared with the Astro tree (src/styles/tokens.css). -->
+	<!-- Loaded before styles.css so legacy selectors build on the same tokens. -->
+	<link rel="stylesheet" href="/styles/tokens.css" />
+	<link rel="stylesheet" href="/styles/dashboard.css" />
+	<link rel="stylesheet" href="/styles/skeletons.css" />
+	<link rel="stylesheet" href="styles.css" />
+
+	<!-- Pick initial theme from OS preference if user hasn't set one. Run in <head>
+	     before any paint to avoid a dark-then-light flash on light-mode users.
+	     Sets data-theme on <html> so /styles/tokens.css's [data-theme=...] blocks
+	     pick the right palette during first paint. -->
+	<script>
+		(function () {
+			try {
+				var stored = localStorage.getItem('site-theme');
+				var prefersLight = !stored && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+				var theme = stored === 'light' || prefersLight ? 'light' : 'dark';
+				document.documentElement.setAttribute('data-theme', theme);
+				if (prefersLight) document.documentElement.setAttribute('data-pref-theme', 'light');
+				// Premium FX (glass blur, 3D tilt, animated hero) — applied
+				// before stylesheet parse so the user doesn't see a flash from
+				// flat → glass on reload.
+				if (localStorage.getItem('jeo-fx-premium') === 'true') {
+					document.documentElement.setAttribute('data-fx', 'premium');
+				}
+			} catch (e) {}
+		})();
+	</script>
+
+	<!-- Third-party analytics/consent: all loaded async and made non-blocking so failures
+	     don't prevent the catalog from rendering. onerror swallows network errors. -->
+	<script async data-cfasync="false" src="https://cmp.gatekeeperconsent.com/min.js" onerror="void 0"></script>
+	<script async data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js" onerror="void 0"></script>
+	<script async src="//www.ezojs.com/ezoic/sa.min.js" onerror="void 0"></script>
+	<script>
+		window.ezstandalone = window.ezstandalone || {};
+		ezstandalone.cmd = ezstandalone.cmd || [];
+	</script>
+	<script async src="//ezoicanalytics.com/analytics.js" onerror="void 0"></script>
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-WQHYZ04776" onerror="void 0"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		window.JEO_GA_STREAM_ID = '14949566361';
+		function gtag(){ try { dataLayer.push(arguments); } catch (e) {} }
+		gtag('js', new Date());
+		gtag('config', 'G-WQHYZ04776');
+	</script>
+	<script src="analytics.js" defer></script>
+	<link rel="stylesheet" href="styles/account-and-reset.css">
+</head>
+
+<body class="theme-dark">
+	<a class="skip-link" href="#mainContent">Skip to games</a>
+	<!-- Animated floating orb background (premium aesthetic) -->
+	<div class="jeo-animated-bg" aria-hidden="true">
+		<div class="orb"></div>
+		<div class="orb"></div>
+		<div class="orb"></div>
+	</div>
+	<script>
+		// Apply the theme preference detected in <head> (avoids any flash of dark on light-mode).
+		(function () {
+			try {
+				if (document.documentElement.getAttribute('data-theme') === 'light') {
+					document.body.classList.remove('theme-dark');
+					document.body.classList.add('theme-light');
+				}
+			} catch (e) {}
+		})();
+	</script>
+<div class="jeo-dashboard">
+	<!-- Sidebar Navigation -->
+	<aside class="jeo-sidebar" id="mainSidebar">
+		<div class="jeo-sidebar-logo">
+			<svg width="40" height="40" viewBox="0 0 32 32">
+				<rect x="2" y="2" width="28" height="28" rx="7" fill="url(#jGrad)" />
+				<path fill="#fff" d="M20 7.5a1.75 1.75 0 0 1 3.5 0v12.25a6.75 6.75 0 0 1-6.75 6.75h-0.5a6.75 6.75 0 0 1-6.75-6.75 1.75 1.75 0 0 1 3.5 0 3.25 3.25 0 0 0 3.25 3.25h0.5a3.25 3.25 0 0 0 3.25-3.25V7.5Z" />
+			</svg>
+		</div>
+		<nav class="jeo-sidebar-nav">
+			<button class="jeo-sidebar-item active" data-filter="all">
+				<span class="jeo-sidebar-icon">🏠</span>
+				<span class="jeo-sidebar-label">Home</span>
+			</button>
+			<button class="jeo-sidebar-item" data-filter="Action">
+				<span class="jeo-sidebar-icon">⚔️</span>
+				<span class="jeo-sidebar-label">Action</span>
+			</button>
+			<button class="jeo-sidebar-item" data-filter="Retro">
+				<span class="jeo-sidebar-icon">👾</span>
+				<span class="jeo-sidebar-label">Retro</span>
+			</button>
+			<button class="jeo-sidebar-item" data-filter="Puzzle">
+				<span class="jeo-sidebar-icon">🧩</span>
+				<span class="jeo-sidebar-label">Puzzle</span>
+			</button>
+			<button class="jeo-sidebar-item" data-filter="Driving">
+				<span class="jeo-sidebar-icon">🏎️</span>
+				<span class="jeo-sidebar-label">Driving</span>
+			</button>
+			<div class="jeo-sidebar-divider"></div>
+			<button class="jeo-sidebar-item" id="sidebarSurpriseBtn">
+				<span class="jeo-sidebar-icon">🎲</span>
+				<span class="jeo-sidebar-label">Roulette</span>
+			</button>
+			<button class="jeo-sidebar-item" id="sidebarSavesBtn">
+				<span class="jeo-sidebar-icon">💾</span>
+				<span class="jeo-sidebar-label">My Saves</span>
+				<span class="jeo-sidebar-badge" style="display:none">0</span>
+			</button>
+		</nav>
+	</aside>
+	<div class="jeo-dashboard-content">
+	<header class="topbar">
+		<div class="header-left">
+			<a href="." class="brand-section" aria-label="Jeo home">
+				<svg class="brand-logo-svg" width="32" height="32" viewBox="0 0 32 32" role="img" aria-label="Jeo">
+					<defs>
+						<linearGradient id="jGrad" x1="0" y1="0" x2="1" y2="1">
+							<stop offset="0%" stop-color="#a855f7" />
+							<stop offset="100%" stop-color="#7c3aed" />
+						</linearGradient>
+					</defs>
+					<rect x="2" y="2" width="28" height="28" rx="7" fill="url(#jGrad)" />
+					<path fill="#fff" d="M20 7.5a1.75 1.75 0 0 1 3.5 0v12.25a6.75 6.75 0 0 1-6.75 6.75h-0.5a6.75 6.75 0 0 1-6.75-6.75 1.75 1.75 0 0 1 3.5 0 3.25 3.25 0 0 0 3.25 3.25h0.5a3.25 3.25 0 0 0 3.25-3.25V7.5Z" />
+				</svg>
+				<div class="brand-text">jeo</div>
+			</a>
+			<a href="flash.html" class="header-nav-link">Flash</a>
+			<a href="retro.html" class="header-nav-link">Retro</a>
+			<a href="logs.html" class="header-nav-link">Logs</a>
+			<a href="links.html" class="header-nav-link">Links</a>
+			<a href="make-your-own.html" class="header-nav-link header-nav-cta">Host your own</a>
+			<a href="https://forms.gle/HgkCSEzaF5iULyfv8" target="_blank" rel="noopener noreferrer" class="header-nav-link feedback-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Send feedback</a>
+		</div>
+		<div class="header-right">
+			<div class="cloaker-wrap">
+				<button id="cloakerBtn" class="header-btn" aria-label="Tab Cloaker" data-tooltip="Tab Cloaker">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><circle cx="9" cy="10" r="1.5" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1.5" fill="currentColor" stroke="none"/><path d="M8 15c0 0 1.5 2 4 2s4-2 4-2"/><path d="M2 12h3M19 12h3"/></svg>
+				</button>
+				<div id="cloakerMenu" class="cloaker-menu">
+					<div class="color-menu-label">Tab Cloaker</div>
+					<div class="cloaker-presets">
+						<button class="cloaker-preset" data-title="Google" data-icon="https://www.google.com/favicon.ico">
+							<img src="https://www.google.com/favicon.ico" alt="" width="16" height="16"/>Google
+						</button>
+						<button class="cloaker-preset" data-title="Google Drive" data-icon="https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png">
+							<img src="https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png" alt="" width="16" height="16"/>Google Drive
+						</button>
+						<button class="cloaker-preset" data-title="Google Docs" data-icon="https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico">
+							<img src="https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico" alt="" width="16" height="16"/>Google Docs
+						</button>
+						<button class="cloaker-preset" data-title="Google Classroom" data-icon="https://ssl.gstatic.com/classroom/favicon.png">
+							<img src="https://ssl.gstatic.com/classroom/favicon.png" alt="" width="16" height="16"/>Classroom
+						</button>
+						<button class="cloaker-preset" data-title="Gmail - Inbox" data-icon="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico">
+							<img src="https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" alt="" width="16" height="16"/>Gmail
+						</button>
+						<button class="cloaker-preset" data-title="Khan Academy" data-icon="https://cdn.kastatic.org/images/favicon.ico">
+							<img src="https://cdn.kastatic.org/images/favicon.ico" alt="" width="16" height="16"/>Khan Academy
+						</button>
+						<button class="cloaker-preset" data-title="Canvas" data-icon="https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico">
+							<img src="https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico" alt="" width="16" height="16"/>Canvas
+						</button>
+						<button class="cloaker-preset" data-title="Wikipedia" data-icon="https://en.wikipedia.org/static/favicon/wikipedia.ico">
+							<img src="https://en.wikipedia.org/static/favicon/wikipedia.ico" alt="" width="16" height="16"/>Wikipedia
+						</button>
+						
+					</div>
+					<div class="menu-divider"></div>
+					<div class="color-menu-label">Custom</div>
+					<div class="cloaker-custom">
+						<input type="text" id="cloakerTitle" class="cloaker-input" placeholder="Tab title..." />
+						<input type="text" id="cloakerIcon" class="cloaker-input" placeholder="Favicon URL..." />
+						<button id="cloakerApply" class="cloaker-apply-btn">Apply Custom</button>
+					</div>
+					<div class="menu-divider"></div>
+					<button id="cloakerReset" class="cloaker-reset-btn">Reset to Default</button>
+				</div>
+			</div>
+			<div class="color-picker-wrap">
+				<button id="colorPickerBtn" class="header-btn" aria-label="Change accent color" data-tooltip="Customize">🎨</button>
+				<div id="colorMenu" class="color-menu">
+					<div class="color-menu-label">Accent Color</div>
+					<div class="color-wheel-row">
+						<input type="color" id="accentColorInput" class="color-wheel-input" value="#7c3aed" />
+						<span class="color-wheel-value" id="accentColorValue">#7c3aed</span>
+						<button class="color-reset-btn" id="accentReset" title="Reset">↺</button>
+					</div>
+
+					<div class="menu-divider"></div>
+
+					<div class="color-menu-label">Background</div>
+					<div class="color-wheel-row">
+						<input type="color" id="bgColorInput" class="color-wheel-input" value="#0c0b14" />
+						<span class="color-wheel-value" id="bgColorValue">#0c0b14</span>
+						<button class="color-reset-btn" id="bgReset" title="Reset">↺</button>
+					</div>
+
+					<div class="menu-divider"></div>
+
+					<div class="color-menu-label">Background Image</div>
+					<div class="bg-image-controls">
+						<label class="bg-upload-btn" for="bgImageInput">Upload Image</label>
+						<input type="file" id="bgImageInput" accept="image/*" hidden />
+						<button id="bgImageClear" class="bg-clear-btn">Remove</button>
+					</div>
+					<div id="bgPreview" class="bg-preview hidden"></div>
+				</div>
+			</div>
+			<div class="theme-btn-wrap" data-tooltip="Dark Mode">
+				<button id="themeToggle" class="theme-btn" aria-label="Toggle theme">🌙</button>
+			</div>
+			<div class="settings-btn-wrap" data-tooltip="Settings">
+				<button id="settingsBtn" class="header-btn" aria-label="Settings">⚙️</button>
+			</div>
+			<div class="jeo-header-account" id="jeoAccountSlot">
+				<a href="login.html" class="jeo-header-signin">Sign in</a>
+			</div>
+		</div>
+	</header>
+
+	<!-- Main Content -->
+	<main class="main">
+		<!-- Hero Section -->
+		<section class="hero">
+			<h1>Play Unlimited Games</h1>
+			<p class="hero-subtitle">No downloads, no sign-ups — just play</p>
+			<div class="stats-row">
+				<div class="stat-card">
+					<div class="stat-number" id="gameCount">0</div>
+					<div class="stat-label">Total Games</div>
+				</div>
+				<div class="stat-divider"></div>
+				<div class="stat-card">
+					<div class="stat-number stat-webgl" id="webglCount">0</div>
+					<div class="stat-label">WebGL Games</div>
+				</div>
+				<div class="stat-divider"></div>
+				<a href="flash.html" class="stat-card stat-card-link">
+					<div class="stat-number stat-flash" id="flashCount">0</div>
+					<div class="stat-label">⚡ Flash Games</div>
+				</a>
+				<div class="stat-divider"></div>
+				<a href="retro.html" class="stat-card stat-card-link">
+					<div class="stat-number stat-retro" id="retroCount">0</div>
+					<div class="stat-label">🎮 Retro Games</div>
+				</a>
+			</div>
+		</section>
+
+		<!-- Spotlight: Game of the Day -->
+		<section id="spotlightSection" class="spotlight-section hidden" aria-label="Featured game">
+			<div class="spotlight-bg" id="spotlightBg"></div>
+			<div class="spotlight-inner">
+				<div class="spotlight-cover" id="spotlightCover" role="img" aria-label=""></div>
+				<div class="spotlight-meta">
+					<span class="spotlight-eyebrow">⭐ Game of the Day</span>
+					<h2 class="spotlight-title" id="spotlightTitle"></h2>
+					<p class="spotlight-sub" id="spotlightSub"></p>
+					<div class="spotlight-actions">
+						<button id="spotlightPlay" class="spotlight-btn primary">▶ Play now</button>
+						<button id="spotlightSkip" class="spotlight-btn">Maybe later</button>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Continue Playing band -->
+		<section id="continueSection" class="continue-section hidden" aria-label="Continue playing">
+			<div class="continue-card" id="continueCard">
+				<div class="continue-cover" id="continueCover"></div>
+				<div class="continue-meta">
+					<span class="continue-eyebrow">⏱ Continue playing</span>
+					<h3 class="continue-title" id="continueTitle"></h3>
+				</div>
+				<button id="continuePlay" class="continue-btn">▶ Continue</button>
+				<button id="continueDismiss" class="continue-dismiss" aria-label="Dismiss">✕</button>
+			</div>
+		</section>
+
+		<!-- Search & Filter -->
+		<section class="toolbar-section">
+			<div class="search-container">
+				<span class="search-icon">🔍</span>
+				<input id="searchInput" class="search-input" placeholder="Search games..." />
+			</div>
+			<select id="sortSelect" class="sort-select">
+				<option value="az">Sort: A-Z</option>
+				<option value="rating">Sort: Top Rated</option>
+				<option value="plays">Sort: Most Played</option>
+			</select>
+			<label class="flash-toggle" data-tooltip="Show/hide Flash games">
+				<span class="flash-toggle-label">⚡ Flash</span>
+				<div class="toggle-switch">
+					<input type="checkbox" id="flashToggle" checked />
+					<span class="toggle-slider"></span>
+				</div>
+			</label>
+			<label class="retro-toggle" data-tooltip="Show/hide Retro games">
+				<span class="retro-toggle-label">🎮 Retro</span>
+				<div class="toggle-switch retro-switch">
+					<input type="checkbox" id="retroToggle" checked />
+					<span class="toggle-slider"></span>
+				</div>
+			</label>
+			<label class="retro-toggle" data-tooltip="Hide games marked as under maintenance">
+				<span class="retro-toggle-label">⚠ Maintenance</span>
+				<div class="toggle-switch retro-switch">
+					<input type="checkbox" id="hideMaintenanceToggle" checked />
+					<span class="toggle-slider"></span>
+				</div>
+			</label>
+			<button id="surpriseMeBtn" class="refresh-btn surprise-btn" data-tooltip="Pick a random game">🎲 Surprise Me</button>
+			<div id="tagChipRow" class="tag-chip-row hidden" role="group" aria-label="Filter by tag"></div>
+			<button id="refreshGames" class="refresh-btn">↻ Refresh</button>
+			<span id="statusFreshness" class="status-freshness" title="Time since the last supervisor / scanner run"></span>
+		</section>
+
+		<!-- Global Trending Now (backend-powered; hidden unless the backend is up) -->
+		<section id="globalTrendingSection" class="carousel-section hidden">
+			<div class="carousel-header">
+				<div class="carousel-title-group">
+					<span class="carousel-icon">🌍</span>
+					<h2 class="carousel-title">Trending Now</h2>
+					<span id="globalTrendingCount" class="carousel-count">0</span>
+				</div>
+			</div>
+			<div class="carousel-track-wrap">
+				<button class="carousel-arrow carousel-arrow-left" data-target="globalTrendingTrack" aria-label="Scroll left">‹</button>
+				<div id="globalTrendingTrack" class="carousel-track"></div>
+				<button class="carousel-arrow carousel-arrow-right" data-target="globalTrendingTrack" aria-label="Scroll right">›</button>
+			</div>
+		</section>
+
+		<!-- Top Rated Games (backend-powered; hidden unless ratings data is available) -->
+		<section id="topRatedSection" class="carousel-section hidden">
+			<div class="carousel-header">
+				<div class="carousel-title-group">
+					<span class="carousel-icon">⭐</span>
+					<h2 class="carousel-title">Top Rated</h2>
+					<span id="topRatedCount" class="carousel-count">0</span>
+				</div>
+				<span class="carousel-subtitle">Sorted by global community ratings</span>
+			</div>
+			<div class="carousel-track-wrap">
+				<button class="carousel-arrow carousel-arrow-left" data-target="topRatedTrack" aria-label="Scroll left">‹</button>
+				<div id="topRatedTrack" class="carousel-track"></div>
+				<button class="carousel-arrow carousel-arrow-right" data-target="topRatedTrack" aria-label="Scroll right">›</button>
+			</div>
+		</section>
+
+		<!-- Favorites Section -->
+		<section id="favoritesSection" class="carousel-section hidden">
+			<div class="carousel-header">
+				<div class="carousel-title-group">
+					<span class="carousel-icon">❤️</span>
+					<h2 class="carousel-title">Favorites</h2>
+					<span id="favCount" class="carousel-count">0</span>
+				</div>
+			</div>
+			<div class="carousel-track-wrap">
+				<button class="carousel-arrow carousel-arrow-left" data-target="favoritesTrack" aria-label="Scroll left">‹</button>
+				<div id="favoritesTrack" class="carousel-track"></div>
+				<button class="carousel-arrow carousel-arrow-right" data-target="favoritesTrack" aria-label="Scroll right">›</button>
+			</div>
+		</section>
+
+		<!-- Trending This Week Section -->
+		<section id="trendingSection" class="carousel-section hidden">
+			<div class="carousel-header">
+				<div class="carousel-title-group">
+					<span class="carousel-icon">🔥</span>
+					<h2 class="carousel-title">Your Top This Week</h2>
+					<span id="trendingCount" class="carousel-count">0</span>
+				</div>
+			</div>
+			<div class="carousel-track-wrap">
+				<button class="carousel-arrow carousel-arrow-left" data-target="trendingTrack" aria-label="Scroll left">‹</button>
+				<div id="trendingTrack" class="carousel-track"></div>
+				<button class="carousel-arrow carousel-arrow-right" data-target="trendingTrack" aria-label="Scroll right">›</button>
+			</div>
+		</section>
+
+		<!-- Play Later (formerly Wishlist) -->
+		<section id="wishlistSection" class="carousel-section hidden">
+			<div class="carousel-header">
+				<div class="carousel-title-group">
+					<span class="carousel-icon">🔖</span>
+					<h2 class="carousel-title">Play Later</h2>
+					<span id="wishlistCount" class="carousel-count">0</span>
+				</div>
+			</div>
+			<div class="carousel-track-wrap">
+				<button class="carousel-arrow carousel-arrow-left" data-target="wishlistTrack" aria-label="Scroll left">‹</button>
+				<div id="wishlistTrack" class="carousel-track"></div>
+				<button class="carousel-arrow carousel-arrow-right" data-target="wishlistTrack" aria-label="Scroll right">›</button>
+			</div>
+		</section>
+
+		<!-- Collections (Playlists) Section -->
+		<section id="collectionsSection" class="carousel-section hidden">
+			<div class="carousel-header">
+				<div class="carousel-title-group">
+					<span class="carousel-icon">📚</span>
+					<h2 class="carousel-title">Your Collections</h2>
+					<span id="collectionsCount" class="carousel-count">0</span>
+				</div>
+				<button id="newCollectionBtn" class="carousel-action-btn" type="button">+ New collection</button>
+			</div>
+			<div class="carousel-track-wrap">
+				<button class="carousel-arrow carousel-arrow-left" data-target="collectionsTrack" aria-label="Scroll left">‹</button>
+				<div id="collectionsTrack" class="carousel-track"></div>
+				<button class="carousel-arrow carousel-arrow-right" data-target="collectionsTrack" aria-label="Scroll right">›</button>
+			</div>
+		</section>
+
+		<!-- Recently Played Section -->
+		<section id="recentSection" class="carousel-section hidden">
+			<div class="carousel-header">
+				<div class="carousel-title-group">
+					<span class="carousel-icon">🕐</span>
+					<h2 class="carousel-title">Recently Played</h2>
+					<span id="recentCount" class="carousel-count">0</span>
+				</div>
+			</div>
+			<div class="carousel-track-wrap">
+				<button class="carousel-arrow carousel-arrow-left" data-target="recentTrack" aria-label="Scroll left">‹</button>
+				<div id="recentTrack" class="carousel-track"></div>
+				<button class="carousel-arrow carousel-arrow-right" data-target="recentTrack" aria-label="Scroll right">›</button>
+			</div>
+		</section>
+
+		<!-- Newly Added Carousel -->
+		<section id="newlyAddedSection" class="carousel-section hidden">
+			<div class="carousel-header">
+				<div class="carousel-title-group">
+					<span class="carousel-icon">✨</span>
+					<h2 class="carousel-title">Newly Added</h2>
+					<span id="newlyAddedCount" class="carousel-count">0</span>
+				</div>
+				<a href="new.html" class="carousel-view-all">See what's new →</a>
+			</div>
+			<div class="carousel-track-wrap">
+				<button class="carousel-arrow carousel-arrow-left" data-target="newlyAddedTrack" aria-label="Scroll left">‹</button>
+				<div id="newlyAddedTrack" class="carousel-track"></div>
+				<button class="carousel-arrow carousel-arrow-right" data-target="newlyAddedTrack" aria-label="Scroll right">›</button>
+			</div>
+		</section>
+
+		<!-- Requested Games Carousel -->
+		<section id="requestedSection" class="carousel-section hidden">
+			<div class="carousel-header">
+				<div class="carousel-title-group">
+					<span class="carousel-icon">📋</span>
+					<h2 class="carousel-title">Requested Games</h2>
+					<span id="requestedCount" class="carousel-count">0</span>
+				</div>
+				 <a href="requested.html" class="carousel-view-all">Browse all requested -></a>
+			</div>
+			<div class="carousel-track-wrap">
+				<button class="carousel-arrow carousel-arrow-left" data-target="requestedTrack" aria-label="Scroll left">‹</button>
+				<div id="requestedTrack" class="carousel-track"></div>
+				<button class="carousel-arrow carousel-arrow-right" data-target="requestedTrack" aria-label="Scroll right">›</button>
+			</div>
+		</section>
+
+		<!-- Loading state -->
+		<div id="loadingState" class="loading-state">
+			<div class="spinner"></div>
+			<p>Loading games...</p>
+		</div>
+
+		<!-- Native Banner Ad -->
+		<div style="margin: 20px 0; text-align: center;">
+			<script async="async" data-cfasync="false" src="https://pl29339095.profitablecpmratenetwork.com/4e098bda900198a91774b8eba3de1871/invoke.js"></script>
+			<div id="container-4e098bda900198a91774b8eba3de1871"></div>
+		</div>
+
+		<!-- Games Grid -->
+		<section class="games-section" id="mainContent">
+			<h2 class="section-title" id="gridSectionTitle">All Games</h2>
+			<div id="searchResultsLive" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+			<div id="gameGrid" class="game-grid">
+				<!-- Skeleton placeholders shown while JS loads -->
+				<div class="jeo-skeleton jeo-skeleton-card"><div class="jeo-skeleton-image"></div><div class="jeo-skeleton-text"><div class="jeo-skeleton-line medium"></div><div class="jeo-skeleton-line short"></div></div></div>
+				<div class="jeo-skeleton jeo-skeleton-card"><div class="jeo-skeleton-image"></div><div class="jeo-skeleton-text"><div class="jeo-skeleton-line medium"></div><div class="jeo-skeleton-line short"></div></div></div>
+				<div class="jeo-skeleton jeo-skeleton-card"><div class="jeo-skeleton-image"></div><div class="jeo-skeleton-text"><div class="jeo-skeleton-line medium"></div><div class="jeo-skeleton-line short"></div></div></div>
+				<div class="jeo-skeleton jeo-skeleton-card"><div class="jeo-skeleton-image"></div><div class="jeo-skeleton-text"><div class="jeo-skeleton-line medium"></div><div class="jeo-skeleton-line short"></div></div></div>
+				<div class="jeo-skeleton jeo-skeleton-card"><div class="jeo-skeleton-image"></div><div class="jeo-skeleton-text"><div class="jeo-skeleton-line medium"></div><div class="jeo-skeleton-line short"></div></div></div>
+				<div class="jeo-skeleton jeo-skeleton-card"><div class="jeo-skeleton-image"></div><div class="jeo-skeleton-text"><div class="jeo-skeleton-line medium"></div><div class="jeo-skeleton-line short"></div></div></div>
+				<div class="jeo-skeleton jeo-skeleton-card"><div class="jeo-skeleton-image"></div><div class="jeo-skeleton-text"><div class="jeo-skeleton-line medium"></div><div class="jeo-skeleton-line short"></div></div></div>
+				<div class="jeo-skeleton jeo-skeleton-card"><div class="jeo-skeleton-image"></div><div class="jeo-skeleton-text"><div class="jeo-skeleton-line medium"></div><div class="jeo-skeleton-line short"></div></div></div>
+				<div class="jeo-skeleton jeo-skeleton-card"><div class="jeo-skeleton-image"></div><div class="jeo-skeleton-text"><div class="jeo-skeleton-line medium"></div><div class="jeo-skeleton-line short"></div></div></div>
+				<div class="jeo-skeleton jeo-skeleton-card"><div class="jeo-skeleton-image"></div><div class="jeo-skeleton-text"><div class="jeo-skeleton-line medium"></div><div class="jeo-skeleton-line short"></div></div></div>
+				<div class="jeo-skeleton jeo-skeleton-card"><div class="jeo-skeleton-image"></div><div class="jeo-skeleton-text"><div class="jeo-skeleton-line medium"></div><div class="jeo-skeleton-line short"></div></div></div>
+				<div class="jeo-skeleton jeo-skeleton-card"><div class="jeo-skeleton-image"></div><div class="jeo-skeleton-text"><div class="jeo-skeleton-line medium"></div><div class="jeo-skeleton-line short"></div></div></div>
+			</div>
+		</section>
+	</main>
+
+	<!-- Last Updated Badge -->
+	<div id="lastUpdated" class="last-updated-badge"></div>
+
+	<!-- Footer -->
+	<footer class="footer">
+		<p>© 2026 jeo</p>
+	</footer>
+	</div> <!-- end .jeo-dashboard-content -->
+</div> <!-- end .jeo-dashboard -->
+
+	<!-- Settings Modal -->
+	<div id="settingsModal" class="modal hidden" aria-hidden="true" style="z-index: 100000;">
+		<div class="modal-inner settings-modal-inner">
+			<div class="modal-toolbar settings-toolbar">
+				<h2 class="settings-title">⚙️ Settings</h2>
+				<div style="flex-grow: 1;"></div>
+				<button id="closeSettingsModal" class="modal-close-btn" aria-label="Close">✕</button>
+			</div>
+
+			<nav class="settings-tabs" role="tablist" aria-label="Settings categories">
+				<button class="settings-tab active" data-tab="general" role="tab" aria-selected="true">🛡 General</button>
+				<button class="settings-tab" data-tab="appearance" role="tab" aria-selected="false">🎨 Appearance</button>
+				<button class="settings-tab" data-tab="profile" role="tab" aria-selected="false">📦 Profile</button>
+				<button class="settings-tab" data-tab="stats" role="tab" aria-selected="false">📊 Stats</button>
+				<button class="settings-tab" data-tab="about" role="tab" aria-selected="false">ℹ About</button>
+			</nav>
+
+			<div class="settings-body">
+				<section class="settings-tab-pane active" data-tab="general" role="tabpanel">
+					<div class="settings-section">
+						<h3>🚨 Panic Button</h3>
+						<p class="settings-help">Instantly hide the game and open a safe website. (Tip: pressing `Esc` also closes games.)</p>
+						<div style="display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+							<input type="text" id="panicKeyInput" class="cloaker-input" placeholder="Click to set hotkey..." readonly style="cursor: pointer; width: 120px; flex-shrink: 0;" />
+							<input type="text" id="panicUrlInput" class="cloaker-input" placeholder="Safe URL (e.g. https://classroom.google.com)" style="flex: 1; min-width: 200px;" />
+							<button id="savePanicBtn" class="cloaker-apply-btn">Save</button>
+						</div>
+					</div>
+					<div class="settings-section hidden" id="dailyRemindersRow">
+						<h3>🔔 Daily reminders</h3>
+						<p class="settings-help">Get a once-a-day nudge to play and keep your streak alive. Off by default — turn it on or off anytime.</p>
+						<label style="display:flex; justify-content:space-between; align-items:center; background:var(--bg); padding:10px; border-radius:8px; border:1px solid var(--border);">
+							<span style="color:var(--text); font-size:14px;">Send me daily reminders</span>
+							<div class="toggle-switch"><input type="checkbox" id="dailyRemindersToggle" /><span class="toggle-slider"></span></div>
+						</label>
+					</div>
+					<div class="settings-section">
+						<h3>💾 Game saves</h3>
+						<p class="settings-help">Auto-save runs in the background while you play. Manual saves live in the player sidebar (Ctrl/Cmd+S).</p>
+						<label style="display:flex; justify-content:space-between; align-items:center; background:var(--bg); padding:10px; border-radius:8px; border:1px solid var(--border); margin-bottom:8px; gap:12px;">
+							<span style="color:var(--text); font-size:14px;">Auto-save interval</span>
+							<select id="autosaveIntervalSel" class="cloaker-input" style="width:auto; min-width:120px;">
+								<option value="30000">Every 30 seconds</option>
+								<option value="60000">Every 1 minute</option>
+								<option value="120000">Every 2 minutes</option>
+								<option value="300000">Every 5 minutes</option>
+							</select>
+						</label>
+						<label style="display:flex; justify-content:space-between; align-items:center; background:var(--bg); padding:10px; border-radius:8px; border:1px solid var(--border);">
+							<span style="color:var(--text); font-size:14px;">Show a "💾 Saved" toast each auto-save</span>
+							<div class="toggle-switch"><input type="checkbox" id="autosaveToastToggle" /><span class="toggle-slider"></span></div>
+						</label>
+					</div>
+				</section>
+
+				<section class="settings-tab-pane" data-tab="appearance" role="tabpanel" hidden>
+					<div class="settings-section">
+						<h3>🎨 Look profiles</h3>
+						<p class="settings-help">Pick a complete vibe — colors, accent, surfaces, and mood — in one click.</p>
+						<div id="lookProfileGrid" class="look-profile-grid"></div>
+					</div>
+
+					<div class="settings-section settings-section-glass">
+						<h3>🌫 Glass intensity</h3>
+						<p class="settings-help">How blurry frosted-glass surfaces feel. Requires Premium FX.</p>
+						<input id="glassSlider" type="range" min="0" max="24" step="1" value="16" class="settings-slider" />
+						<div class="settings-slider-row"><span>Off</span><span id="glassValue">16px</span><span>Heavy</span></div>
+					</div>
+
+					<div class="settings-section">
+						<h3>🌈 Accent style</h3>
+						<p class="settings-help">Use a single color or a holographic gradient.</p>
+						<div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+							<button id="accentSolidBtn" class="accent-mode-btn active" data-mode="solid">Solid</button>
+							<button id="accentGradBtn" class="accent-mode-btn" data-mode="grad">Gradient</button>
+							<input type="color" id="accentGradStop1" value="#ff77e9" class="grad-stop" hidden />
+							<input type="color" id="accentGradStop2" value="#22d3ee" class="grad-stop" hidden />
+							<input type="range" id="accentGradAngle" min="0" max="360" value="135" class="settings-slider" style="flex: 1; min-width: 120px;" hidden />
+						</div>
+					</div>
+
+					<div class="settings-section">
+						<h3>✨ Premium FX</h3>
+						<p class="settings-help">Glass blur, 3D card tilt, animated hero, waterfall card entrance. Off by default for the smoothest scrolling — flip on for the full visual treatment.</p>
+						<label style="display:flex; justify-content:space-between; align-items:center; background:var(--bg); padding:12px; border-radius:8px; border:1px solid var(--border);">
+							<span style="color:var(--text); font-size:14px; font-weight:600;">Enable Premium FX</span>
+							<div class="toggle-switch"><input type="checkbox" id="premiumFxToggle" /><span class="toggle-slider"></span></div>
+						</label>
+					</div>
+
+					<div class="settings-section">
+						<h3>🎛 Per-effect toggles</h3>
+						<p class="settings-help">Fine-grained controls (only apply when Premium FX is on).</p>
+						<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+							<label style="display:flex; justify-content:space-between; align-items:center; background:var(--bg); padding:10px; border-radius:8px; border:1px solid var(--border);">
+								<span style="color:var(--text); font-size:14px;">3D Card Hover</span>
+								<div class="toggle-switch"><input type="checkbox" id="animHoverToggle" checked /><span class="toggle-slider"></span></div>
+							</label>
+							<label style="display:flex; justify-content:space-between; align-items:center; background:var(--bg); padding:10px; border-radius:8px; border:1px solid var(--border);">
+								<span style="color:var(--text); font-size:14px;">Click Ripples</span>
+								<div class="toggle-switch"><input type="checkbox" id="animRippleToggle" checked /><span class="toggle-slider"></span></div>
+							</label>
+							<label style="display:flex; justify-content:space-between; align-items:center; background:var(--bg); padding:10px; border-radius:8px; border:1px solid var(--border);">
+								<span style="color:var(--text); font-size:14px;">UI Sounds</span>
+								<div class="toggle-switch"><input type="checkbox" id="soundsToggle" /><span class="toggle-slider"></span></div>
+							</label>
+						</div>
+					</div>
+
+					<div class="settings-section">
+						<h3>📐 Layout & Style</h3>
+						<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+							<button class="layout-btn" data-layout="normal" style="padding:10px; border-radius:8px; border:1px solid var(--accent); background:rgba(124,58,237,0.1); color:var(--text); cursor:pointer;">Normal Grid</button>
+							<button class="layout-btn" data-layout="compact" style="padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--bg); color:var(--text); cursor:pointer;">Compact Grid</button>
+						</div>
+						<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+							<button class="radius-btn" data-radius="square" style="padding:10px; border-radius:0px; border:1px solid var(--border); background:var(--bg); color:var(--text); cursor:pointer; font-size:14px;">Square</button>
+							<button class="radius-btn" data-radius="rounded" style="padding:10px; border-radius:8px; border:1px solid var(--accent); background:rgba(124,58,237,0.1); color:var(--text); cursor:pointer; font-size:14px;">Rounded</button>
+							<button class="radius-btn" data-radius="pill" style="padding:10px; border-radius:24px; border:1px solid var(--border); background:var(--bg); color:var(--text); cursor:pointer; font-size:14px;">Pill</button>
+						</div>
+					</div>
+				</section>
+
+				<section class="settings-tab-pane" data-tab="profile" role="tabpanel" hidden>
+					<div class="settings-section">
+						<h3>📦 Export / Import Profile</h3>
+						<p class="settings-help">Moving to your own site? Export your favorites, history, and settings.</p>
+						<div style="display: flex; gap: 10px; flex-wrap: wrap;">
+							<button id="exportProfileBtn" class="loading-btn share-btn" style="flex: 1; min-width: 140px; padding: 10px; background: rgba(124, 58, 237, 0.2); border: 1px solid var(--accent); color: var(--text);">📤 Export Profile</button>
+							<label for="importProfileInput" class="loading-btn bug-btn" style="flex: 1; min-width: 140px; padding: 10px; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border); color: var(--text); cursor: pointer; text-align: center;">📥 Import Profile</label>
+							<input type="file" id="importProfileInput" accept=".jeo,.json" hidden />
+						</div>
+					</div>
+				</section>
+
+				<section class="settings-tab-pane" data-tab="stats" role="tabpanel" hidden>
+					<div id="statsTabBody"><p class="settings-help">Loading stats…</p></div>
+				</section>
+
+				<section class="settings-tab-pane" data-tab="about" role="tabpanel" hidden>
+					<div class="settings-section">
+						<h3>ℹ About Jeoweb</h3>
+						<p class="settings-help">Static-first, self-hosted unblocked games portal. Privacy-first: all data stays on your device.</p>
+						<p class="settings-help"><strong>Version:</strong> <span id="aboutVersion">v2.0</span></p>
+						<p class="settings-help"><strong>Source:</strong> <a href="https://github.com/Gotojeowebsite/jeoweb" target="_blank" rel="noopener" style="color:var(--accent)">github.com/Gotojeowebsite/jeoweb</a></p>
+						<button id="changelogBtn" class="accent-mode-btn" type="button">📜 View recent changes</button>
+					</div>
+				</section>
+			</div>
+		</div>
+	</div>
+
+	<script>
+	// Sounds toggle + changelog modal + extras
+	document.addEventListener('DOMContentLoaded', () => {
+		const soundsToggle = document.getElementById('soundsToggle');
+		if (soundsToggle && window.JeoSounds) {
+			soundsToggle.checked = window.JeoSounds.isEnabled();
+			soundsToggle.addEventListener('change', () => {
+				window.JeoSounds.setEnabled(soundsToggle.checked);
+				if (soundsToggle.checked) window.JeoSounds.play('open');
+			});
+		}
+		const cl = document.getElementById('changelogBtn');
+		if (cl) cl.addEventListener('click', async () => {
+			const existing = document.getElementById('jeoChangelog');
+			if (existing) existing.remove();
+			const modal = document.createElement('div');
+			modal.id = 'jeoChangelog';
+			modal.innerHTML = `<div class="jcl-card">
+				<header><h3>📜 Recent changes</h3><button class="jcl-x" aria-label="Close">✕</button></header>
+				<div class="jcl-body"><p class="settings-help">Loading…</p></div></div>`;
+			document.body.appendChild(modal);
+			modal.querySelector('.jcl-x').addEventListener('click', () => modal.remove());
+			modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+			try {
+				const r = await fetch('https://api.github.com/repos/Gotojeowebsite/jeoweb/commits?per_page=10');
+				if (!r.ok) throw new Error('fetch failed');
+				const data = await r.json();
+				const list = data.map(c => `
+					<li><div class="jcl-msg">${(c.commit.message || '').split('\n')[0].replace(/[<>"']/g, m => ({'<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}</div>
+					<div class="jcl-meta">${new Date(c.commit.author.date).toLocaleString()} · ${c.commit.author.name}</div></li>`).join('');
+				modal.querySelector('.jcl-body').innerHTML = `<ul class="jcl-list">${list}</ul>`;
+			} catch (err) {
+				modal.querySelector('.jcl-body').innerHTML = `<p class="settings-help">Could not load changelog: ${err.message}</p>`;
+			}
+		});
+	});
+
+	// Settings tab switcher (Sprint E)
+	(function () {
+		document.addEventListener('click', (e) => {
+			const tab = e.target.closest('.settings-tab');
+			if (!tab) return;
+			const id = tab.dataset.tab;
+			const root = tab.closest('.settings-modal-inner');
+			if (!root) return;
+			root.querySelectorAll('.settings-tab').forEach(t => {
+				const on = t.dataset.tab === id;
+				t.classList.toggle('active', on);
+				t.setAttribute('aria-selected', on ? 'true' : 'false');
+			});
+			root.querySelectorAll('.settings-tab-pane').forEach(p => {
+				const on = p.dataset.tab === id;
+				p.classList.toggle('active', on);
+				if (on) p.removeAttribute('hidden'); else p.setAttribute('hidden', '');
+			});
+		});
+	})();
+	</script>
+
+	<!-- Collection View Modal -->
+	<div id="collectionModal" class="modal hidden" aria-hidden="true" role="dialog" aria-labelledby="collectionModalTitle">
+		<div class="modal-inner collection-modal-inner">
+			<div class="modal-toolbar">
+				<h2 id="collectionModalTitle" class="collection-modal-title">Collection</h2>
+				<span id="collectionModalCount" class="collection-modal-count"></span>
+				<button id="collectionRenameBtn" class="modal-tool-btn" type="button">✏️ Rename</button>
+				<button id="collectionDeleteBtn" class="modal-tool-btn" type="button">🗑 Delete</button>
+				<button id="collectionModalClose" class="modal-close-btn" aria-label="Close">✕</button>
+			</div>
+			<div id="collectionModalGrid" class="game-grid collection-modal-grid"></div>
+		</div>
+	</div>
+
+	<!-- Play Modal -->
+	<div id="playModal" class="modal hidden" aria-hidden="true">
+		<div class="modal-inner">
+			<div class="modal-toolbar">
+				<button id="fullscreenBtn" class="modal-tool-btn" aria-label="Fullscreen" title="Fullscreen">⛶</button>
+				<div id="playerRatingSlot" class="player-rating-slot" aria-label="Rate this game"></div>
+				<span id="playerPresence" class="player-presence hidden" title="Players in this game right now"></span>
+				<span id="playerPlaytime" class="player-playtime hidden" title="Your total time on this game"></span>
+				<span id="playerSavesBadge" class="player-saves-badge hidden" title="Saved snapshots for this game"></span>
+				<div class="modal-toolbar-spacer"></div>
+				<div class="player-collection-wrap">
+					<button id="addToCollectionBtn" class="modal-tool-btn" type="button" aria-haspopup="true" aria-expanded="false" title="Add this game to a collection"><span class="mt-emoji">📚</span><span class="mt-label">Add to…</span></button>
+					<div id="collectionsPopover" class="collections-popover hidden" role="menu" aria-hidden="true"></div>
+				</div>
+				<div class="player-leaderboard-wrap">
+					<button id="leaderboardBtn" class="modal-tool-btn hidden" type="button" aria-haspopup="true" aria-expanded="false" title="Global leaderboard for this game"><span class="mt-emoji">🏆</span><span class="mt-label">Scores</span></button>
+					<div id="leaderboardPopover" class="leaderboard-popover hidden" role="menu" aria-hidden="true"></div>
+				</div>
+				<button id="shareGameBtn" class="modal-tool-btn" aria-label="Copy share link" title="Copy share link"><span class="mt-emoji">🔗</span><span class="mt-label">Share</span></button>
+				<button id="aboutBlankBtn" class="modal-tool-btn" aria-label="Open in stealth tab" title="Open in stealth about:blank tab"><span class="mt-emoji">🛡</span><span class="mt-label">Stealth</span></button>
+				<button id="openNewTabBtn" class="modal-tool-btn" aria-label="Open in new tab" title="Open in new tab"><span class="mt-emoji">↗</span><span class="mt-label">New tab</span></button>
+				<div class="player-more-wrap">
+					<button id="moreBtn" class="modal-tool-btn" type="button" aria-haspopup="true" aria-expanded="false" title="More options"><span class="mt-emoji">⋯</span><span class="mt-label">More</span></button>
+					<div id="morePopover" class="more-popover hidden" role="menu" aria-hidden="true">
+						<a href="https://forms.gle/HgkCSEzaF5iULyfv8" target="_blank" rel="noopener" class="more-popover-row">➕ Request a game</a>
+						<a href="https://forms.gle/HgkCSEzaF5iULyfv8" target="_blank" rel="noopener" class="more-popover-row">🐛 Not working? Report it</a>
+						<a href="make-your-own.html" target="_blank" rel="noopener" class="more-popover-row">🚀 Host your own</a>
+					</div>
+				</div>
+				<button id="closeModal" class="modal-close-btn" aria-label="Close">✕</button>
+			</div>
+			
+			<!-- Custom Loading Overlay -->
+			<div id="gameLoadingOverlay" class="game-loading-overlay hidden">
+				<div id="loadingDynamicBg" class="dynamic-bg"></div>
+				<div class="loading-content">
+					<svg class="loading-brand-logo" width="64" height="64" viewBox="0 0 32 32" role="img" aria-label="Jeo">
+						<defs>
+							<linearGradient id="jGradLoad" x1="0" y1="0" x2="1" y2="1">
+								<stop offset="0%" stop-color="#a855f7" />
+								<stop offset="100%" stop-color="#7c3aed" />
+							</linearGradient>
+						</defs>
+						<rect x="2" y="2" width="28" height="28" rx="7" fill="url(#jGradLoad)" />
+						<path fill="#fff" d="M20 7.5a1.75 1.75 0 0 1 3.5 0v12.25a6.75 6.75 0 0 1-6.75 6.75h-0.5a6.75 6.75 0 0 1-6.75-6.75 1.75 1.75 0 0 1 3.5 0 3.25 3.25 0 0 0 3.25 3.25h0.5a3.25 3.25 0 0 0 3.25-3.25V7.5Z" />
+					</svg>
+					<h2 id="loadingGameTitle">Loading Game...</h2>
+					<div class="loading-progress-container">
+						<div id="loadingProgressBar" class="loading-progress-bar"></div>
+					</div>
+					<p id="rotatingTip" class="rotating-tip">Jeo is fetching your game...</p>
+					<div class="loading-actions" style="margin-top: 24px;">
+						<button id="shareWebsiteBtn" class="loading-btn share-btn">🔗 Share Website</button>
+						<button id="skipLoadingBtn" class="loading-btn skip-btn" type="button" title="Show the game now">▶ Show game now</button>
+					</div>
+				</div>
+			</div>
+
+			<iframe id="gameFrame" src="" frameborder="0" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation-by-user-activation allow-modals allow-pointer-lock allow-orientation-lock allow-presentation" allow="autoplay; fullscreen; pointer-lock; gamepad"></iframe>
+
+			<!-- Save Sidebar -->
+			<button id="saveSidebarToggle" class="save-sidebar-toggle" aria-label="Open saves" title="Saves (Ctrl+S to save now)">💾</button>
+			<aside id="saveSidebar" class="save-sidebar hidden" aria-hidden="true">
+				<header class="save-sidebar-head">
+					<h3>Saves</h3>
+					<span id="saveSidebarStatus" class="save-sidebar-status">Auto-save off</span>
+					<button id="saveSidebarClose" class="save-sidebar-close" aria-label="Close saves">✕</button>
+				</header>
+				<div class="save-sidebar-actions">
+					<button id="saveNowBtn" class="save-action-btn primary">💾 Save now</button>
+					<button id="saveLabelBtn" class="save-action-btn">🏷 Save with label</button>
+					<button id="cloudSyncBtn" class="save-action-btn hidden" title="Push your manual saves to the cloud and pull any saves from other devices">☁ Sync saves</button>
+				</div>
+				<div id="saveSidebarList" class="save-sidebar-list" role="list">
+					<p class="save-empty">No saves yet for this game. Press <kbd>Ctrl/Cmd+S</kbd> while playing.</p>
+				</div>
+			</aside>
+		</div>
+	</div>
+
+	<!-- Script Loader -->
+	<script>
+		(function(){
+			function showOverlay(msg){
+				let el = document.getElementById('errorOverlay');
+				if (!el){
+					el = document.createElement('div');
+					el.id = 'errorOverlay';
+					el.style.cssText = [
+						'position:fixed',
+						'inset:16px',
+						'padding:24px',
+						'border-radius:16px',
+						'background:rgba(0,0,0,0.95)',
+						'color:#fff',
+						'font-family:system-ui,Segoe UI,Roboto',
+						'z-index:99999',
+						'overflow:auto',
+						'max-height:60vh',
+						'border:1px solid rgba(255,255,255,0.1)'
+					].join(';');
+					document.body.appendChild(el);
+				}
+				el.textContent = msg;
+				el.style.display = 'block';
+			}
+
+			window.addEventListener('error', function(e){
+				const msg = e.error?.message || e.message;
+				console.error(e.error || e.message);
+				showOverlay('Error: ' + msg);
+				if (window.JeoAnalytics) window.JeoAnalytics.trackError(msg, 'window_error');
+			});
+
+			window.addEventListener('unhandledrejection', function(e){
+				const msg = e.reason?.message || String(e.reason);
+				console.error('Unhandled rejection', e.reason);
+				showOverlay('Unhandled rejection: ' + msg);
+				if (window.JeoAnalytics) window.JeoAnalytics.trackError(msg, 'promise_rejection');
+			});
+
+			function loadScript(src){
+				return new Promise(function(resolve, reject){
+					const s = document.createElement('script');
+					s.src = src;
+					s.defer = true;
+					s.onload = () => resolve(src);
+					s.onerror = () => reject(new Error('Failed to load ' + src));
+					document.body.appendChild(s);
+				});
+			}
+
+			(async function start(){
+				try{
+					await loadScript('app.js');
+				} catch (err) {
+					console.error(err);
+					showOverlay(err.message || String(err));
+				}
+
+				// Fetch last commit for "Last Updated" badge — deferred so it never
+				// competes with game catalog rendering on slow connections.
+				var _fetchLastCommit = function() {
+					fetch('https://api.github.com/repos/Gotojeowebsite/jeoweb/commits?per_page=1')
+						.then(function(resp) { return resp.ok ? resp.json() : null; })
+						.then(function(data) {
+							if (!data || !data.length) return;
+							var d = new Date(data[0].commit.author.date);
+							var dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+							var timeStr = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+							var el = document.getElementById('lastUpdated');
+							if (el) el.textContent = 'Last updated: ' + dateStr + ' at ' + timeStr;
+						})
+						.catch(function(e) { console.warn('Could not fetch last commit', e); });
+				};
+				if (window.requestIdleCallback) {
+					requestIdleCallback(_fetchLastCommit, { timeout: 5000 });
+				} else {
+					setTimeout(_fetchLastCommit, 5000);
+				}
+			})();
+
+			// Register the service worker for offline support + PWA installability.
+			// Wrapped so a registration failure never trips the global error overlay.
+			if ('serviceWorker' in navigator) {
+				window.addEventListener('load', function(){
+					navigator.serviceWorker.register('sw.js').then(function(reg){
+						// When a new version installs while an old one controls the
+						// page, offer a one-tap refresh instead of silently going stale.
+						reg.addEventListener('updatefound', function(){
+							var nw = reg.installing;
+							if (!nw) return;
+							nw.addEventListener('statechange', function(){
+								if (nw.state === 'installed' && navigator.serviceWorker.controller && window.JeoToast) {
+									window.JeoToast.info('A new version of Jeoweb is ready.', {
+										ttl: 0,
+										action: { label: 'Refresh', onClick: function(){
+											navigator.serviceWorker.addEventListener('controllerchange', function(){
+												window.location.reload();
+											});
+											nw.postMessage({ type: 'SKIP_WAITING' });
+										} }
+									});
+								}
+							});
+						});
+					}).catch(function(err){
+						console.warn('Service worker registration failed', err);
+					});
+				});
+			}
+
+			document.addEventListener('keydown', function(e){
+				if (e.key === 'Escape'){
+					const collectionModal = document.getElementById('collectionModal');
+					if (collectionModal && !collectionModal.classList.contains('hidden')){
+						const cClose = document.getElementById('collectionModalClose');
+						if (cClose) { cClose.click(); return; }
+					}
+					const modal = document.getElementById('playModal');
+					if (modal && !modal.classList.contains('hidden')){
+						const close = document.getElementById('closeModal');
+						if (close) close.click();
+					}
+				}
+			});
+		})();
+	</script>
+	<script src="theme-manager.js" defer></script>
+	<script src="account-system.js" defer></script>
+	<script src="jeo-backend.js" defer></script>
+	<script src="save-manager.js" defer></script>
+	<script src="playtime.js" defer></script>
+	<script src="toast.js" defer></script>
+	<script src="ratings.js" defer></script>
+	<script src="playlists.js" defer></script>
+	<script src="achievements.js" defer></script>
+	<script src="confetti.js" defer></script>
+	<script src="sounds.js" defer></script>
+	<script src="swr-loader.js" defer></script>
+	<script src="lazy-loader.js" defer></script>
+	<script src="profile-db.js" defer></script>
+	<script src="save-backup.js" defer></script>
+	<script src="about-blank-spawner.js" defer></script>
+	<script src="proxy-router.js" defer></script>
+	<script src="share-session.js" defer></script>
+	<script src="whats-new.js" defer></script>
+	<script src="surprise-me.js" defer></script>
+	<script src="stats.js" defer></script>
+	<script src="avatars.js" defer></script>
+	<script src="seasonal-themes.js" defer></script>
+	<script src="command-palette.js" defer></script>
+	<script src="streaks.js" defer></script>
+	<script src="daily-challenge.js" defer></script>
+	<script src="leaderboard.js" defer></script>
+	<script src="notifications.js" defer></script>
+	<script src="reset-progress.js" defer></script>
+	<script>
+	document.addEventListener('DOMContentLoaded', function() {
+	(function () {
+		const slot = document.getElementById('jeoAccountSlot');
+		if (!slot || !window.JeoAccount) return;
+		const PRESET_GRADS = {
+			p1: ['#7a5cff','#22d3ee'], p2: ['#ff6b9d','#7a5cff'], p3: ['#22c55e','#0ea5e9'],
+			p4: ['#f59e0b','#ef4444'], p5: ['#06b6d4','#8b5cf6'], p6: ['#ec4899','#f43f5e'],
+			p7: ['#10b981','#3b82f6'], p8: ['#f97316','#a78bfa'],
+		};
+		function presetBg(p) { const [a,b] = (PRESET_GRADS[p] || PRESET_GRADS.p1); return `linear-gradient(135deg, ${a}, ${b})`; }
+
+		function render(state) {
+			slot.innerHTML = '';
+			if (!state) {
+				const a = document.createElement('a');
+				a.href = 'login.html'; a.className = 'jeo-header-signin'; a.textContent = 'Sign in';
+				slot.appendChild(a);
+				const b = document.createElement('a');
+				b.href = 'signup.html'; b.className = 'jeo-header-signin';
+				b.style.background = 'rgba(255,255,255,0.06)'; b.style.color = '#e7e7ee';
+				b.textContent = 'Create';
+				slot.appendChild(b);
+				return;
+			}
+			const av = document.createElement('div');
+			av.className = 'jeo-header-avatar';
+			if (state.profile.avatar_data_url) av.style.backgroundImage = `url(${state.profile.avatar_data_url})`;
+			else av.style.backgroundImage = presetBg(state.profile.avatar_preset);
+			av.title = state.profile.name;
+			av.innerHTML = '<div class="badge"></div>';
+			av.onclick = (e) => { e.stopPropagation(); openMenu(state); };
+			slot.appendChild(av);
+		}
+
+		function backupLabel(days) {
+			if (!Number.isFinite(days)) return { text: 'Last backup: never — download a .jeo file now', stale: true };
+			if (days < 1) return { text: 'Last backup: today', stale: false };
+			if (days < 2) return { text: 'Last backup: yesterday', stale: false };
+			const d = Math.floor(days);
+			return { text: `Last backup: ${d} day${d === 1 ? '' : 's'} ago`, stale: d >= 7 };
+		}
+
+		async function downloadBackup(state) {
+			const pw = prompt('Enter a passphrase to encrypt your save (≥ 5 chars).\nUse this passphrase + the .jeo file to sign in on another device.');
+			if (!pw) return false;
+			try {
+				const { blob, recoveryCodes } = await JeoAccount.exportBlob(pw);
+				const a = document.createElement('a');
+				const safe = (state.profile.name || 'jeoweb').replace(/[^a-z0-9_-]+/gi, '_');
+				const stamp = new Date().toISOString().slice(0,10);
+				a.href = URL.createObjectURL(new Blob([blob], { type: 'text/plain' }));
+				a.download = `${safe}-${stamp}.jeo`; a.click();
+				URL.revokeObjectURL(a.href);
+				showRecoveryCodes(recoveryCodes, safe);
+				return true;
+			} catch (err) {
+				if (window.JeoToast) JeoToast.error(String(err.message || err));
+				else alert(String(err.message || err));
+				return false;
+			}
+		}
+
+		async function copyBackup() {
+			const pw = prompt('Enter a passphrase to encrypt your save (≥ 5 chars).');
+			if (!pw) return;
+			try {
+				const { blob, recoveryCodes } = await JeoAccount.exportBlob(pw);
+				await navigator.clipboard.writeText(blob);
+				if (window.JeoToast) JeoToast.success('Encrypted save copied to clipboard.');
+				else alert('Encrypted save copied to clipboard.');
+				showRecoveryCodes(recoveryCodes, 'jeoweb');
+			} catch (err) {
+				if (window.JeoToast) JeoToast.error(String(err.message || err));
+				else alert(String(err.message || err));
+			}
+		}
+
+		function showRecoveryCodes(codes, safeName) {
+			if (!Array.isArray(codes) || codes.length === 0) return;
+			const m = document.createElement('div');
+			m.className = 'jeo-recovery-modal';
+			m.innerHTML = `
+				<div class="jrm-card">
+					<div class="jrm-title">🛟 Your recovery codes were rotated</div>
+					<div class="jrm-sub">Each export generates a fresh set of single-use codes. Save these somewhere safe — they let you sign back in if you forget your passphrase.</div>
+					<div class="jrm-grid">
+						${codes.map((c, i) => `<div class="jrm-code"><span>${String(i+1).padStart(2,'0')}</span><code>${c}</code></div>`).join('')}
+					</div>
+					<div class="jrm-actions">
+						<button class="jrm-btn jrm-ghost" data-act="copy">Copy all</button>
+						<button class="jrm-btn" data-act="dl">Download .txt</button>
+						<button class="jrm-btn jrm-primary" data-act="close">I've saved them</button>
+					</div>
+				</div>`;
+			document.body.appendChild(m);
+			m.onclick = (e) => {
+				const act = e.target.dataset?.act;
+				if (act === 'copy') {
+					navigator.clipboard.writeText(codes.map((c, i) => `${i+1}. ${c}`).join('\n'));
+					e.target.textContent = 'Copied ✓';
+				} else if (act === 'dl') {
+					const text = `Jeoweb recovery codes\nGenerated ${new Date().toLocaleString()}\n\n` + codes.map((c, i) => `${String(i+1).padStart(2,'0')}.  ${c}`).join('\n');
+					const a = document.createElement('a');
+					a.href = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
+					a.download = `${safeName}-recovery-codes.txt`; a.click();
+					URL.revokeObjectURL(a.href);
+				} else if (act === 'close' || e.target === m) {
+					m.remove();
+				}
+			};
+		}
+
+		async function deleteAccount() {
+			const ok = prompt('Type DELETE in caps to confirm permanent account deletion.\n\nThis will wipe all your settings, favorites, saves, and the encrypted account data on this device. The .jeo file you downloaded earlier will still work elsewhere.');
+			if (ok !== 'DELETE') return;
+			await JeoAccount.deleteAccount();
+			if (window.JeoToast) JeoToast.success('Account deleted on this device.');
+			setTimeout(() => window.location.reload(), 600);
+		}
+
+		function openMenu(state) {
+			document.querySelectorAll('.jeo-header-menu').forEach(n => n.remove());
+			const m = document.createElement('div');
+			m.className = 'jeo-header-menu';
+			const bk = backupLabel(JeoAccount.getBackupAgeDays());
+			m.innerHTML = `
+				<div class="who">Signed in as <strong></strong></div>
+				<div class="backup-status${bk.stale ? ' stale' : ''}"></div>
+				<button data-act="download">⬇ Download .jeo backup</button>
+				<button data-act="export">Copy encrypted save</button>
+				<button data-act="lock">🔒 Lock now</button>
+				<button class="danger" data-act="logout">Log out (forget device)</button>
+				<button class="danger" data-act="delete">🗑 Delete account on this device…</button>`;
+			m.querySelector('strong').textContent = state.profile.name;
+			m.querySelector('.backup-status').textContent = bk.text;
+			document.body.appendChild(m);
+			m.onclick = async (e) => {
+				const act = e.target.dataset?.act; if (!act) return;
+				if (act === 'logout') {
+					if (!confirm('Log out and forget this device?\n\nMake sure you have downloaded a .jeo backup — without it you cannot sign back in.')) return;
+					await JeoAccount.signOut({ forgetDevice: true });
+					m.remove(); window.location.reload();
+				} else if (act === 'download') {
+					if (await downloadBackup(state)) dismissBackupBanner();
+					m.remove();
+				} else if (act === 'export') {
+					await copyBackup();
+					m.remove();
+				} else if (act === 'lock') {
+					JeoAccount.lock();
+					m.remove();
+				} else if (act === 'delete') {
+					m.remove();
+					await deleteAccount();
+				}
+			};
+			setTimeout(() => {
+				const off = (e) => { if (!m.contains(e.target)) { m.remove(); document.removeEventListener('click', off); } };
+				document.addEventListener('click', off);
+			}, 0);
+		}
+
+		// ---- backup-reminder banner ----
+		// Shown when last backup is >= 7 days ago (or never). Snoozed for 24h
+		// after dismiss; suppressed for the rest of the session after download.
+		const SNOOZE_KEY = 'jeo:backupBannerSnoozeUntil';
+		let bannerEl = null;
+		function dismissBackupBanner({ snoozeHours = 24 } = {}) {
+			if (bannerEl) { bannerEl.remove(); bannerEl = null; }
+			try { localStorage.setItem(SNOOZE_KEY, String(Date.now() + snoozeHours * 3600_000)); } catch {}
+		}
+		function maybeShowBackupBanner(state) {
+			if (!state) return;
+			if (bannerEl) return;
+			const snooze = parseInt(localStorage.getItem(SNOOZE_KEY) || '0', 10);
+			if (Date.now() < snooze) return;
+			const days = JeoAccount.getBackupAgeDays();
+			if (Number.isFinite(days) && days < 7) return;
+
+			const el = document.createElement('div');
+			el.className = 'jeo-backup-banner';
+			const never = !Number.isFinite(days);
+			el.innerHTML = `
+				<button class="jbb-close" aria-label="Dismiss">×</button>
+				<div class="jbb-title">${never ? 'Back up your account' : 'Time to back up your save'}</div>
+				<div class="jbb-body">
+					${never
+						? 'Your game progress is only on this device. <strong>Download a <code>.jeo</code> file</strong> so you can sign in on another computer — or recover if Jeoweb gets blocked.'
+						: 'It\'s been over a week since your last backup. Download a fresh <strong><code>.jeo</code> file</strong> so newer save data is portable if this device or the site becomes unavailable.'}
+				</div>
+				<div class="jbb-actions">
+					<button class="jbb-btn jbb-primary" data-act="download">Download .jeo</button>
+					<button class="jbb-btn jbb-ghost" data-act="later">Remind me later</button>
+				</div>`;
+			document.body.appendChild(el);
+			bannerEl = el;
+			el.addEventListener('click', async (e) => {
+				const act = e.target.dataset?.act || (e.target.classList?.contains('jbb-close') ? 'later' : null);
+				if (act === 'download') {
+					const ok = await downloadBackup(JeoAccount.getState() || state);
+					if (ok) dismissBackupBanner({ snoozeHours: 24 * 365 }); // effectively for session; re-evaluates next load
+				} else if (act === 'later') {
+					dismissBackupBanner({ snoozeHours: 24 });
+				}
+			});
+		}
+
+		render(JeoAccount.getState());
+		JeoAccount.onChange((state, info) => {
+			render(state);
+			maybeShowBackupBanner(state);
+			if (info && info.locked) showLockScreen();
+			else hideLockScreen();
+		});
+		// Initial check after a short delay so account-system has loaded from device.
+		setTimeout(() => maybeShowBackupBanner(JeoAccount.getState()), 1500);
+
+		// ---- inactivity lock UI ----
+		let lockEl = null;
+		function showLockScreen() {
+			if (lockEl) return;
+			lockEl = document.createElement('div');
+			lockEl.className = 'jeo-lock-screen';
+			lockEl.innerHTML = `
+				<div class="jeo-lock-card">
+					<h2>🔒 Locked</h2>
+					<p>Your session locked after inactivity. Enter your passphrase to continue, or reload the page.</p>
+					<form id="lockForm"><input type="password" id="lockPw" autocomplete="current-password" autofocus><button type="submit">Unlock</button></form>
+					<button id="lockReload" style="margin-top:8px;background:transparent;color:#9aa0b4;border:1px solid rgba(255,255,255,0.1);">Sign out instead</button>
+					<div id="lockErr" style="color:#ff8a8a;font-size:12px;margin-top:8px;min-height:14px"></div>
+				</div>`;
+			document.body.appendChild(lockEl);
+			lockEl.querySelector('#lockForm').onsubmit = async (e) => {
+				e.preventDefault();
+				try {
+					await JeoAccount.unlock(lockEl.querySelector('#lockPw').value);
+					hideLockScreen();
+				} catch (err) {
+					lockEl.querySelector('#lockErr').textContent = String(err.message || err);
+				}
+			};
+			lockEl.querySelector('#lockReload').onclick = async () => {
+				await JeoAccount.signOut({ forgetDevice: true });
+				window.location.reload();
+			};
+		}
+		function hideLockScreen() { if (lockEl) { lockEl.remove(); lockEl = null; } }
+
+		// ---- recovery-mode notice ----
+		if (sessionStorage.getItem('jeo:force-passphrase-reset')) {
+			sessionStorage.removeItem('jeo:force-passphrase-reset');
+			setTimeout(() => {
+				if (window.JeoToast) {
+					JeoToast.warn('Signed in with a recovery code. Open the avatar menu → Download .jeo backup to set a new passphrase and rotate codes.', 12000);
+				}
+			}, 1200);
+		}
+
+		// ---- session-only mode ----
+		if (sessionStorage.getItem('jeo:session-only')) {
+			window.addEventListener('beforeunload', () => {
+				try { JeoAccount.signOut({ forgetDevice: true }); } catch {}
+			});
+		}
+	})();
+	});
+	</script>
+	<script src="https://pl29339094.profitablecpmratenetwork.com/83/59/3f/83593fb83e97e9d850b37eac8c847fa2.js"></script>
+</body>
+</html>
