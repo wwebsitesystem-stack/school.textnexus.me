@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Nexus</title>
     
+    <!-- Persistent Tab Cloak Loader -->
+    <script>
+        const savedTitle = localStorage.getItem('nexus-tab-title');
+        if (savedTitle) document.title = savedTitle;
+        const savedIcon = localStorage.getItem('nexus-tab-icon');
+        if (savedIcon) {
+            let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+            link.type = 'image/x-icon';
+            link.rel = 'shortcut icon';
+            link.href = savedIcon;
+            document.getElementsByTagName('head')[0].appendChild(link);
+        }
+    </script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -82,8 +96,8 @@
                 <button onclick="switchTab('updates', this)" class="nav-btn flex items-center gap-3 px-3 py-2 rounded-lg text-textMuted hover:text-textMain hover:bg-surfaceHover transition-colors text-sm font-medium"><i class="ph ph-bell text-lg"></i> Updates</button>
                 <button onclick="switchTab('ghostlink', this)" class="nav-btn flex items-center gap-3 px-3 py-2 rounded-lg text-textMuted hover:text-textMain hover:bg-surfaceHover transition-colors text-sm font-medium"><i class="ph ph-ghost text-lg"></i> Ghostlink</button>
                 <button onclick="switchTab('suggestions', this)" class="nav-btn flex items-center gap-3 px-3 py-2 rounded-lg text-textMuted hover:text-textMain hover:bg-surfaceHover transition-colors text-sm font-medium"><i class="ph ph-note text-lg"></i> Suggestions</button>
-                <button onclick="switchTab('jeoweb', this)" class="nav-btn flex items-center gap-3 px-3 py-2 rounded-lg text-textmuted hover:text-textMain hover:bg-surfaceHover transition-colors text-sm font-medium"><i class="ph ph-web"></i> jeoweb</button>
-                <button onclick="switchTab('MathHelperWebsite-main', this)" class="nav-btn flex items-center gap-3 px-3 py-2 rounded-lg text-textMutes hover:text-textMain hover:bg-surfaceHover transition-colors text-sm font-medium"><i class="ph ph-web"></i> Proxy</button>
+                <button onclick="switchTab('jeoweb', this)" class="nav-btn flex items-center gap-3 px-3 py-2 rounded-lg text-textMuted hover:text-textMain hover:bg-surfaceHover transition-colors text-sm font-medium"><i class="ph ph-globe text-lg"></i> jeoweb</button>
+                <button onclick="switchTab('MathHelperWebsite-main', this)" class="nav-btn flex items-center gap-3 px-3 py-2 rounded-lg text-textMuted hover:text-textMain hover:bg-surfaceHover transition-colors text-sm font-medium"><i class="ph ph-globe-hemisphere-west text-lg"></i> Proxy</button>
                 <a href="creator.html" class="nav-btn flex items-center gap-3 px-3 py-2 rounded-lg text-textMuted hover:text-textMain hover:bg-surfaceHover transition-colors text-sm font-medium"><i class="ph ph-magic-wand text-lg"></i> AI Creator</a>
                 
                 <p class="px-3 mt-4 mb-2 text-[11px] font-semibold tracking-wider text-textMuted uppercase">Communication</p>
@@ -176,6 +190,12 @@
                 btn.classList.add('active');
             }
             document.getElementById('content-frame').src = page + '.html';
+        };
+
+        // Open Settings inside main content frame
+        window.openSettings = () => {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('content-frame').src = 'settings.html';
         };
 
         // Auth Logic
