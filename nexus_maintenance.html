@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus — Maintenance</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        nexus: {
+                            black: '#000000',
+                            950: '#09090b',
+                            900: '#121215',
+                            800: '#1c1c21',
+                            700: '#2a2a32',
+                            400: '#8e8e9f',
+                            200: '#d1d1db',
+                            100: '#f4f4f6',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #f4f4f6;
+        }
+
+        /* Subtle grid background pattern */
+        .grid-bg {
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+
+        /* Subtle glow effect behind main card */
+        .subtle-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, rgba(0, 0, 0, 0) 70%);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-nexus-black text-nexus-100 min-h-screen flex flex-col justify-between relative selection:bg-nexus-100 selection:text-nexus-black grid-bg overflow-x-hidden">
+
+    <!-- Ambient Subtle Glow -->
+    <div class="subtle-glow"></div>
+
+    <!-- Navigation Header -->
+    <header class="relative z-10 w-full max-w-4xl mx-auto px-6 py-8 flex justify-between items-center">
+        <!-- Nexus Branding -->
+        <div class="flex items-center space-x-3">
+            <div class="w-7 h-7 rounded-lg bg-nexus-100 text-nexus-black flex items-center justify-center font-bold text-xs tracking-tighter">
+                NX
+            </div>
+            <span class="font-semibold text-base tracking-widest uppercase text-nexus-100">
+                Nexus
+            </span>
+        </div>
+
+        <!-- Live Status Badge -->
+        <div class="flex items-center space-x-2 text-xs font-mono text-nexus-400 bg-nexus-900 border border-nexus-800 px-3 py-1.5 rounded-full">
+            <span class="w-1.5 h-1.5 rounded-full bg-nexus-200 animate-pulse"></span>
+            <span>MAINTENANCE MODE</span>
+        </div>
+    </header>
+
+    <!-- Main Content Box -->
+    <main class="relative z-10 w-full max-w-2xl mx-auto px-6 py-12 my-auto">
+        
+        <!-- Primary Headline -->
+        <div class="text-left mb-10">
+            <div class="inline-flex items-center space-x-2 font-mono text-xs text-nexus-400 mb-3 tracking-wider uppercase">
+                <span>SYSTEM STATUS // 05_UPGRADE</span>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-light tracking-tight text-nexus-100 mb-4">
+                Nexus is currently undergoing scheduled maintenance.
+            </h1>
+            <p class="text-nexus-400 text-sm sm:text-base leading-relaxed max-w-lg font-normal">
+                We are performing routine core updates and infrastructure enhancements. Normal system operations will resume shortly.
+            </p>
+        </div>
+
+        <!-- Estimated Return Timer (Synced with Firebase RTDB) -->
+        <div class="bg-nexus-950 border border-nexus-800 rounded-xl p-5 mb-6">
+            <div class="flex items-center justify-between mb-3 border-b border-nexus-900 pb-2">
+                <div class="flex items-center space-x-2">
+                    <span class="text-xs font-mono uppercase tracking-wider text-nexus-400">Estimated Completion</span>
+                    <span id="syncStatus" class="text-[10px] font-mono text-nexus-400 bg-nexus-900 px-2 py-0.5 rounded border border-nexus-800">CONNECTING...</span>
+                </div>
+                <span id="utcTime" class="text-xs font-mono text-nexus-400">UTC --:--</span>
+            </div>
+            <div class="grid grid-cols-4 gap-2 font-mono text-center">
+                <div class="p-3 bg-nexus-900 rounded-lg border border-nexus-800/50">
+                    <span id="timerDays" class="text-xl sm:text-2xl font-medium text-nexus-100 block">--</span>
+                    <span class="text-[10px] text-nexus-400 uppercase tracking-widest mt-1 block">Days</span>
+                </div>
+                <div class="p-3 bg-nexus-900 rounded-lg border border-nexus-800/50">
+                    <span id="timerHours" class="text-xl sm:text-2xl font-medium text-nexus-100 block">--</span>
+                    <span class="text-[10px] text-nexus-400 uppercase tracking-widest mt-1 block">Hours</span>
+                </div>
+                <div class="p-3 bg-nexus-900 rounded-lg border border-nexus-800/50">
+                    <span id="timerMinutes" class="text-xl sm:text-2xl font-medium text-nexus-100 block">--</span>
+                    <span class="text-[10px] text-nexus-400 uppercase tracking-widest mt-1 block">Mins</span>
+                </div>
+                <div class="p-3 bg-nexus-900 rounded-lg border border-nexus-800/50">
+                    <span id="timerSeconds" class="text-xl sm:text-2xl font-medium text-nexus-200 block">--</span>
+                    <span class="text-[10px] text-nexus-400 uppercase tracking-widest mt-1 block">Secs</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Service Indicators -->
+        <div class="bg-nexus-950 border border-nexus-800 rounded-xl p-5 mb-6">
+            <span class="text-xs font-mono uppercase tracking-wider text-nexus-400 block mb-3">Service Breakdown</span>
+            <div class="space-y-2 font-mono text-xs">
+                
+                <div class="flex items-center justify-between p-2.5 bg-nexus-900 rounded-lg border border-nexus-800/40">
+                    <span class="text-nexus-200">Core Engine</span>
+                    <span class="text-nexus-400 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-nexus-400"></span>
+                        PAUSED
+                    </span>
+                </div>
+
+                <div class="flex items-center justify-between p-2.5 bg-nexus-900 rounded-lg border border-nexus-800/40">
+                    <span class="text-nexus-200">Database Services</span>
+                    <span class="text-nexus-200 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-nexus-200 animate-pulse"></span>
+                        MIGRATING
+                    </span>
+                </div>
+
+                <div class="flex items-center justify-between p-2.5 bg-nexus-900 rounded-lg border border-nexus-800/40">
+                    <span class="text-nexus-200">API Gateway</span>
+                    <span class="text-nexus-200 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-nexus-100"></span>
+                        ONLINE
+                    </span>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Notification Form -->
+        <div class="bg-nexus-950 border border-nexus-800 rounded-xl p-5">
+            <div class="mb-3">
+                <h3 class="text-sm font-medium text-nexus-100">Get notified when Nexus is live</h3>
+                <p class="text-xs text-nexus-400 mt-0.5">Receive an automated ping as soon as systems stabilize.</p>
+            </div>
+
+            <form id="subscribeForm" onsubmit="handleNotifySubmit(event)" class="flex flex-col sm:flex-row gap-2">
+                <input 
+                    type="email" 
+                    id="userEmail" 
+                    required 
+                    placeholder="email@nexus.io" 
+                    class="flex-1 px-3.5 py-2 rounded-lg bg-nexus-900 border border-nexus-800 text-xs text-nexus-100 placeholder-nexus-400 focus:outline-none focus:border-nexus-400 transition-colors font-mono"
+                >
+                <button 
+                    type="submit" 
+                    id="submitBtn" 
+                    class="px-4 py-2 rounded-lg bg-nexus-100 hover:bg-nexus-200 text-nexus-black text-xs font-semibold transition-all flex items-center justify-center gap-2 whitespace-nowrap"
+                >
+                    <span>Subscribe</span>
+                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </button>
+            </form>
+            <div id="notifyMessage" class="hidden text-xs font-mono mt-3 p-2 rounded-lg bg-nexus-900 border border-nexus-800 text-nexus-200"></div>
+        </div>
+
+    </main>
+
+    <!-- Minimal Footer -->
+    <footer class="relative z-10 w-full max-w-4xl mx-auto px-6 py-6 border-t border-nexus-900 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs font-mono text-nexus-400">
+        <p>&copy; NEXUS INC. ALL SYSTEMS MONITORED.</p>
+
+        <div class="flex items-center space-x-5">
+            <a href="#" class="hover:text-nexus-100 transition-colors">STATUS</a>
+            <a href="#" class="hover:text-nexus-100 transition-colors">DOCUMENTATION</a>
+            <a href="mailto:support@nexus.io" class="hover:text-nexus-100 transition-colors">SUPPORT</a>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK Imports & Realtime Database Integration -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAO_ffupJOIMPE9m4ARtaqSzC1vGDkIAco",
+            authDomain: "nexus-web-development-official.firebaseapp.com",
+            databaseURL: "https://nexus-web-development-official-default-rtdb.firebaseio.com",
+            projectId: "nexus-web-development-official",
+            storageBucket: "nexus-web-development-official.firebasestorage.app",
+            messagingSenderId: "553556577139",
+            appId: "1:553556577139:web:ea4469b06c2c01cc999306",
+            measurementId: "G-S6K1M5PZLE"
+        };
+
+        // Initialize Firebase
+        let targetTimestamp = null;
+        let timerInterval = null;
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            const db = getDatabase(app);
+            const timerRef = ref(db, 'maintenance/targetTime');
+
+            // Listen in real-time to Firebase Realtime Database
+            onValue(timerRef, (snapshot) => {
+                const val = snapshot.val();
+                if (val) {
+                    targetTimestamp = Number(val);
+                    document.getElementById('syncStatus').innerText = 'SYNCED';
+                    document.getElementById('syncStatus').classList.add('text-nexus-100');
+                } else {
+                    // Fallback default target if database node is empty (e.g. 2 hours from now)
+                    targetTimestamp = new Date().getTime() + (2 * 60 * 60 * 1000);
+                    document.getElementById('syncStatus').innerText = 'DEFAULT';
+                }
+            }, (error) => {
+                console.warn("Firebase read failed, using fallback timer.", error);
+                targetTimestamp = new Date().getTime() + (2 * 60 * 60 * 1000);
+                document.getElementById('syncStatus').innerText = 'OFFLINE';
+            });
+        } catch (err) {
+            console.warn("Firebase initialization error:", err);
+            targetTimestamp = new Date().getTime() + (2 * 60 * 60 * 1000);
+            document.getElementById('syncStatus').innerText = 'OFFLINE';
+        }
+
+        // Countdown calculation loop
+        function updateCountdown() {
+            if (!targetTimestamp) return;
+            const now = new Date().getTime();
+            const distance = targetTimestamp - now;
+
+            if (distance < 0) {
+                document.getElementById('timerDays').innerText = '00';
+                document.getElementById('timerHours').innerText = '00';
+                document.getElementById('timerMinutes').innerText = '00';
+                document.getElementById('timerSeconds').innerText = '00';
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('timerDays').innerText = String(days).padStart(2, '0');
+            document.getElementById('timerHours').innerText = String(hours).padStart(2, '0');
+            document.getElementById('timerMinutes').innerText = String(minutes).padStart(2, '0');
+            document.getElementById('timerSeconds').innerText = String(seconds).padStart(2, '0');
+        }
+
+        setInterval(updateCountdown, 1000);
+    </script>
+
+    <script>
+        // Update UTC Time Header
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getUTCHours()).padStart(2, '0');
+            const minutes = String(now.getUTCMinutes()).padStart(2, '0');
+            document.getElementById('utcTime').innerText = `UTC ${hours}:${minutes}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Subscription handler
+        function handleNotifySubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const msg = document.getElementById('notifyMessage');
+            const email = document.getElementById('userEmail').value;
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin text-[10px]"></i> <span>Saving...</span>';
+
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<span>Subscribed</span> <i class="fa-solid fa-check text-[10px]"></i>';
+                
+                msg.innerHTML = `REGISTERED: Notification will be sent to <span class="text-nexus-100">${email}</span> upon recovery.`;
+                msg.classList.remove('hidden');
+
+                document.getElementById('userEmail').value = '';
+            }, 600);
+        }
+    </script>
+</body>
+</html>
