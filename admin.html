@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Control Center - Nexus</title>
+    <title>Nexus Admin Control Center</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -33,88 +33,108 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #262626; border-radius: 4px; }
         .tab-btn.active { background-color: #1c1c1c; color: #ededed; border-color: #3f3f46; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .modal-anim { animation: fadeIn 0.2s ease-out forwards; }
     </style>
 </head>
-<body class="w-screen h-screen flex flex-col overflow-hidden bg-background relative">
+<body class="w-screen h-screen flex flex-col overflow-hidden bg-background relative selection:bg-zinc-800 selection:text-white">
 
     <!-- TWO-STEP STRICT LOCK OVERLAY -->
     <div id="password-lock-screen" class="fixed inset-0 z-50 bg-background/95 backdrop-blur-md flex flex-col items-center justify-center p-4">
         <div class="bg-surface border border-border p-6 rounded-xl shadow-2xl max-w-sm w-full flex flex-col gap-4 text-center">
             <div class="w-12 h-12 rounded-full bg-surfaceHover border border-border flex items-center justify-center mx-auto text-textMain">
-                <i class="ph ph-shield-warning text-2xl"></i>
+                <i class="ph ph-shield-warning text-2xl text-amber-400"></i>
             </div>
             <div>
                 <h3 class="text-base font-semibold text-textMain">Admin Access Restricted</h3>
-                <p class="text-xs text-textMuted mt-1">You must be logged in as <span class="text-textMain font-mono">Brody Williams</span> to enter the passcode.</p>
+                <p class="text-xs text-textMuted mt-1">Authorized for <span class="text-textMain font-mono">Brody Williams</span> only.</p>
             </div>
 
             <!-- STEP 1: Login Check -->
             <div id="admin-login-section" class="flex flex-col gap-2.5 mt-2">
-                <button id="admin-login-btn" class="w-full py-2 bg-surfaceHover border border-border text-textMain rounded-lg text-xs font-semibold hover:bg-border transition-colors flex items-center justify-center gap-1.5">
-                    <i class="ph ph-google-logo text-sm"></i> Authenticate Account
+                <button id="admin-login-btn" class="w-full py-2.5 bg-surfaceHover border border-border text-textMain rounded-lg text-xs font-semibold hover:bg-border transition-colors flex items-center justify-center gap-1.5 shadow-sm">
+                    <i class="ph ph-google-logo text-sm"></i> Authenticate Google Account
                 </button>
                 <p id="auth-error-msg" class="text-[11px] text-red-400 hidden mt-1"></p>
             </div>
 
             <!-- STEP 2: Passcode Form -->
             <form id="lock-form" class="flex flex-col gap-2.5 hidden mt-2">
-                <div class="flex items-center justify-center gap-1.5 mb-2 text-[11px] font-medium text-emerald-400 bg-emerald-500/10 py-1.5 rounded-lg border border-emerald-500/20">
+                <div class="flex items-center justify-center gap-1.5 mb-1 text-[11px] font-medium text-emerald-400 bg-emerald-500/10 py-1.5 rounded-lg border border-emerald-500/20">
                     <i class="ph ph-check-circle"></i> Verified: Owner Account
                 </div>
-                <input type="password" id="admin-password-input" placeholder="Enter Admin Passcode..." class="w-full bg-background border border-border rounded-lg px-3.5 py-2.5 text-sm text-textMain text-center outline-none focus:border-textMuted transition-colors">
+                <input type="password" id="admin-password-input" placeholder="Enter 6-Digit Passcode..." maxlength="6" class="w-full bg-background border border-border rounded-lg px-3.5 py-2.5 text-sm text-textMain text-center tracking-widest outline-none focus:border-textMuted transition-colors">
                 <p id="lock-error-msg" class="text-[11px] text-red-400 hidden">Incorrect passcode.</p>
                 <button type="submit" class="w-full py-2.5 bg-textMain text-background rounded-lg text-xs font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5 mt-1">
-                    <i class="ph ph-lock-key-open text-sm"></i> Unlock Admin Panel
+                    <i class="ph ph-lock-key-open text-sm"></i> Unlock Control Center
                 </button>
             </form>
         </div>
     </div>
 
     <!-- Admin Header -->
-    <header class="h-16 border-b border-border flex items-center justify-between px-8 bg-surface shrink-0 z-10">
+    <header class="h-16 border-b border-border flex items-center justify-between px-6 lg:px-8 bg-surface shrink-0 z-10">
         <div class="flex items-center gap-3">
-            <i class="ph ph-shield-check text-textMuted text-xl"></i>
+            <div class="w-9 h-9 rounded-lg bg-surfaceHover border border-border flex items-center justify-center text-textMain">
+                <i class="ph ph-shield-check text-lg"></i>
+            </div>
             <div>
-                <h2 class="font-semibold text-textMain text-sm">Nexus Admin Control Center</h2>
-                <p class="text-[11px] text-textMuted">Users, AI Chats, Credits & Workspace Management</p>
+                <h2 class="font-semibold text-textMain text-sm flex items-center gap-2">
+                    Nexus Admin Control Center 
+                    <span id="maintenance-badge" class="hidden px-2 py-0.5 text-[10px] bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded font-mono">MAINTENANCE ON</span>
+                </h2>
+                <p class="text-[11px] text-textMuted">Enterprise Management, Security Audits & Global Overrides</p>
             </div>
         </div>
         
         <div class="flex items-center gap-3">
-            <div id="admin-badge" class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full font-medium">
-                <i class="ph ph-check-circle"></i> System Owner Verified
+            <!-- Global Power Controls -->
+            <div class="hidden md:flex items-center gap-2 bg-background border border-border px-3 py-1 rounded-lg">
+                <button id="global-airdrop-btn" class="text-xs text-amber-400 hover:text-amber-300 font-medium flex items-center gap-1.5 transition-colors pr-2 border-r border-border">
+                    <i class="ph ph-coins text-sm"></i> Global +1k Credits
+                </button>
+                <button id="global-maintenance-btn" class="text-xs text-textMuted hover:text-textMain font-medium flex items-center gap-1.5 transition-colors pl-1">
+                    <i class="ph ph-power text-sm"></i> <span id="maint-btn-text">Toggle Maintenance</span>
+                </button>
             </div>
-            <button id="re-lock-btn" class="px-2.5 py-1 bg-surfaceHover border border-border text-xs text-textMuted hover:text-textMain rounded-lg transition-colors flex items-center gap-1.5">
-                <i class="ph ph-lock text-xs"></i> Lock Panel
+
+            <div id="admin-badge" class="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full font-medium">
+                <i class="ph ph-check-circle"></i> Owner Active
+            </div>
+            <button id="re-lock-btn" class="px-2.5 py-1.5 bg-surfaceHover border border-border text-xs text-textMuted hover:text-textMain rounded-lg transition-colors flex items-center gap-1.5">
+                <i class="ph ph-lock text-xs"></i> Lock
             </button>
         </div>
     </header>
 
     <!-- Sub-navigation Tabs -->
-    <div class="border-b border-border bg-surface px-8 py-2.5 flex items-center gap-2 shrink-0">
-        <button onclick="switchAdminTab('users', this)" class="tab-btn active px-3.5 py-1.5 rounded-lg border border-transparent text-xs font-medium text-textMuted hover:text-textMain transition-colors flex items-center gap-2">
+    <div class="border-b border-border bg-surface px-6 lg:px-8 py-2.5 flex items-center gap-2 shrink-0 overflow-x-auto">
+        <button onclick="switchAdminTab('users', this)" class="tab-btn active px-3.5 py-1.5 rounded-lg border border-transparent text-xs font-medium text-textMuted hover:text-textMain transition-colors flex items-center gap-2 whitespace-nowrap">
             <i class="ph ph-users text-sm"></i> Users & Credits
         </button>
-        <button onclick="switchAdminTab('aisites', this)" class="tab-btn px-3.5 py-1.5 rounded-lg border border-transparent text-xs font-medium text-textMuted hover:text-textMain transition-colors flex items-center gap-2">
+        <button onclick="switchAdminTab('aisites', this)" class="tab-btn px-3.5 py-1.5 rounded-lg border border-transparent text-xs font-medium text-textMuted hover:text-textMain transition-colors flex items-center gap-2 whitespace-nowrap">
             <i class="ph ph-magic-wand text-sm"></i> AI Generated Sites
         </button>
-        <button onclick="switchAdminTab('chats', this)" class="tab-btn px-3.5 py-1.5 rounded-lg border border-transparent text-xs font-medium text-textMuted hover:text-textMain transition-colors flex items-center gap-2">
+        <button onclick="switchAdminTab('chats', this)" class="tab-btn px-3.5 py-1.5 rounded-lg border border-transparent text-xs font-medium text-textMuted hover:text-textMain transition-colors flex items-center gap-2 whitespace-nowrap">
             <i class="ph ph-chat-teardrop-text text-sm"></i> TextNexus Channels
         </button>
-        <button onclick="switchAdminTab('updates', this)" class="tab-btn px-3.5 py-1.5 rounded-lg border border-transparent text-xs font-medium text-textMuted hover:text-textMain transition-colors flex items-center gap-2">
+        <button onclick="switchAdminTab('audit', this)" class="tab-btn px-3.5 py-1.5 rounded-lg border border-transparent text-xs font-medium text-textMuted hover:text-textMain transition-colors flex items-center gap-2 whitespace-nowrap">
+            <i class="ph ph-shield-check text-sm"></i> Security Audit Trail
+        </button>
+        <button onclick="switchAdminTab('updates', this)" class="tab-btn px-3.5 py-1.5 rounded-lg border border-transparent text-xs font-medium text-textMuted hover:text-textMain transition-colors flex items-center gap-2 whitespace-nowrap">
             <i class="ph ph-bell text-sm"></i> Workspace Updates
         </button>
     </div>
 
     <!-- Main Scrollable Area -->
-    <main class="flex-1 overflow-y-auto p-8 relative">
-        <div class="max-w-6xl mx-auto flex flex-col gap-6 pb-12">
+    <main class="flex-1 overflow-y-auto p-6 lg:p-8 relative">
+        <div class="max-w-7xl mx-auto flex flex-col gap-6 pb-16">
             
             <!-- Overall System Stats & Owner Credit Editor -->
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 <div class="bg-surface border border-border p-4 rounded-xl flex items-center justify-between">
                     <div>
-                        <p class="text-xs text-textMuted font-medium">Total Registered Users</p>
+                        <p class="text-xs text-textMuted font-medium">Registered Users</p>
                         <h3 id="stat-total-users" class="text-2xl font-bold text-textMain mt-1">0</h3>
                     </div>
                     <div class="w-10 h-10 rounded-lg bg-surfaceHover border border-border flex items-center justify-center text-textMuted">
@@ -123,7 +143,7 @@
                 </div>
                 <div class="bg-surface border border-border p-4 rounded-xl flex items-center justify-between">
                     <div>
-                        <p class="text-xs text-textMuted font-medium">AI Websites Generated</p>
+                        <p class="text-xs text-textMuted font-medium">AI Websites</p>
                         <h3 id="stat-total-sites" class="text-2xl font-bold text-amber-400 mt-1">0</h3>
                     </div>
                     <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
@@ -132,7 +152,7 @@
                 </div>
                 <div class="bg-surface border border-border p-4 rounded-xl flex items-center justify-between">
                     <div>
-                        <p class="text-xs text-textMuted font-medium">Active TextNexus Chats</p>
+                        <p class="text-xs text-textMuted font-medium">Active Channels</p>
                         <h3 id="stat-chats" class="text-2xl font-bold text-textMain mt-1">0</h3>
                     </div>
                     <div class="w-10 h-10 rounded-lg bg-surfaceHover border border-border flex items-center justify-center text-textMuted">
@@ -151,12 +171,12 @@
                 <!-- Owner Direct Credit Control Card -->
                 <div class="bg-surface border border-border p-4 rounded-xl flex flex-col justify-between">
                     <div class="flex items-center justify-between">
-                        <p class="text-xs text-textMuted font-medium">My Credits</p>
+                        <p class="text-xs text-textMuted font-medium">My Owner Credits</p>
                         <i class="ph ph-coins text-amber-400 text-lg"></i>
                     </div>
                     <div class="flex items-center gap-2 mt-2">
                         <input type="number" id="owner-credit-input" class="w-full bg-background border border-border rounded px-2 py-1 text-sm font-mono text-amber-400 font-bold outline-none focus:border-textMuted" value="5000">
-                        <button id="owner-save-credits-btn" class="px-3 py-1 bg-textMain text-background rounded text-xs font-semibold hover:opacity-90">Save</button>
+                        <button id="owner-save-credits-btn" class="px-3 py-1 bg-textMain text-background rounded text-xs font-semibold hover:opacity-90 whitespace-nowrap">Save</button>
                     </div>
                 </div>
             </div>
@@ -164,9 +184,15 @@
             <!-- TAB 1: USER MANAGEMENT & CREDITS -->
             <section id="tab-users" class="admin-section flex flex-col gap-4">
                 <div class="bg-surface border border-border rounded-xl overflow-hidden shadow-2xl">
-                    <div class="p-4 border-b border-border flex items-center justify-between bg-surface">
-                        <h3 class="text-sm font-semibold text-textMain">User Directory & Credits</h3>
-                        <span class="text-xs text-textMuted">Manage roles, ban users, customize or reset user credits</span>
+                    <div class="p-4 border-b border-border flex flex-col sm:flex-row items-center justify-between gap-3 bg-surface">
+                        <div>
+                            <h3 class="text-sm font-semibold text-textMain">User Directory & Credits</h3>
+                            <p class="text-xs text-textMuted">Manage roles, ban users, customize or reset user credits</p>
+                        </div>
+                        <div class="w-full sm:w-72 relative">
+                            <i class="ph ph-magnifying-glass absolute left-3 top-2.5 text-textMuted text-sm"></i>
+                            <input type="text" id="user-search-input" placeholder="Search by name or email..." class="w-full bg-background border border-border rounded-lg pl-9 pr-3 py-1.5 text-xs text-textMain outline-none focus:border-textMuted">
+                        </div>
                     </div>
 
                     <div class="overflow-x-auto">
@@ -196,8 +222,13 @@
             <section id="tab-aisites" class="admin-section hidden flex-col gap-4">
                 <div class="bg-surface border border-border rounded-xl overflow-hidden shadow-2xl">
                     <div class="p-4 border-b border-border flex items-center justify-between bg-surface">
-                        <h3 class="text-sm font-semibold text-textMain">AI Generation History</h3>
-                        <span class="text-xs text-textMuted">Monitor user prompts and created subdomains</span>
+                        <div>
+                            <h3 class="text-sm font-semibold text-textMain">AI Generation History</h3>
+                            <p class="text-xs text-textMuted">Monitor user prompts, subdomains, and purge malicious endpoints</p>
+                        </div>
+                        <button id="purge-all-sites-btn" class="px-3 py-1.5 bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 text-xs font-semibold rounded-lg transition-colors">
+                            Purge All AI Sites
+                        </button>
                     </div>
 
                     <div class="overflow-x-auto">
@@ -227,8 +258,10 @@
             <section id="tab-chats" class="admin-section hidden flex-col gap-4">
                 <div class="bg-surface border border-border rounded-xl overflow-hidden shadow-2xl">
                     <div class="p-4 border-b border-border flex items-center justify-between bg-surface">
-                        <h3 class="text-sm font-semibold text-textMain">All Active TextNexus Group Chats</h3>
-                        <span class="text-xs text-textMuted">Disable, enable, or delete channels</span>
+                        <div>
+                            <h3 class="text-sm font-semibold text-textMain">Active TextNexus Group Channels</h3>
+                            <p class="text-xs text-textMuted">Disable, enable, or delete group chat channels</p>
+                        </div>
                     </div>
 
                     <div class="overflow-x-auto">
@@ -254,11 +287,46 @@
                 </div>
             </section>
 
-            <!-- TAB 4: WORKSPACE UPDATES -->
+            <!-- TAB 4: SECURITY AUDIT TRAIL -->
+            <section id="tab-audit" class="admin-section hidden flex-col gap-4">
+                <div class="bg-surface border border-border rounded-xl overflow-hidden shadow-2xl">
+                    <div class="p-4 border-b border-border flex items-center justify-between bg-surface">
+                        <div>
+                            <h3 class="text-sm font-semibold text-textMain">Live Security Audit Logs</h3>
+                            <p class="text-xs text-textMuted">Real-time log of administrative overrides, logins, and bans</p>
+                        </div>
+                        <button id="clear-audit-btn" class="px-3 py-1.5 bg-surfaceHover border border-border text-textMuted hover:text-textMain text-xs font-semibold rounded-lg transition-colors">
+                            Clear Logs
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-textMuted">
+                            <thead class="bg-background text-xs uppercase tracking-wider text-textMuted border-b border-border">
+                                <tr>
+                                    <th class="py-3.5 px-6 font-medium">Timestamp</th>
+                                    <th class="py-3.5 px-6 font-medium">Admin</th>
+                                    <th class="py-3.5 px-6 font-medium">Action</th>
+                                    <th class="py-3.5 px-6 font-medium">Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="audit-table-body" class="divide-y divide-border">
+                                <tr>
+                                    <td colspan="4" class="py-12 text-center text-textMuted">
+                                        <i class="ph ph-spinner animate-spin text-2xl mb-2 block mx-auto"></i> Fetching audit trail...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: WORKSPACE UPDATES -->
             <section id="tab-updates" class="admin-section hidden flex-col gap-4">
                 <div class="bg-surface border border-border rounded-xl p-6 shadow-xl flex flex-col gap-4">
                     <h3 class="text-sm font-semibold text-textMain border-b border-border pb-3 flex items-center gap-2">
-                        <i class="ph ph-plus-circle text-lg text-[var(--brand-color)]"></i> Quick Publish Announcement
+                        <i class="ph ph-plus-circle text-lg text-[var(--brand-color)]"></i> Quick Publish Broadcast Announcement
                     </h3>
                     <div class="flex flex-col gap-3">
                         <input type="text" id="admin-update-title" placeholder="Announcement Title" class="bg-background border border-border rounded-lg px-3.5 py-2 text-sm text-textMain outline-none focus:border-textMuted">
@@ -282,11 +350,31 @@
         </div>
     </main>
 
+    <!-- CUSTOM MODAL DIALOG -->
+    <div id="custom-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-surface border border-border rounded-xl p-6 max-w-sm w-full flex flex-col gap-4 modal-anim shadow-2xl">
+            <h3 id="modal-title" class="text-sm font-semibold text-textMain">Confirm Action</h3>
+            <p id="modal-desc" class="text-xs text-textMuted">Are you sure you want to perform this administrative action?</p>
+            <div class="flex items-center justify-end gap-2.5 mt-2">
+                <button id="modal-cancel-btn" class="px-4 py-2 bg-surfaceHover border border-border text-xs font-medium text-textMuted hover:text-textMain rounded-lg transition-colors">Cancel</button>
+                <button id="modal-confirm-btn" class="px-4 py-2 bg-textMain text-background text-xs font-semibold rounded-lg hover:opacity-90 transition-opacity">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 bg-surface border border-border px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300">
+        <div id="toast-icon" class="text-emerald-400 text-lg">
+            <i class="ph ph-check-circle"></i>
+        </div>
+        <p id="toast-msg" class="text-xs text-textMain font-medium">Action completed successfully.</p>
+    </div>
+
     <!-- Firebase & Admin Logic Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getDatabase, ref as dbRef, onValue, update, remove, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        import { getDatabase, ref as dbRef, onValue, update, remove, push, serverTimestamp, set } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAO_ffupJOIMPE9m4ARtaqSzC1vGDkIAco",
@@ -304,6 +392,8 @@
 
         let currentUser = null;
         let isOwner = false;
+        let cachedUsers = {};
+        let modalCallback = null;
 
         const lockScreen = document.getElementById('password-lock-screen');
         const loginSection = document.getElementById('admin-login-section');
@@ -315,6 +405,65 @@
         const reLockBtn = document.getElementById('re-lock-btn');
         const ownerCreditInput = document.getElementById('owner-credit-input');
         const ownerSaveCreditsBtn = document.getElementById('owner-save-credits-btn');
+        const globalAirdropBtn = document.getElementById('global-airdrop-btn');
+        const globalMaintenanceBtn = document.getElementById('global-maintenance-btn');
+        const maintBtnText = document.getElementById('maint-btn-text');
+        const maintenanceBadge = document.getElementById('maintenance-badge');
+        const userSearchInput = document.getElementById('user-search-input');
+        const purgeAllSitesBtn = document.getElementById('purge-all-sites-btn');
+        const clearAuditBtn = document.getElementById('clear-audit-btn');
+        
+        // Custom Toast Helper
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            const toastIcon = document.getElementById('toast-icon');
+            
+            toastMsg.textContent = msg;
+            toastIcon.innerHTML = type === 'success' ? '<i class="ph ph-check-circle text-emerald-400"></i>' : '<i class="ph ph-warning-circle text-red-400"></i>';
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Custom Modal Helper
+        function openModal(title, desc, onConfirm) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-desc').textContent = desc;
+            modalCallback = onConfirm;
+            document.getElementById('custom-modal').classList.remove('hidden');
+            document.getElementById('custom-modal').classList.add('flex');
+        }
+
+        document.getElementById('modal-cancel-btn').addEventListener('click', () => {
+            document.getElementById('custom-modal').classList.add('hidden');
+            document.getElementById('custom-modal').classList.remove('flex');
+            modalCallback = null;
+        });
+
+        document.getElementById('modal-confirm-btn').addEventListener('click', () => {
+            if (modalCallback) modalCallback();
+            document.getElementById('custom-modal').classList.add('hidden');
+            document.getElementById('custom-modal').classList.remove('flex');
+            modalCallback = null;
+        });
+
+        // Audit Logger
+        async function logAudit(action, details) {
+            if (!currentUser) return;
+            try {
+                await push(dbRef(db, 'nexus/audit_logs'), {
+                    timestamp: Date.now(),
+                    adminEmail: currentUser.email || 'Unknown',
+                    action,
+                    details
+                });
+            } catch (e) {
+                console.error("Audit log error:", e);
+            }
+        }
 
         adminLoginBtn.addEventListener('click', async () => {
             try {
@@ -322,6 +471,8 @@
                 await signInWithPopup(auth, new GoogleAuthProvider());
             } catch (err) {
                 console.error("Authentication failed", err);
+                authErrorMsg.textContent = "Google Sign-In failed or was cancelled.";
+                authErrorMsg.classList.remove('hidden');
             }
         });
 
@@ -341,7 +492,7 @@
                     adminLoginBtn.innerHTML = `<i class="ph ph-arrows-left-right text-sm"></i> Switch Account`;
                 } else {
                     authErrorMsg.classList.add('hidden');
-                    adminLoginBtn.innerHTML = `<i class="ph ph-google-logo text-sm"></i> Authenticate Account`;
+                    adminLoginBtn.innerHTML = `<i class="ph ph-google-logo text-sm"></i> Authenticate Google Account`;
                 }
             } else {
                 loginSection.classList.add('hidden');
@@ -351,35 +502,39 @@
                     lockScreen.classList.add('hidden');
                 }
 
-                onValue(dbRef(db, `textnexus/users/${user.uid}/credits`), (snapshot) => {
+                onValue(dbRef(db, `nexus/users/${user.uid}/credits`), (snapshot) => {
                     const val = snapshot.val();
                     if (val !== null) ownerCreditInput.value = val;
                 }, { onlyOnce: true });
             }
 
             if (user) {
-                const userRef = dbRef(db, `textnexus/users/${user.uid}`);
+                const userRef = dbRef(db, `nexus/users/${user.uid}`);
                 await update(userRef, {
                     uid: user.uid,
                     name: user.displayName || 'Anonymous',
                     email: user.email,
                     photoURL: user.photoURL || 'https://placehold.co/100',
-                    lastLogin: Date.now()
+                    lastLogin: Date.now(),
+                    role: isOwner ? 'Owner' : (user.role || 'User')
                 });
             }
 
+            listenToSystem();
             listenToUsers();
             listenToAiSites();
             listenToChats();
+            listenToAuditLogs();
             listenToUpdates();
         });
 
         ownerSaveCreditsBtn.addEventListener('click', async () => {
             if (!currentUser || !isOwner) return;
             const newCredits = parseInt(ownerCreditInput.value);
-            if (isNaN(newCredits)) return alert("Please enter a valid number.");
-            await update(dbRef(db, `textnexus/users/${currentUser.uid}`), { credits: newCredits });
-            alert("Your credits have been updated!");
+            if (isNaN(newCredits)) return showToast("Please enter a valid number.", "error");
+            await update(dbRef(db, `nexus/users/${currentUser.uid}`), { credits: newCredits });
+            await logAudit("Update Owner Credits", `Set personal credits to ${newCredits}`);
+            showToast("Your credits have been updated!");
         });
 
         lockForm.addEventListener('submit', (e) => {
@@ -393,12 +548,62 @@
             lockScreen.classList.add('hidden');
             errorMsg.classList.add('hidden');
             passInput.value = '';
+            logAudit("Admin Login Unlocked", "Successfully entered admin passcode.");
+            showToast("Welcome to Nexus Admin Control Center");
         });
 
         reLockBtn.addEventListener('click', () => {
             sessionStorage.removeItem('nexus_admin_unlocked');
             lockScreen.classList.remove('hidden');
+            logAudit("Admin Locked", "Manual panel lock triggered.");
         });
+
+        // Global Power Controls
+        globalAirdropBtn.addEventListener('click', () => {
+            if (!isOwner) return;
+            openModal("Global Credit Airdrop", "Are you sure you want to award +1,000 credits to ALL registered users?", async () => {
+                const snapshot = await new Promise(resolve => {
+                    onValue(dbRef(db, 'nexus/users'), resolve, { onlyOnce: true });
+                });
+                const users = snapshot.val();
+                if (!users) return showToast("No users found.", "error");
+
+                const updates = {};
+                Object.keys(users).forEach(uid => {
+                    const currentCredits = users[uid].credits ?? 10000;
+                    updates[`nexus/users/${uid}/credits`] = currentCredits + 1000;
+                });
+                await update(dbRef(db), updates);
+                await logAudit("Global Airdrop", "Awarded +1,000 credits to all users.");
+                showToast("Successfully airdropped +1,000 credits to all users!");
+            });
+        });
+
+        globalMaintenanceBtn.addEventListener('click', async () => {
+            if (!isOwner) return;
+            const currentMaint = globalMaintenanceBtn.dataset.active === 'true';
+            const newState = !currentMaint;
+            await update(dbRef(db, 'nexus/system'), { maintenanceMode: newState });
+            await logAudit("Maintenance Mode", `Toggled maintenance mode to ${newState}`);
+            showToast(`Maintenance mode is now ${newState ? 'ENABLED' : 'DISABLED'}`);
+        });
+
+        function listenToSystem() {
+            onValue(dbRef(db, 'nexus/system'), (snapshot) => {
+                const data = snapshot.val() || {};
+                const isMaint = !!data.maintenanceMode;
+                globalMaintenanceBtn.dataset.active = isMaint;
+                if (isMaint) {
+                    maintenanceBadge.classList.remove('hidden');
+                    maintBtnText.textContent = "Disable Maintenance";
+                    globalMaintenanceBtn.classList.add('text-amber-400');
+                } else {
+                    maintenanceBadge.classList.add('hidden');
+                    maintBtnText.textContent = "Enable Maintenance";
+                    globalMaintenanceBtn.classList.remove('text-amber-400');
+                }
+            });
+        }
 
         window.switchAdminTab = (tabName, btn) => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -407,95 +612,122 @@
             document.getElementById(`tab-${tabName}`).classList.remove('hidden');
         };
 
+        // Users & Credits Tab
         function listenToUsers() {
-            onValue(dbRef(db, 'textnexus/users'), (snapshot) => {
+            onValue(dbRef(db, 'nexus/users'), (snapshot) => {
                 const data = snapshot.val();
-                const tbody = document.getElementById('user-table-body');
-                tbody.innerHTML = '';
+                cachedUsers = data || {};
+                renderUsers();
+            });
+        }
 
-                if (!data) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-textMuted">No users found.</td></tr>`;
-                    document.getElementById('stat-total-users').textContent = '0';
-                    document.getElementById('stat-banned').textContent = '0';
-                    return;
-                }
+        userSearchInput.addEventListener('input', renderUsers);
 
-                const users = Object.keys(data).map(k => ({ uid: k, ...data[k] }));
-                document.getElementById('stat-total-users').textContent = users.length;
-                document.getElementById('stat-banned').textContent = users.filter(u => u.isBanned).length;
+        function renderUsers() {
+            const data = cachedUsers;
+            const tbody = document.getElementById('user-table-body');
+            tbody.innerHTML = '';
 
-                users.forEach(u => {
-                    const isTargetOwner = (u.email === OWNER_EMAIL);
-                    const disableControls = !isOwner;
-                    const userCredits = u.credits ?? 5000;
+            if (!data || Object.keys(data).length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-textMuted">No users found.</td></tr>`;
+                document.getElementById('stat-total-users').textContent = '0';
+                document.getElementById('stat-banned').textContent = '0';
+                return;
+            }
 
-                    const row = document.createElement('tr');
-                    row.className = 'hover:bg-surfaceHover/50 transition-colors';
-                    row.innerHTML = `
-                        <td class="py-4 px-6 flex items-center gap-3">
-                            <img src="${u.photoURL || 'https://placehold.co/100'}" class="w-9 h-9 rounded-full object-cover border border-border">
-                            <div class="flex flex-col">
-                                <span class="font-medium text-textMain text-sm">${u.name}</span>
-                                <span class="text-xs font-mono text-textMuted">${u.email}</span>
-                            </div>
-                        </td>
-                        <td class="py-4 px-6 font-mono text-xs">
-                            <div class="flex items-center gap-2">
-                                <input type="number" id="credits-${u.uid}" value="${userCredits}" class="w-24 bg-background border border-border rounded px-2 py-1 text-amber-400 font-bold outline-none focus:border-textMuted" ${disableControls ? 'disabled' : ''}>
-                                <button onclick="window.saveUserCredits('${u.uid}')" ${disableControls ? 'disabled' : ''} class="px-2 py-1 rounded bg-surfaceHover border border-border text-textMain hover:bg-border disabled:opacity-30">Set</button>
-                                <button onclick="window.resetCredits('${u.uid}')" ${disableControls ? 'disabled' : ''} class="px-2 py-1 rounded bg-surfaceHover border border-border text-textMuted hover:text-textMain disabled:opacity-30">Reset</button>
-                            </div>
-                        </td>
-                        <td class="py-4 px-6">
-                            <select onchange="window.changeRole('${u.uid}', this.value)" ${disableControls ? 'disabled' : ''} class="bg-background border border-border text-textMain text-xs rounded-lg px-2.5 py-1.5 outline-none focus:border-textMuted disabled:opacity-50">
-                                <option value="User" ${u.role === 'User' ? 'selected' : ''}>User</option>
-                                <option value="Admin" ${u.role === 'Admin' ? 'selected' : ''}>Admin</option>
-                                <option value="Owner" ${u.role === 'Owner' ? 'selected' : ''}>Owner</option>
-                            </select>
-                        </td>
-                        <td class="py-4 px-6">
-                            ${u.isBanned 
-                                ? '<span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-red-500/10 text-red-400 border border-red-500/20">Banned</span>' 
-                                : '<span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Active</span>'
-                            }
-                        </td>
-                        <td class="py-4 px-6 text-right">
-                            <button onclick="window.toggleBan('${u.uid}', ${!!u.isBanned})" ${disableControls ? 'disabled' : ''} class="px-3 py-1.5 rounded-lg text-xs font-medium border ${u.isBanned ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'} disabled:opacity-30">
-                                ${u.isBanned ? 'Unban' : 'Ban'}
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                });
+            const query = userSearchInput.value.toLowerCase();
+            const users = Object.keys(data).map(k => ({ uid: k, ...data[k] }))
+                .filter(u => (u.name?.toLowerCase().includes(query) || u.email?.toLowerCase().includes(query)));
+
+            document.getElementById('stat-total-users').textContent = Object.keys(data).length;
+            document.getElementById('stat-banned').textContent = Object.values(data).filter(u => u.isBanned).length;
+
+            if (users.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-textMuted">No matching users found.</td></tr>`;
+                return;
+            }
+
+            users.forEach(u => {
+                const isTargetOwner = (u.email === OWNER_EMAIL);
+                const disableControls = !isOwner;
+                const userCredits = u.credits ?? 10000;
+
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-surfaceHover/50 transition-colors';
+                row.innerHTML = `
+                    <td class="py-4 px-6 flex items-center gap-3">
+                        <img src="${u.photoURL || 'https://placehold.co/100'}" class="w-9 h-9 rounded-full object-cover border border-border" onerror="this.src='https://placehold.co/100'">
+                        <div class="flex flex-col">
+                            <span class="font-medium text-textMain text-sm">${u.name}</span>
+                            <span class="text-xs font-mono text-textMuted">${u.email}</span>
+                        </div>
+                    </td>
+                    <td class="py-4 px-6 font-mono text-xs">
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="credits-${u.uid}" value="${userCredits}" class="w-24 bg-background border border-border rounded px-2 py-1 text-amber-400 font-bold outline-none focus:border-textMuted" ${disableControls ? 'disabled' : ''}>
+                            <button onclick="window.saveUserCredits('${u.uid}')" ${disableControls ? 'disabled' : ''} class="px-2.5 py-1 rounded bg-surfaceHover border border-border text-textMain hover:bg-border disabled:opacity-30">Set</button>
+                            <button onclick="window.resetCredits('${u.uid}')" ${disableControls ? 'disabled' : ''} class="px-2.5 py-1 rounded bg-surfaceHover border border-border text-textMuted hover:text-textMain disabled:opacity-30">Reset</button>
+                        </div>
+                    </td>
+                    <td class="py-4 px-6">
+                        <select onchange="window.changeRole('${u.uid}', this.value)" ${disableControls ? 'disabled' : ''} class="bg-background border border-border text-textMain text-xs rounded-lg px-2.5 py-1.5 outline-none focus:border-textMuted disabled:opacity-50">
+                            <option value="User" ${u.role === 'User' ? 'selected' : ''}>User</option>
+                            <option value="Admin" ${u.role === 'Admin' ? 'selected' : ''}>Admin</option>
+                            <option value="Owner" ${u.role === 'Owner' ? 'selected' : ''}>Owner</option>
+                        </select>
+                    </td>
+                    <td class="py-4 px-6">
+                        ${u.isBanned 
+                            ? '<span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-red-500/10 text-red-400 border border-red-500/20">Banned</span>' 
+                            : '<span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Active</span>'
+                        }
+                    </td>
+                    <td class="py-4 px-6 text-right">
+                        <button onclick="window.toggleBan('${u.uid}', ${!!u.isBanned})" ${disableControls ? 'disabled' : ''} class="px-3 py-1.5 rounded-lg text-xs font-medium border ${u.isBanned ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20' : 'bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20'} disabled:opacity-30 transition-colors">
+                            ${u.isBanned ? 'Unban' : 'Ban'}
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
             });
         }
 
         window.saveUserCredits = async (uid) => {
             if (!isOwner) return;
             const val = parseInt(document.getElementById(`credits-${uid}`).value);
-            if (isNaN(val)) return alert("Invalid amount.");
-            await update(dbRef(db, `textnexus/users/${uid}`), { credits: val });
-            alert("Credits successfully updated.");
+            if (isNaN(val)) return showToast("Invalid amount.", "error");
+            await update(dbRef(db, `nexus/users/${uid}`), { credits: val });
+            await logAudit("Update User Credits", `Set credits for UID ${uid} to ${val}`);
+            showToast("Credits successfully updated.");
         };
 
         window.resetCredits = async (uid) => {
             if (!isOwner) return;
-            await update(dbRef(db, `textnexus/users/${uid}`), { credits: 10000 });
-            alert("Credits reset to default (10,000).");
+            await update(dbRef(db, `nexus/users/${uid}`), { credits: 10000 });
+            await logAudit("Reset User Credits", `Reset credits for UID ${uid} to default (10,000)`);
+            showToast("Credits reset to default (10,000).");
         };
 
         window.changeRole = async (uid, role) => {
             if (!isOwner) return;
-            await update(dbRef(db, `textnexus/users/${uid}`), { role });
+            await update(dbRef(db, `nexus/users/${uid}`), { role });
+            await logAudit("Change User Role", `Changed role for UID ${uid} to ${role}`);
+            showToast(`Role updated to ${role}.`);
         };
 
         window.toggleBan = async (uid, currentStatus) => {
             if (!isOwner) return;
-            await update(dbRef(db, `textnexus/users/${uid}`), { isBanned: !currentStatus });
+            const newStatus = !currentStatus;
+            openModal(newStatus ? "Ban User Account" : "Unban User Account", `Are you sure you want to ${newStatus ? 'ban' : 'unban'} this user?`, async () => {
+                await update(dbRef(db, `nexus/users/${uid}`), { isBanned: newStatus });
+                await logAudit("Toggle User Ban", `User UID ${uid} ban status set to ${newStatus}`);
+                showToast(`User successfully ${newStatus ? 'banned' : 'unbanned'}.`);
+            });
         };
 
+        // AI Sites Tab
         function listenToAiSites() {
-            onValue(dbRef(db, 'textnexus/ai_sites'), (snapshot) => {
+            onValue(dbRef(db, 'nexus/ai_sites'), (snapshot) => {
                 const data = snapshot.val();
                 const tbody = document.getElementById('site-table-body');
                 tbody.innerHTML = '';
@@ -518,7 +750,7 @@
                         <td class="py-4 px-6 text-xs text-textMuted max-w-xs truncate">${s.prompt}</td>
                         <td class="py-4 px-6 text-xs text-textMuted">${new Date(s.createdAt).toLocaleDateString()}</td>
                         <td class="py-4 px-6 text-right">
-                            <button onclick="window.deleteAiSite('${s.id}')" ${!isOwner ? 'disabled' : ''} class="p-1.5 rounded bg-surfaceHover text-textMuted hover:text-red-400 disabled:opacity-30">
+                            <button onclick="window.deleteAiSite('${s.id}')" ${!isOwner ? 'disabled' : ''} class="p-1.5 rounded bg-surfaceHover text-textMuted hover:text-red-400 disabled:opacity-30 transition-colors">
                                 <i class="ph ph-trash text-sm"></i>
                             </button>
                         </td>
@@ -530,13 +762,25 @@
 
         window.deleteAiSite = async (id) => {
             if (!isOwner) return;
-            if (confirm("Are you sure you want to delete this AI site record?")) {
-                await remove(dbRef(db, `textnexus/ai_sites/${id}`));
-            }
+            openModal("Delete AI Site", "Are you sure you want to delete this AI site record?", async () => {
+                await remove(dbRef(db, `nexus/ai_sites/${id}`));
+                await logAudit("Delete AI Site", `Deleted AI site record ID ${id}`);
+                showToast("AI site deleted.");
+            });
         };
 
+        purgeAllSitesBtn.addEventListener('click', () => {
+            if (!isOwner) return;
+            openModal("Purge All AI Sites", "WARNING: This will delete ALL generated AI sites across the platform. Continue?", async () => {
+                await remove(dbRef(db, 'nexus/ai_sites'));
+                await logAudit("Purge AI Sites", "Purged all AI sites from the database.");
+                showToast("All AI sites purged successfully.");
+            });
+        });
+
+        // Chats Tab
         function listenToChats() {
-            onValue(dbRef(db, 'textnexus/chats'), (snapshot) => {
+            onValue(dbRef(db, 'nexus/chats'), (snapshot) => {
                 const data = snapshot.val();
                 const tbody = document.getElementById('chat-table-body');
                 tbody.innerHTML = '';
@@ -545,22 +789,28 @@
                     document.getElementById('stat-chats').textContent = '0';
                     return;
                 }
+
                 const chats = Object.keys(data).map(k => ({ id: k, ...data[k] }));
                 document.getElementById('stat-chats').textContent = chats.length;
 
-                chats.forEach(chat => {
+                chats.forEach(c => {
                     const row = document.createElement('tr');
                     row.className = 'hover:bg-surfaceHover/50 transition-colors';
                     row.innerHTML = `
-                        <td class="py-4 px-6 font-medium text-textMain text-sm">${chat.name || 'Global Chat'}</td>
-                        <td class="py-4 px-6 font-mono text-xs text-textMuted">${chat.code || 'PUBLIC'}</td>
-                        <td class="py-4 px-6 text-xs text-textMuted">${chat.createdEmail || 'System'}</td>
-                        <td class="py-4 px-6"><span class="px-2 py-0.5 rounded text-[10px] ${chat.disabled ? 'bg-red-500/10 text-red-400' : 'bg-emerald-500/10 text-emerald-400'}">${chat.disabled ? 'Disabled' : 'Active'}</span></td>
-                        <td class="py-4 px-6 text-right">
-                            <button onclick="window.toggleChat('${chat.id}', ${!!chat.disabled})" ${!isOwner ? 'disabled' : ''} class="px-2.5 py-1 rounded text-xs border border-border bg-surfaceHover text-textMain hover:bg-border disabled:opacity-30">
-                                ${chat.disabled ? 'Enable' : 'Disable'}
+                        <td class="py-4 px-6 font-medium text-textMain text-sm">${c.name || 'Untitled'}</td>
+                        <td class="py-4 px-6 font-mono text-xs text-amber-400">${c.inviteCode || 'N/A'}</td>
+                        <td class="py-4 px-6 text-xs text-textMuted">${c.creatorEmail || 'Unknown'}</td>
+                        <td class="py-4 px-6">
+                            ${c.isDisabled 
+                                ? '<span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">Disabled</span>' 
+                                : '<span class="px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Active</span>'
+                            }
+                        </td>
+                        <td class="py-4 px-6 text-right flex items-center justify-end gap-2">
+                            <button onclick="window.toggleChatState('${c.id}', ${!!c.isDisabled})" ${!isOwner ? 'disabled' : ''} class="px-2.5 py-1 rounded bg-surfaceHover border border-border text-xs text-textMuted hover:text-textMain disabled:opacity-30 transition-colors">
+                                ${c.isDisabled ? 'Enable' : 'Disable'}
                             </button>
-                            <button onclick="window.deleteChat('${chat.id}')" ${!isOwner ? 'disabled' : ''} class="p-1 rounded bg-surfaceHover text-textMuted hover:text-red-400 ml-1 disabled:opacity-30">
+                            <button onclick="window.deleteChat('${c.id}')" ${!isOwner ? 'disabled' : ''} class="p-1.5 rounded bg-surfaceHover text-textMuted hover:text-red-400 disabled:opacity-30 transition-colors">
                                 <i class="ph ph-trash text-sm"></i>
                             </button>
                         </td>
@@ -570,69 +820,117 @@
             });
         }
 
-        window.toggleChat = async (chatId, currentStatus) => {
+        window.toggleChatState = async (chatId, currentDisabled) => {
             if (!isOwner) return;
-            await update(dbRef(db, `textnexus/chats/${chatId}`), { disabled: !currentStatus });
+            const newState = !currentDisabled;
+            await update(dbRef(db, `nexus/chats/${chatId}`), { isDisabled: newState });
+            await logAudit("Toggle Chat State", `Chat channel ${chatId} disabled status set to ${newState}`);
+            showToast(`Channel successfully ${newState ? 'disabled' : 'enabled'}.`);
         };
 
         window.deleteChat = async (chatId) => {
             if (!isOwner) return;
-            if (confirm("Delete this chat channel?")) {
-                await remove(dbRef(db, `textnexus/chats/${chatId}`));
-            }
+            openModal("Delete Channel", "Are you sure you want to delete this chat channel?", async () => {
+                await remove(dbRef(db, `nexus/chats/${chatId}`));
+                await logAudit("Delete Channel", `Deleted chat channel ID ${chatId}`);
+                showToast("Chat channel deleted.");
+            });
         };
 
-        document.getElementById('admin-publish-btn').addEventListener('click', async () => {
-            if (!isOwner) return;
-            const title = document.getElementById('admin-update-title').value.trim();
-            const content = document.getElementById('admin-update-content').value.trim();
-            if (!title || !content) return alert("Please fill out both title and content.");
+        // Audit Trail Tab
+        function listenToAuditLogs() {
+            onValue(dbRef(db, 'nexus/audit_logs'), (snapshot) => {
+                const data = snapshot.val();
+                const tbody = document.getElementById('audit-table-body');
+                tbody.innerHTML = '';
+                if (!data) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-textMuted">No security audit logs recorded.</td></tr>`;
+                    return;
+                }
 
-            await push(dbRef(db, 'textnexus/updates'), {
+                const logs = Object.keys(data).map(k => ({ id: k, ...data[k] })).sort((a, b) => b.timestamp - a.timestamp);
+
+                logs.forEach(l => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-surfaceHover/50 transition-colors text-xs font-mono';
+                    row.innerHTML = `
+                        <td class="py-3 px-6 text-textMuted">${new Date(l.timestamp).toLocaleString()}</td>
+                        <td class="py-3 px-6 text-textMain">${l.adminEmail}</td>
+                        <td class="py-3 px-6 text-amber-400 font-semibold">${l.action}</td>
+                        <td class="py-3 px-6 text-textMuted">${l.details}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            });
+        }
+
+        clearAuditBtn.addEventListener('click', () => {
+            if (!isOwner) return;
+            openModal("Clear Audit Logs", "Are you sure you want to clear all security audit logs?", async () => {
+                await remove(dbRef(db, 'nexus/audit_logs'));
+                showToast("Audit logs cleared.");
+            });
+        });
+
+        // Updates & Broadcast Tab
+        const adminUpdateTitle = document.getElementById('admin-update-title');
+        const adminUpdateContent = document.getElementById('admin-update-content');
+        const adminPublishBtn = document.getElementById('admin-publish-btn');
+        const adminUpdatesList = document.getElementById('admin-updates-list');
+
+        adminPublishBtn.addEventListener('click', async () => {
+            if (!currentUser || !isOwner) return;
+            const title = adminUpdateTitle.value.trim();
+            const content = adminUpdateContent.value.trim();
+            if (!title || !content) return showToast("Please fill in both title and content.", "error");
+
+            await push(dbRef(db, 'nexus/updates'), {
                 title,
                 content,
-                createdAt: serverTimestamp(),
-                author: currentUser.email
+                author: currentUser.displayName || 'Owner',
+                timestamp: serverTimestamp()
             });
 
-            document.getElementById('admin-update-title').value = '';
-            document.getElementById('admin-update-content').value = '';
-            alert("Announcement published!");
+            adminUpdateTitle.value = '';
+            adminUpdateContent.value = '';
+            await logAudit("Publish Update", `Published workspace announcement: ${title}`);
+            showToast("Announcement published successfully!");
         });
 
         function listenToUpdates() {
-            onValue(dbRef(db, 'textnexus/updates'), (snapshot) => {
+            onValue(dbRef(db, 'nexus/updates'), (snapshot) => {
                 const data = snapshot.val();
-                const container = document.getElementById('admin-updates-list');
-                container.innerHTML = '';
+                adminUpdatesList.innerHTML = '';
                 if (!data) {
-                    container.innerHTML = '<p class="text-xs text-textMuted py-4 text-center">No announcements posted yet.</p>';
+                    adminUpdatesList.innerHTML = `<p class="text-xs text-textMuted text-center py-6">No workspace announcements posted.</p>`;
                     return;
                 }
-                const updates = Object.keys(data).map(k => ({ id: k, ...data[k] })).reverse();
+
+                const updates = Object.keys(data).map(k => ({ id: k, ...data[k] })).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
                 updates.forEach(u => {
-                    const div = document.createElement('div');
-                    div.className = 'p-4 rounded-lg bg-background border border-border flex justify-between items-start gap-4';
-                    div.innerHTML = `
+                    const item = document.createElement('div');
+                    item.className = 'bg-background border border-border p-4 rounded-xl flex items-start justify-between gap-4';
+                    item.innerHTML = `
                         <div class="flex flex-col gap-1">
                             <h4 class="text-sm font-semibold text-textMain">${u.title}</h4>
-                            <p class="text-xs text-textMuted whitespace-pre-wrap">${u.content}</p>
-                            <span class="text-[10px] text-zinc-500 mt-1">Posted by ${u.author}</span>
+                            <p class="text-xs text-textMuted leading-relaxed">${u.content}</p>
+                            <span class="text-[10px] text-textMuted font-mono mt-1">Posted by ${u.author || 'Owner'}</span>
                         </div>
-                        <button onclick="window.deleteUpdate('${u.id}')" ${!isOwner ? 'disabled' : ''} class="p-1 text-textMuted hover:text-red-400 disabled:opacity-30">
+                        <button onclick="window.deleteUpdate('${u.id}')" ${!isOwner ? 'disabled' : ''} class="p-1.5 rounded bg-surfaceHover text-textMuted hover:text-red-400 disabled:opacity-30 transition-colors shrink-0">
                             <i class="ph ph-trash text-sm"></i>
                         </button>
                     `;
-                    container.appendChild(div);
+                    adminUpdatesList.appendChild(item);
                 });
             });
         }
 
         window.deleteUpdate = async (id) => {
             if (!isOwner) return;
-            if (confirm("Delete this announcement?")) {
-                await remove(dbRef(db, `textnexus/updates/${id}`));
-            }
+            await remove(dbRef(db, `nexus/updates/${id}`));
+            await logAudit("Delete Announcement", `Deleted announcement ID ${id}`);
+            showToast("Announcement deleted.");
         };
     </script>
 </body>
