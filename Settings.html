@@ -1,1 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Settings</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        background: '#0a0a0a',
+                        surface: '#121212',
+                        surfaceHover: '#1c1c1c',
+                        border: '#262626',
+                        textMain: '#ededed',
+                        textMuted: '#a1a1aa',
+                        brand: 'var(--brand-color)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root { --brand-color: #ededed; }
+        body { background-color: #0a0a0a; color: #ededed; font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #262626; border-radius: 4px; }
+    </style>
+</head>
+<body class="p-8 md:p-12 max-w-4xl mx-auto antialiased selection:bg-brand/20 selection:text-white">
 
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8 pb-6 border-b border-border">
+        <div>
+            <h1 class="text-2xl font-semibold text-textMain tracking-tight">Settings</h1>
+            <p class="text-sm text-textMuted mt-1">Customize your theme accents, tab cloaking, and stealth options.</p>
+        </div>
+        <button onclick="saveAllSettings()" class="px-4 py-2 bg-textMain text-background hover:opacity-90 font-medium text-sm rounded-lg transition-all flex items-center gap-2">
+            <i class="ph ph-check text-base"></i> Save Changes
+        </button>
+    </div>
+
+    <!-- Settings Sections -->
+    <div class="space-y-8">
+        
+        <!-- Section 1: Accent Colors -->
+        <div class="bg-surface border border-border rounded-xl p-6">
+            <h2 class="text-base font-semibold text-textMain flex items-center gap-2 mb-2">
+                <i class="ph ph-palette text-brand text-lg"></i> Accent Color
+            </h2>
+            <p class="text-xs text-textMuted mb-6">Choose an accent color to personalize your highlights, borders, and UI accents across Nexus.</p>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3 mb-6">
+                <button onclick="setAccent('#ededed', this)" class="flex flex-col items-center justify-center p-3 rounded-xl border border-border bg-surfaceHover hover:border-textMuted transition-all group">
+                    <div class="w-6 h-6 rounded-full bg-[#ededed] mb-2 shadow-sm"></div>
+                    <span class="text-xs text-textMuted group-hover:text-textMain font-medium">Default</span>
+                </button>
+                <button onclick="setAccent('#6366f1', this)" class="flex flex-col items-center justify-center p-3 rounded-xl border border-border bg-surfaceHover hover:border-textMuted transition-all group">
+                    <div class="w-6 h-6 rounded-full bg-indigo-500 mb-2 shadow-sm"></div>
+                    <span class="text-xs text-textMuted group-hover:text-textMain font-medium">Indigo</span>
+                </button>
+                <button onclick="setAccent('#10b981', this)" class="flex flex-col items-center justify-center p-3 rounded-xl border border-border bg-surfaceHover hover:border-textMuted transition-all group">
+                    <div class="w-6 h-6 rounded-full bg-emerald-500 mb-2 shadow-sm"></div>
+                    <span class="text-xs text-textMuted group-hover:text-textMain font-medium">Emerald</span>
+                </button>
+                <button onclick="setAccent('#f43f5e', this)" class="flex flex-col items-center justify-center p-3 rounded-xl border border-border bg-surfaceHover hover:border-textMuted transition-all group">
+                    <div class="w-6 h-6 rounded-full bg-rose-500 mb-2 shadow-sm"></div>
+                    <span class="text-xs text-textMuted group-hover:text-textMain font-medium">Rose</span>
+                </button>
+                <button onclick="setAccent('#f59e0b', this)" class="flex flex-col items-center justify-center p-3 rounded-xl border border-border bg-surfaceHover hover:border-textMuted transition-all group">
+                    <div class="w-6 h-6 rounded-full bg-amber-500 mb-2 shadow-sm"></div>
+                    <span class="text-xs text-textMuted group-hover:text-textMain font-medium">Amber</span>
+                </button>
+                <button onclick="setAccent('#8b5cf6', this)" class="flex flex-col items-center justify-center p-3 rounded-xl border border-border bg-surfaceHover hover:border-textMuted transition-all group">
+                    <div class="w-6 h-6 rounded-full bg-violet-500 mb-2 shadow-sm"></div>
+                    <span class="text-xs text-textMuted group-hover:text-textMain font-medium">Violet</span>
+                </button>
+                <button onclick="setAccent('#06b6d4', this)" class="flex flex-col items-center justify-center p-3 rounded-xl border border-border bg-surfaceHover hover:border-textMuted transition-all group">
+                    <div class="w-6 h-6 rounded-full bg-cyan-500 mb-2 shadow-sm"></div>
+                    <span class="text-xs text-textMuted group-hover:text-textMain font-medium">Cyan</span>
+                </button>
+            </div>
+
+            <div class="flex items-center gap-4 pt-4 border-t border-border">
+                <label class="text-sm font-medium text-textMain">Custom Hex:</label>
+                <div class="flex items-center gap-2">
+                    <input type="color" id="custom-color-input" onchange="setAccent(this.value)" class="w-10 h-10 rounded-lg bg-surfaceHover border border-border cursor-pointer p-1">
+                    <input type="text" id="custom-hex-text" placeholder="#6366f1" class="bg-surfaceHover border border-border rounded-lg px-3 py-2 text-sm text-textMain focus:outline-none focus:border-textMuted w-32">
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Tab Cloaking (Title & Logo) -->
+        <div class="bg-surface border border-border rounded-xl p-6">
+            <h2 class="text-base font-semibold text-textMain flex items-center gap-2 mb-2">
+                <i class="ph ph-shield-check text-brand text-lg"></i> Tab Cloaker (Disguise)
+            </h2>
+            <p class="text-xs text-textMuted mb-6">Instantly change your browser tab name and logo (favicon) to blend in with school or work tools.</p>
+            
+            <!-- Presets -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+                <button onclick="setCloakPreset('Nexus', 'https://www.google.com/favicon.ico')" class="p-3 rounded-xl border border-border bg-surfaceHover hover:border-textMuted transition-all text-left flex items-center gap-3">
+                    <i class="ph ph-house text-xl text-textMuted"></i>
+                    <div>
+                        <p class="text-sm font-medium text-textMain">Nexus (Default)</p>
+                        <p class="text-[11px] text-textMuted">Reset title & logo</p>
+                    </div>
+                </button>
+                <button onclick="setCloakPreset('Google', 'https://www.google.com/favicon.ico')" class="p-3 rounded-xl border border-border bg-surfaceHover hover:border-textMuted transition-all text-left flex items-center gap-3">
+                    <i class="ph ph-google-logo text-xl text-textMuted"></i>
+                    <div>
+                        <p class="text-sm font-medium text-textMain">Google</p>
+                        <p class="text-[11px] text-textMuted">Google Search</p>
+                    </div>
+                </button>
+                <button onclick="setCloakPreset('Google Classroom', 'https://ssl.gstatic.com/classroom/ic_product_classroom_32.png')" class="p-3 rounded-xl border border-border bg-surfaceHover hover:border-textMuted transition-all text-left flex items-center gap-3">
+                    <i class="ph ph-chalkboard text-xl text-textMuted"></i>
+                    <div>
+                        <p class="text-sm font-medium text-textMain">Google Classroom</p>
+                        <p class="text-[11px] text-textMuted">Classes & Assignments</p>
+                    </div>
+                </button>
+                <button onclick="setCloakPreset('Google Drive', 'https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico')" class="p-3 rounded-xl border border-border bg-surfaceHover hover:border-textMuted transition-all text-left flex items-center gap-3">
+                    <i class="ph ph-hard-drive text-xl text-textMuted"></i>
+                    <div>
+                        <p class="text-sm font-medium text-textMain">Google Drive</p>
+                        <p class="text-[11px] text-textMuted">My Drive - Files</p>
+                    </div>
+                </button>
+                <button onclick="setCloakPreset('Wikipedia, the free encyclopedia', 'https://en.wikipedia.org/static/favicon/wikipedia.ico')" class="p-3 rounded-xl border border-border bg-surfaceHover hover:border-textMuted transition-all text-left flex items-center gap-3">
+                    <i class="ph ph-book-open text-xl text-textMuted"></i>
+                    <div>
+                        <p class="text-sm font-medium text-textMain">Wikipedia</p>
+                        <p class="text-[11px] text-textMuted">Encyclopedia</p>
+                    </div>
+                </button>
+                <button onclick="setCloakPreset('Canvas', 'https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico')" class="p-3 rounded-xl border border-border bg-surfaceHover hover:border-textMuted transition-all text-left flex items-center gap-3">
+                    <i class="ph ph-graduation-cap text-xl text-textMuted"></i>
+                    <div>
+                        <p class="text-sm font-medium text-textMain">Canvas LMS</p>
+                        <p class="text-[11px] text-textMuted">School Dashboard</p>
+                    </div>
+                </button>
+            </div>
+
+            <!-- Custom Inputs -->
+            <div class="space-y-4 pt-4 border-t border-border">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-textMuted mb-2">Custom Tab Title</label>
+                    <input type="text" id="cloak-title-input" placeholder="Google Classroom" class="w-full bg-surfaceHover border border-border rounded-lg px-4 py-2.5 text-sm text-textMain focus:outline-none focus:border-textMuted">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-textMuted mb-2">Custom Favicon URL</label>
+                    <input type="text" id="cloak-icon-input" placeholder="https://example.com/favicon.ico" class="w-full bg-surfaceHover border border-border rounded-lg px-4 py-2.5 text-sm text-textMain focus:outline-none focus:border-textMuted">
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Stealth Mode -->
+        <div class="bg-surface border border-border rounded-xl p-6">
+            <h2 class="text-base font-semibold text-textMain flex items-center gap-2 mb-2">
+                <i class="ph ph-eye-slash text-brand text-lg"></i> Stealth Options
+            </h2>
+            <p class="text-xs text-textMuted mb-6">Open Nexus inside a hidden about:blank tab so it cannot be tracked in your browser history.</p>
+            <button onclick="openAboutBlank()" class="px-4 py-2.5 bg-surfaceHover border border-border hover:border-textMuted text-textMain font-medium text-sm rounded-lg transition-all flex items-center gap-2">
+                <i class="ph ph-arrow-square-out text-base"></i> Open in about:blank (Stealth Mode)
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-surface border border-border text-textMain px-4 py-3 rounded-xl shadow-2xl text-sm flex items-center gap-3 opacity-0 pointer-events-none transition-opacity duration-300 z-50">
+        <i class="ph ph-check-circle text-emerald-500 text-lg"></i>
+        <span id="toast-msg">Settings saved successfully!</span>
+    </div>
+
+    <script>
+        // Load saved preferences on startup
+        window.addEventListener('load', () => {
+            const savedColor = localStorage.getItem('nexus-brand-color') || '#ededed';
+            document.getElementById('custom-color-input').value = savedColor;
+            document.getElementById('custom-hex-text').value = savedColor;
+
+            const savedTitle = localStorage.getItem('nexus-tab-title') || 'Nexus';
+            const savedIcon = localStorage.getItem('nexus-tab-icon') || '';
+            document.getElementById('cloak-title-input').value = savedTitle;
+            document.getElementById('cloak-icon-input').value = savedIcon;
+        });
+
+        // Set Accent
+        window.setAccent = (color) => {
+            document.documentElement.style.setProperty('--brand-color', color);
+            document.getElementById('custom-color-input').value = color;
+            document.getElementById('custom-hex-text').value = color;
+            localStorage.setItem('nexus-brand-color', color);
+            
+            if (window.parent && window.parent !== window) {
+                window.parent.document.documentElement.style.setProperty('--brand-color', color);
+            }
+        };
+
+        // Set Cloak Preset
+        window.setCloakPreset = (title, iconUrl) => {
+            document.getElementById('cloak-title-input').value = title;
+            document.getElementById('cloak-icon-input').value = iconUrl;
+            applyCloak(title, iconUrl);
+        };
+
+        // Apply Cloak
+        function applyCloak(title, iconUrl) {
+            localStorage.setItem('nexus-tab-title', title);
+            localStorage.setItem('nexus-tab-icon', iconUrl);
+
+            const targetWin = window.parent && window.parent !== window ? window.parent : window;
+            targetWin.document.title = title;
+            
+            let link = targetWin.document.querySelector("link[rel*='icon']") || targetWin.document.createElement('link');
+            link.type = 'image/x-icon';
+            link.rel = 'shortcut icon';
+            link.href = iconUrl;
+            targetWin.document.getElementsByTagName('head')[0].appendChild(link);
+        }
+
+        // Save All Settings
+        window.saveAllSettings = () => {
+            const color = document.getElementById('custom-color-input').value;
+            const title = document.getElementById('cloak-title-input').value || 'Nexus';
+            const iconUrl = document.getElementById('cloak-icon-input').value || '';
+
+            localStorage.setItem('nexus-brand-color', color);
+            applyCloak(title, iconUrl);
+            showToast("Settings saved and applied successfully!");
+        };
+
+        // Open in about:blank
+        window.openAboutBlank = () => {
+            const win = window.open();
+            if (!win) {
+                alert("Popup blocked! Please allow popups for this site.");
+                return;
+            }
+            const html = `<!DOCTYPE html>
+            <html lang="en" class="dark">
+            <head>
+                <meta charset="UTF-8">
+                <title>${localStorage.getItem('nexus-tab-title') || 'Nexus'}</title>
+                <link rel="icon" href="${localStorage.getItem('nexus-tab-icon') || ''}">
+                <style>
+                    html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #0a0a0a; }
+                    iframe { width: 100%; height: 100%; border: none; }
+                </style>
+            </head>
+            <body>
+                <iframe src="${window.location.origin + window.location.pathname.replace('settings.html', 'index.html')}"></iframe>
+            </body>
+            </html>`;
+            win.document.open();
+            win.document.write(html);
+            win.document.close();
+        };
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            toast.style.opacity = '1';
+            toast.style.pointerEvents = 'auto';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.pointerEvents = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
