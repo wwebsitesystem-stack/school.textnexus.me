@@ -8,6 +8,8 @@
     <!-- Google AdSense Verification / Certification Mode -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1457471654932561"
         crossorigin="anonymous"></script>
+    <!-- Cloudflare Turnstile -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <!-- High-End Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -162,6 +164,64 @@
             opacity: 0; filter: blur(30px); transform: scale(1.1); pointer-events: none;
         }
 
+        /* =========================================
+           HUMAN VERIFICATION GATE (Turnstile)
+        ========================================= */
+        #turnstile-gate {
+            position: fixed; inset: 0; z-index: 99998;
+            background: #000;
+            display: none; align-items: center; justify-content: center;
+            opacity: 0;
+            transition: opacity 0.8s var(--ease-out-expo), filter 0.8s var(--ease-out-expo), transform 0.8s var(--ease-out-expo);
+        }
+        #turnstile-gate.gate-visible { display: flex; opacity: 1; }
+        #turnstile-gate.gate-hidden {
+            opacity: 0; filter: blur(30px); transform: scale(1.1); pointer-events: none;
+        }
+
+        .gate-panel {
+            position: relative; z-index: 10;
+            width: 100%; max-width: 420px;
+            display: flex; flex-direction: column; align-items: center;
+            text-align: center;
+            background: var(--glass-panel);
+            backdrop-filter: blur(40px) saturate(150%);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 40px 32px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+
+        .gate-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            background: #fff; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 20px; box-shadow: 0 0 20px rgba(255,255,255,0.2);
+        }
+        .gate-icon svg { width: 22px; height: 22px; stroke: #000; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+        .gate-title {
+            font-size: 16px; font-weight: 600; letter-spacing: 2px;
+            text-transform: uppercase; color: #fff; margin-bottom: 8px;
+        }
+        .gate-subtitle {
+            font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary);
+            letter-spacing: 0.3px; margin-bottom: 28px; line-height: 1.5;
+        }
+
+        .gate-widget-slot { min-height: 65px; display: flex; align-items: center; justify-content: center; }
+
+        .gate-status {
+            font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary);
+            margin-top: 16px; min-height: 16px;
+        }
+        .gate-status.gate-status-error { color: #ff6b6b; }
+
+        .gate-retry-btn {
+            margin-top: 14px; padding: 8px 18px; background: rgba(255,255,255,0.08);
+            border: 1px solid var(--glass-border); border-radius: 10px; color: #fff;
+            font-size: 12px; font-weight: 500; cursor: pointer; display: none;
+        }
+        .gate-retry-btn:hover { background: var(--glass-hover); }
 
         /* =========================================
            OS APP LAYOUT STYLES (Unchanged Structure)
@@ -332,6 +392,22 @@
                     <div class="progress-fill" id="boot-progress-bar"></div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- HUMAN VERIFICATION GATE -->
+    <div id="turnstile-gate">
+        <div class="gate-panel">
+            <div class="gate-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+            </div>
+            <div class="gate-title">Verify You're Human</div>
+            <div class="gate-subtitle">Confirm you're not a bot to continue to Nexus OS.</div>
+            <div class="gate-widget-slot">
+                <div id="turnstile-widget"></div>
+            </div>
+            <div class="gate-status" id="gate-status-text"></div>
+            <button class="gate-retry-btn" id="gate-retry-btn" onclick="retryTurnstile()">Try Again</button>
         </div>
     </div>
 
@@ -571,22 +647,113 @@
                 // Finish Boot
                 if (currentProg >= 100) {
                     clearInterval(bootInterval);
-                    
-                    // Cinematic Fade out
+
+                    // Cinematic Fade out, then hand off to human verification
                     setTimeout(() => {
                         const bootScreen = document.getElementById('boot-screen');
-                        const appRoot = document.getElementById('app-root');
-                        
                         bootScreen.classList.add('boot-hidden');
-                        appRoot.classList.add('loaded');
 
                         setTimeout(() => {
                             bootScreen.style.display = 'none';
+                            showTurnstileGate();
                         }, 1200); // Matches CSS transition duration
                     }, 500);
                 }
             }, 30); // Fast, fluid updates
         });
+
+        // =========================================
+        // CLOUDFLARE TURNSTILE — HUMAN VERIFICATION
+        // =========================================
+        const TURNSTILE_SITE_KEY = '0x4AAAAAAFXCQ7lZ7OM2JFsT';
+        let turnstileWidgetId = null;
+
+        function showTurnstileGate() {
+            const gate = document.getElementById('turnstile-gate');
+            gate.classList.add('gate-visible');
+            renderTurnstileWidget();
+        }
+
+        function renderTurnstileWidget() {
+            const statusEl = document.getElementById('gate-status-text');
+            const retryBtn = document.getElementById('gate-retry-btn');
+
+            const doRender = () => {
+                turnstileWidgetId = window.turnstile.render('#turnstile-widget', {
+                    sitekey: TURNSTILE_SITE_KEY,
+                    theme: 'dark',
+                    callback: onTurnstileSuccess,
+                    'error-callback': onTurnstileError,
+                    'expired-callback': onTurnstileExpired,
+                    'timeout-callback': onTurnstileExpired
+                });
+            };
+
+            // api.js loads async/defer, so wait for window.turnstile to exist
+            if (window.turnstile) {
+                doRender();
+            } else {
+                statusEl.textContent = 'Loading verification...';
+                const waitForTurnstile = setInterval(() => {
+                    if (window.turnstile) {
+                        clearInterval(waitForTurnstile);
+                        statusEl.textContent = '';
+                        doRender();
+                    }
+                }, 100);
+            }
+        }
+
+        window.retryTurnstile = function() {
+            const statusEl = document.getElementById('gate-status-text');
+            const retryBtn = document.getElementById('gate-retry-btn');
+            retryBtn.style.display = 'none';
+            statusEl.classList.remove('gate-status-error');
+            statusEl.textContent = '';
+            if (turnstileWidgetId !== null && window.turnstile) {
+                window.turnstile.reset(turnstileWidgetId);
+            } else {
+                renderTurnstileWidget();
+            }
+        };
+
+        window.onTurnstileSuccess = function(token) {
+            // Token received client-side. Note: this project has no backend,
+            // so this confirms the challenge passed in-browser only — it does not
+            // call Cloudflare's siteverify endpoint. Wire the token to a server
+            // if real server-side verification is ever needed.
+            const gate = document.getElementById('turnstile-gate');
+            const appRoot = document.getElementById('app-root');
+            const statusEl = document.getElementById('gate-status-text');
+
+            statusEl.classList.remove('gate-status-error');
+            statusEl.textContent = 'Verified.';
+
+            setTimeout(() => {
+                gate.classList.add('gate-hidden');
+                appRoot.classList.add('loaded');
+                setTimeout(() => {
+                    gate.style.display = 'none';
+                }, 800);
+            }, 400);
+        };
+
+        window.onTurnstileError = function() {
+            const statusEl = document.getElementById('gate-status-text');
+            const retryBtn = document.getElementById('gate-retry-btn');
+            statusEl.classList.add('gate-status-error');
+            statusEl.textContent = 'Verification failed. Please try again.';
+            retryBtn.style.display = 'inline-block';
+        };
+
+        window.onTurnstileExpired = function() {
+            const statusEl = document.getElementById('gate-status-text');
+            statusEl.classList.add('gate-status-error');
+            statusEl.textContent = 'Verification expired, retrying...';
+            if (turnstileWidgetId !== null && window.turnstile) {
+                window.turnstile.reset(turnstileWidgetId);
+            }
+        };
 
         // LIVE CLOCK
         setInterval(() => {
