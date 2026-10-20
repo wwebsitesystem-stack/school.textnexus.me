@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus OS 6.0 — Executive Command Matrix</title>
-    
+    <title>Nexus Command Matrix</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: { 
+                    fontFamily: {
                         sans: ['Plus Jakarta Sans', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace']
                     },
@@ -32,30 +32,51 @@
         }
     </script>
     <style>
-        body { background-color: #020205; color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; }
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        body { background-color: #020205; color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #1c1c2e; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
-        .tab-button.active { background: linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(56,189,248,0.1) 100%); color: #38bdf8; border-color: rgba(56,189,248,0.4); box-shadow: 0 0 20px rgba(56,189,248,0.1); }
-        .glass-card { background: rgba(9, 9, 15, 0.75); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.04); }
-        .glow-blue { box-shadow: 0 0 30px rgba(56, 189, 248, 0.15); }
+        .glass-card { background: rgba(9, 9, 15, 0.75); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .nav-item.active { background: linear-gradient(135deg, rgba(99,102,241,0.16) 0%, rgba(56,189,248,0.08) 100%); color: #38bdf8; border-color: rgba(56,189,248,0.35); }
+        .nav-item.active .nav-badge { background: rgba(56,189,248,0.15); color: #38bdf8; }
+        .chip.active { background: #f8fafc; color: #020205; border-color: #f8fafc; }
+        .field { background: #020205; border: 1px solid #1c1c2e; border-radius: 0.75rem; outline: none; transition: border-color .15s; }
+        .field:focus { border-color: #38bdf8; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; border-radius: .75rem; font-weight: 700; font-size: .75rem; transition: all .15s; }
+        .btn:disabled { opacity: .35; cursor: not-allowed; }
+        .btn-ghost { background: #12121c; border: 1px solid #1c1c2e; color: #94a3b8; }
+        .btn-ghost:hover:not(:disabled) { color: #f8fafc; border-color: #2e2e48; }
+        .btn-primary { background: linear-gradient(90deg, #38bdf8, #6366f1); color: #020205; }
+        .btn-primary:hover:not(:disabled) { filter: brightness(1.1); }
+        .btn-danger { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.25); color: #f87171; }
+        .btn-danger:hover:not(:disabled) { background: rgba(239,68,68,.2); }
+        .btn-ok { background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.25); color: #34d399; }
+        .btn-ok:hover:not(:disabled) { background: rgba(16,185,129,.2); }
+        .pill { display: inline-flex; align-items: center; gap: .35rem; padding: .2rem .65rem; border-radius: 9999px; font-size: 10px; font-weight: 800; border-width: 1px; white-space: nowrap; }
+        .credit-input.dirty { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,.12); }
+        kbd { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 1px 5px; border-radius: 4px; border: 1px solid #1c1c2e; background: #12121c; color: #94a3b8; }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+        .toast { animation: toastIn .18s ease-out; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+        .admin-section:not(.hidden) { animation: fadeUp .2s ease-out; }
+        @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
     </style>
 </head>
-<body class="w-screen h-screen flex flex-col bg-bgRoot relative selection:bg-cyan-500 selection:text-black">
+<body class="min-h-screen bg-bgRoot selection:bg-cyan-500 selection:text-black">
 
     <!-- TWO-STEP SECURITY GATEWAY -->
     <div id="password-lock-screen" class="fixed inset-0 z-50 bg-bgRoot/95 backdrop-blur-3xl flex flex-col items-center justify-center p-4">
-        <div class="glass-card p-8 rounded-[2.5px] shadow-2xl max-w-md w-full flex flex-col gap-6 text-center relative overflow-hidden border border-lineBorder">
+        <div class="glass-card p-8 rounded-3xl shadow-2xl max-w-md w-full flex flex-col gap-6 text-center relative overflow-hidden">
             <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-neonBlue via-neonIndigo to-purple-500"></div>
-            
+
             <div class="w-16 h-16 rounded-2xl bg-panelHover border border-lineBorder flex items-center justify-center mx-auto text-neonBlue shadow-inner">
                 <i class="ph ph-shield-chevron text-3xl"></i>
             </div>
-            
+
             <div>
                 <h2 class="text-xl font-extrabold text-textPrimary tracking-tight">Executive Authentication</h2>
-                <p class="text-xs text-textSecondary mt-1">OS 6.0 Kernel Lock. Verify credentials for <span class="text-textPrimary font-mono">Brody Williams</span>.</p>
+                <p class="text-xs text-textSecondary mt-1">Sign in with the owner Google account, then enter the passcode.</p>
             </div>
 
             <!-- STEP 1: Google Identity -->
@@ -69,328 +90,572 @@
             <!-- STEP 2: Passcode Entry -->
             <form id="lock-form" class="flex flex-col gap-4 hidden">
                 <div class="flex items-center justify-center gap-2 text-xs font-semibold text-emerald-400 bg-emerald-500/10 py-3 rounded-xl border border-emerald-500/20">
-                    <i class="ph ph-check-circle text-sm"></i> Identity Confirmed: Owner Access
+                    <i class="ph ph-check-circle text-sm"></i> <span id="lock-identity">Identity Confirmed: Owner Access</span>
                 </div>
-                <input type="password" id="admin-password-input" placeholder="Enter Secure Passcode..." class="w-full bg-bgRoot border border-lineBorder rounded-2xl px-4 py-4 text-sm text-textPrimary text-center outline-none focus:border-neonBlue transition-all font-mono tracking-[0.3em] shadow-inner">
+                <input type="password" id="admin-password-input" autocomplete="off" inputmode="numeric" placeholder="Enter Secure Passcode..." class="w-full bg-bgRoot border border-lineBorder rounded-2xl px-4 py-4 text-sm text-textPrimary text-center outline-none focus:border-neonBlue transition-all font-mono tracking-[0.3em] shadow-inner">
                 <p id="lock-error-msg" class="text-[11px] text-red-400 hidden">Incorrect secure passcode.</p>
-                <button type="submit" class="w-full py-4 bg-gradient-to-r from-neonBlue to-neonIndigo text-black font-extrabold rounded-2xl text-xs transition-all flex items-center justify-center gap-2 shadow-xl shadow-neonBlue/20">
+                <button type="submit" class="btn btn-primary w-full py-4 rounded-2xl font-extrabold shadow-xl shadow-neonBlue/20">
                     <i class="ph ph-lock-key-open text-base"></i> Initialize Command Matrix
                 </button>
+                <button type="button" id="lock-switch-btn" class="text-[11px] text-textSecondary hover:text-textPrimary">Use a different account</button>
             </form>
         </div>
     </div>
 
-    <!-- MAIN OS HEADER -->
-    <header class="h-20 border-b border-lineBorder flex items-center justify-between px-8 bg-panelDark/80 backdrop-blur-xl shrink-0 z-20">
-        <div class="flex items-center gap-4">
-            <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-neonBlue to-neonIndigo flex items-center justify-center text-black font-black text-lg shadow-lg glow-blue">
-                Ω
-            </div>
-            <div>
-                <h1 class="font-extrabold text-textPrimary text-sm tracking-tight flex items-center gap-2.5">
-                    Nexus Command Matrix
-                    <span class="text-[10px] bg-cyan-500/10 text-neonBlue border border-cyan-500/20 px-2.5 py-0.5 rounded-full font-mono uppercase tracking-widest font-bold">OS 6.0 Stable</span>
-                </h1>
-                <p class="text-[11px] text-textSecondary flex items-center gap-2 mt-0.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Real-Time RTDB Telemetry Online
-                </p>
-            </div>
-        </div>
-        
-        <div class="flex items-center gap-3">
-            <!-- Maintenance Switch -->
-            <div class="flex items-center gap-3 bg-panelHover border border-lineBorder px-4 py-2 rounded-2xl text-xs shadow-inner">
-                <span class="text-textSecondary font-semibold">Maintenance Mode:</span>
-                <button id="maintenance-toggle-btn" class="w-10 h-6 rounded-full bg-lineBorder relative transition-colors cursor-pointer">
-                    <div id="maintenance-thumb" class="w-5 h-5 rounded-full bg-textPrimary absolute top-0.5 left-0.5 transition-transform shadow-md"></div>
-                </button>
-            </div>
-
-            <button id="global-airdrop-btn" class="px-4 py-2.5 bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-extrabold rounded-2xl hover:bg-amber-500/20 transition-all flex items-center gap-2 shadow-sm">
-                <i class="ph ph-coins text-sm"></i> +1,000 Credits Global Airdrop
-            </button>
-            
-            <button id="re-lock-btn" class="px-4 py-2.5 bg-panelHover border border-lineBorder text-xs text-textSecondary hover:text-textPrimary rounded-2xl transition-all flex items-center gap-2 shadow-sm font-semibold">
-                <i class="ph ph-lock text-sm"></i> Lock Matrix
-            </button>
-        </div>
-    </header>
-
-    <!-- NAVIGATION TABS -->
-    <nav class="border-b border-lineBorder bg-panelDark/40 px-8 py-3 flex items-center gap-3 shrink-0 z-10 overflow-x-auto">
-        <button onclick="switchAdminTab('users', this)" class="tab-button active px-5 py-2.5 rounded-2xl border border-lineBorder text-xs font-bold text-textSecondary transition-all flex items-center gap-2.5">
-            <i class="ph ph-users-three text-base"></i> User Database & Credits
-        </button>
-        <button onclick="switchAdminTab('aisites', this)" class="tab-button px-5 py-2.5 rounded-2xl border border-lineBorder text-xs font-bold text-textSecondary transition-all flex items-center gap-2.5">
-            <i class="ph ph-globe-hemisphere-west text-base"></i> Subdomains & Web Generators
-        </button>
-        <button onclick="switchAdminTab('chats', this)" class="tab-button px-5 py-2.5 rounded-2xl border border-lineBorder text-xs font-bold text-textSecondary transition-all flex items-center gap-2.5">
-            <i class="ph ph-chats-teardrop text-base"></i> Active Chat Channels
-        </button>
-        <button onclick="switchAdminTab('audit', this)" class="tab-button px-5 py-2.5 rounded-2xl border border-lineBorder text-xs font-bold text-textSecondary transition-all flex items-center gap-2.5">
-            <i class="ph ph-shield-warning text-base"></i> Security Audit Trail
-        </button>
-        <button onclick="switchAdminTab('updates', this)" class="tab-button px-5 py-2.5 rounded-2xl border border-lineBorder text-xs font-bold text-textSecondary transition-all flex items-center gap-2.5">
-            <i class="ph ph-broadcast text-base"></i> Global Announcements
-        </button>
-    </nav>
-
-    <!-- VIEWPORT CONTENT -->
-    <main class="flex-1 overflow-y-auto p-8 relative">
-        <div class="max-w-7xl mx-auto flex flex-col gap-6 pb-16">
-            
-            <!-- METRICS SUMMARY CARDS -->
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                <div class="glass-card p-5 rounded-3xl flex items-center justify-between shadow-lg">
-                    <div>
-                        <p class="text-[10px] uppercase tracking-wider text-textSecondary font-bold">Total Users</p>
-                        <h3 id="stat-total-users" class="text-2xl font-black text-textPrimary mt-1">0</h3>
-                    </div>
-                    <div class="w-12 h-12 rounded-2xl bg-panelHover border border-lineBorder flex items-center justify-center text-textSecondary shadow-inner">
-                        <i class="ph ph-users text-xl"></i>
-                    </div>
-                </div>
-                <div class="glass-card p-5 rounded-3xl flex items-center justify-between shadow-lg">
-                    <div>
-                        <p class="text-[10px] uppercase tracking-wider text-textSecondary font-bold">AI Web Sites</p>
-                        <h3 id="stat-total-sites" class="text-2xl font-black text-neonBlue mt-1">0</h3>
-                    </div>
-                    <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-neonBlue shadow-inner">
-                        <i class="ph ph-globe text-xl"></i>
-                    </div>
-                </div>
-                <div class="glass-card p-5 rounded-3xl flex items-center justify-between shadow-lg">
-                    <div>
-                        <p class="text-[10px] uppercase tracking-wider text-textSecondary font-bold">Active Chats</p>
-                        <h3 id="stat-chats" class="text-2xl font-black text-purple-400 mt-1">0</h3>
-                    </div>
-                    <div class="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shadow-inner">
-                        <i class="ph ph-chat-circle-dots text-xl"></i>
-                    </div>
-                </div>
-                <div class="glass-card p-5 rounded-3xl flex items-center justify-between shadow-lg">
-                    <div>
-                        <p class="text-[10px] uppercase tracking-wider text-textSecondary font-bold">Banned Accounts</p>
-                        <h3 id="stat-banned" class="text-2xl font-black text-red-400 mt-1">0</h3>
-                    </div>
-                    <div class="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 shadow-inner">
-                        <i class="ph ph-user-minus text-xl"></i>
-                    </div>
-                </div>
-                <div class="glass-card p-5 rounded-3xl flex flex-col justify-between shadow-lg">
-                    <div class="flex items-center justify-between">
-                        <p class="text-[10px] uppercase tracking-wider text-textSecondary font-bold">My Owner Credits</p>
-                        <i class="ph ph-coins text-amber-400 text-lg"></i>
-                    </div>
-                    <div class="flex items-center gap-2 mt-2">
-                        <input type="number" id="owner-credit-input" class="w-full bg-bgRoot border border-lineBorder rounded-xl px-3 py-2 text-xs font-mono text-amber-400 font-bold outline-none focus:border-neonBlue shadow-inner" value="5000">
-                        <button id="owner-save-credits-btn" class="px-3.5 py-2 bg-textPrimary text-black rounded-xl text-xs font-extrabold hover:opacity-90 transition-all shrink-0">Set</button>
-                    </div>
+    <div class="flex min-h-screen">
+        <!-- SIDEBAR (desktop) -->
+        <aside class="hidden lg:flex w-64 shrink-0 flex-col border-r border-lineBorder bg-panelDark/80 backdrop-blur-xl sticky top-0 h-screen">
+            <div class="h-20 flex items-center gap-3 px-6 border-b border-lineBorder">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-neonBlue to-neonIndigo flex items-center justify-center text-black font-black text-lg shadow-lg">Ω</div>
+                <div>
+                    <h1 class="font-extrabold text-sm tracking-tight">Command Matrix</h1>
+                    <p class="text-[10px] text-textSecondary font-mono uppercase tracking-widest">Nexus OS 6.0</p>
                 </div>
             </div>
+            <nav id="side-nav" class="flex-1 p-4 flex flex-col gap-1.5 overflow-y-auto"></nav>
+            <div class="p-4 border-t border-lineBorder flex flex-col gap-3">
+                <div class="flex items-center gap-3">
+                    <img id="me-avatar" alt="" class="avatar w-9 h-9 rounded-xl object-cover border border-lineBorder bg-panelHover" src="https://placehold.co/100">
+                    <div class="min-w-0">
+                        <p id="me-name" class="text-xs font-bold truncate">—</p>
+                        <p id="me-email" class="text-[10px] font-mono text-textSecondary truncate">—</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="re-lock-btn" class="btn btn-ghost py-2"><i class="ph ph-lock"></i> Lock</button>
+                    <button id="sign-out-btn" class="btn btn-ghost py-2"><i class="ph ph-sign-out"></i> Sign out</button>
+                </div>
+                <p class="text-[10px] text-textSecondary text-center">Press <kbd>?</kbd> for shortcuts</p>
+            </div>
+        </aside>
 
-            <!-- TAB 1: USERS & CREDITS -->
-            <section id="tab-users" class="admin-section flex flex-col gap-4">
-                <div class="glass-card rounded-3xl overflow-hidden shadow-2xl">
-                    <div class="p-6 border-b border-lineBorder flex flex-wrap items-center justify-between gap-4 bg-panelDark/40">
-                        <div class="flex items-center gap-4">
-                            <h3 class="text-xs font-extrabold uppercase tracking-wider text-textPrimary">Platform User Management</h3>
-                            <div class="relative">
-                                <i class="ph ph-magnifying-glass absolute left-4 top-3 text-textSecondary text-xs"></i>
-                                <input type="text" id="user-search-input" placeholder="Filter by handle or email..." class="bg-bgRoot border border-lineBorder rounded-2xl pl-10 pr-4 py-2.5 text-xs text-textPrimary outline-none focus:border-neonBlue w-72 transition-all shadow-inner">
+        <div class="flex-1 min-w-0 flex flex-col">
+            <!-- TOP BAR -->
+            <header class="sticky top-0 z-20 border-b border-lineBorder bg-panelDark/80 backdrop-blur-xl">
+                <div class="h-16 lg:h-20 flex items-center justify-between gap-3 px-4 lg:px-8">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="lg:hidden w-9 h-9 rounded-xl bg-gradient-to-tr from-neonBlue to-neonIndigo flex items-center justify-center text-black font-black shrink-0">Ω</div>
+                        <div class="min-w-0">
+                            <h2 id="page-title" class="font-extrabold text-sm lg:text-base tracking-tight truncate">Overview</h2>
+                            <p class="text-[11px] text-textSecondary flex items-center gap-2">
+                                <span id="conn-dot" class="w-2 h-2 rounded-full bg-amber-400"></span>
+                                <span id="conn-label">Connecting…</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="maintenance-toggle-btn" class="flex items-center gap-2.5 bg-panelHover border border-lineBorder px-3 py-2 rounded-xl text-xs" title="Toggle maintenance mode">
+                            <span class="text-textSecondary font-semibold hidden sm:inline">Maintenance</span>
+                            <span id="maintenance-track" class="w-9 h-5 rounded-full bg-lineBorder relative transition-colors">
+                                <span id="maintenance-thumb" class="w-4 h-4 rounded-full bg-textPrimary absolute top-0.5 left-0.5 transition-transform shadow"></span>
+                            </span>
+                        </button>
+                        <button id="global-airdrop-btn" class="btn px-3 py-2.5 bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/20">
+                            <i class="ph ph-coins text-sm"></i> <span class="hidden sm:inline">Airdrop</span>
+                        </button>
+                        <button id="re-lock-btn-mobile" class="lg:hidden btn btn-ghost px-3 py-2.5" title="Lock"><i class="ph ph-lock"></i></button>
+                    </div>
+                </div>
+                <div id="maintenance-banner" class="hidden px-4 lg:px-8 py-2 bg-amber-500/10 border-t border-amber-500/20 text-[11px] text-amber-300 flex items-center gap-2">
+                    <i class="ph ph-warning"></i> Maintenance mode is ON — non-admin users are being redirected to the maintenance page.
+                </div>
+                <!-- mobile nav -->
+                <nav id="top-nav" class="lg:hidden flex gap-2 px-4 pb-3 overflow-x-auto"></nav>
+            </header>
+
+            <main class="flex-1 p-4 lg:p-8">
+                <div class="max-w-7xl mx-auto flex flex-col gap-6 pb-16">
+
+                    <!-- OVERVIEW -->
+                    <section id="tab-overview" class="admin-section flex flex-col gap-6">
+                        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4" id="stat-grid"></div>
+
+                        <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                            <div class="glass-card rounded-3xl xl:col-span-2 overflow-hidden">
+                                <div class="px-6 py-4 border-b border-lineBorder flex items-center justify-between">
+                                    <h3 class="text-xs font-extrabold uppercase tracking-wider">Recent Admin Activity</h3>
+                                    <button class="text-[11px] text-neonBlue hover:underline" data-goto="audit">View all</button>
+                                </div>
+                                <ul id="overview-audit" class="divide-y divide-lineBorder"></ul>
+                            </div>
+                            <div class="flex flex-col gap-6">
+                                <div class="glass-card rounded-3xl p-6 flex flex-col gap-3">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="text-xs font-extrabold uppercase tracking-wider">My Owner Credits</h3>
+                                        <i class="ph ph-coins text-amber-400 text-lg"></i>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <input type="number" id="owner-credit-input" class="field w-full px-3 py-2.5 text-sm font-mono text-amber-400 font-bold" value="0">
+                                        <button id="owner-save-credits-btn" class="btn px-4 py-2.5 bg-textPrimary text-black hover:opacity-90">Set</button>
+                                    </div>
+                                </div>
+                                <div class="glass-card rounded-3xl overflow-hidden">
+                                    <div class="px-6 py-4 border-b border-lineBorder flex items-center justify-between">
+                                        <h3 class="text-xs font-extrabold uppercase tracking-wider">Recently Active</h3>
+                                        <button class="text-[11px] text-neonBlue hover:underline" data-goto="users">All users</button>
+                                    </div>
+                                    <ul id="overview-recent-users" class="divide-y divide-lineBorder"></ul>
+                                </div>
+                                <div class="glass-card rounded-3xl overflow-hidden">
+                                    <div class="px-6 py-4 border-b border-lineBorder">
+                                        <h3 class="text-xs font-extrabold uppercase tracking-wider">Top Credit Holders</h3>
+                                    </div>
+                                    <ul id="overview-top-credits" class="divide-y divide-lineBorder"></ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </section>
 
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm text-textSecondary">
-                            <thead class="bg-bgRoot/80 text-[10px] uppercase tracking-widest text-textSecondary border-b border-lineBorder font-bold">
-                                <tr>
-                                    <th class="py-4 px-6">User Profile</th>
-                                    <th class="py-4 px-6">Credit Balance Control</th>
-                                    <th class="py-4 px-6">Access Role</th>
-                                    <th class="py-4 px-6">State</th>
-                                    <th class="py-4 px-6 text-right">Governing Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="user-table-body" class="divide-y divide-lineBorder">
-                                <tr>
-                                    <td colspan="5" class="py-16 text-center text-textSecondary">
-                                        <i class="ph ph-spinner animate-spin text-3xl mb-2 block mx-auto text-neonBlue"></i> Loading secure database...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 2: SUBDOMAINS -->
-            <section id="tab-aisites" class="admin-section hidden flex-col gap-4">
-                <div class="glass-card rounded-3xl overflow-hidden shadow-2xl">
-                    <div class="p-6 border-b border-lineBorder flex items-center justify-between bg-panelDark/40">
-                        <h3 class="text-xs font-extrabold uppercase tracking-wider text-textPrimary">Deployed AI Subdomains</h3>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm text-textSecondary">
-                            <thead class="bg-bgRoot/80 text-[10px] uppercase tracking-widest text-textSecondary border-b border-lineBorder font-bold">
-                                <tr>
-                                    <th class="py-4 px-6">Creator</th>
-                                    <th class="py-4 px-6">Assigned Subdomain</th>
-                                    <th class="py-4 px-6">Original Prompt</th>
-                                    <th class="py-4 px-6">Timestamp</th>
-                                    <th class="py-4 px-6 text-right">Purge</th>
-                                </tr>
-                            </thead>
-                            <tbody id="site-table-body" class="divide-y divide-lineBorder"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 3: CHATS -->
-            <section id="tab-chats" class="admin-section hidden flex-col gap-4">
-                <div class="glass-card rounded-3xl overflow-hidden shadow-2xl">
-                    <div class="p-6 border-b border-lineBorder flex items-center justify-between bg-panelDark/40">
-                        <h3 class="text-xs font-extrabold uppercase tracking-wider text-textPrimary">Active Chat Rooms</h3>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm text-textSecondary">
-                            <thead class="bg-bgRoot/80 text-[10px] uppercase tracking-widest text-textSecondary border-b border-lineBorder font-bold">
-                                <tr>
-                                    <th class="py-4 px-6">Channel Name</th>
-                                    <th class="py-4 px-6">Invite Code</th>
-                                    <th class="py-4 px-6">Creator</th>
-                                    <th class="py-4 px-6">State</th>
-                                    <th class="py-4 px-6 text-right">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="chat-table-body" class="divide-y divide-lineBorder"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 4: AUDIT LOG -->
-            <section id="tab-audit" class="admin-section hidden flex-col gap-4">
-                <div class="glass-card rounded-3xl overflow-hidden shadow-2xl">
-                    <div class="p-6 border-b border-lineBorder flex items-center justify-between bg-panelDark/40">
-                        <h3 class="text-xs font-extrabold uppercase tracking-wider text-textPrimary">Immutable Security Audit Trail</h3>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm text-textSecondary">
-                            <thead class="bg-bgRoot/80 text-[10px] uppercase tracking-widest text-textSecondary border-b border-lineBorder font-bold">
-                                <tr>
-                                    <th class="py-4 px-6">Timestamp</th>
-                                    <th class="py-4 px-6">Administrator</th>
-                                    <th class="py-4 px-6">Action</th>
-                                    <th class="py-4 px-6">Telemetry Details</th>
-                                </tr>
-                            </thead>
-                            <tbody id="audit-table-body" class="divide-y divide-lineBorder"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 5: UPDATES -->
-            <section id="tab-updates" class="admin-section hidden flex-col gap-4">
-                <div class="glass-card p-6 shadow-2xl flex flex-col gap-4 rounded-3xl">
-                    <h3 class="text-xs font-extrabold uppercase tracking-wider text-textPrimary border-b border-lineBorder pb-3 flex items-center gap-2.5">
-                        <i class="ph ph-broadcast text-lg text-neonBlue"></i> Broadcast Global Announcement
-                    </h3>
-                    <div class="flex flex-col gap-3.5">
-                        <input type="text" id="admin-update-title" placeholder="Announcement Title" class="bg-bgRoot border border-lineBorder rounded-2xl px-4 py-3.5 text-xs text-textPrimary outline-none focus:border-neonBlue transition-all shadow-inner">
-                        <textarea id="admin-update-content" rows="3" placeholder="Announcement Details..." class="bg-bgRoot border border-lineBorder rounded-2xl p-4 text-xs text-textPrimary outline-none focus:border-neonBlue resize-none transition-all shadow-inner"></textarea>
-                        <div class="flex justify-end">
-                            <button id="admin-publish-btn" class="px-6 py-3.5 bg-neonBlue text-black font-extrabold rounded-2xl text-xs transition-all shadow-lg shadow-neonBlue/20">
-                                Broadcast Live
-                            </button>
+                    <!-- USERS -->
+                    <section id="tab-users" class="admin-section hidden flex-col gap-4">
+                        <div class="glass-card rounded-3xl overflow-hidden shadow-2xl">
+                            <div class="p-4 lg:p-6 border-b border-lineBorder flex flex-col gap-4">
+                                <div class="flex flex-wrap items-center gap-3">
+                                    <div class="relative flex-1 min-w-[200px]">
+                                        <i class="ph ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-textSecondary text-xs"></i>
+                                        <input type="text" id="user-search-input" data-search placeholder="Search name, email or UID…  (/)" class="field w-full pl-9 pr-4 py-2.5 text-xs">
+                                    </div>
+                                    <select id="user-sort" class="field px-3 py-2.5 text-xs font-semibold">
+                                        <option value="lastLogin">Sort: Last active</option>
+                                        <option value="name">Sort: Name</option>
+                                        <option value="credits">Sort: Credits (high→low)</option>
+                                        <option value="creditsAsc">Sort: Credits (low→high)</option>
+                                    </select>
+                                    <button id="users-export-btn" class="btn btn-ghost px-3 py-2.5"><i class="ph ph-download-simple"></i> CSV</button>
+                                </div>
+                                <div class="flex flex-wrap items-center gap-2" id="user-filter-chips">
+                                    <button class="chip active btn btn-ghost px-3 py-1.5 rounded-full" data-filter="all">All</button>
+                                    <button class="chip btn btn-ghost px-3 py-1.5 rounded-full" data-filter="active">Active</button>
+                                    <button class="chip btn btn-ghost px-3 py-1.5 rounded-full" data-filter="banned">Banned</button>
+                                    <button class="chip btn btn-ghost px-3 py-1.5 rounded-full" data-filter="staff">Admins & Owners</button>
+                                    <span id="user-result-count" class="ml-auto text-[11px] text-textSecondary font-mono"></span>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm text-textSecondary">
+                                    <thead class="bg-bgRoot/80 text-[10px] uppercase tracking-widest border-b border-lineBorder font-bold">
+                                        <tr>
+                                            <th class="py-3.5 px-6">User</th>
+                                            <th class="py-3.5 px-6">Credits</th>
+                                            <th class="py-3.5 px-6">Role</th>
+                                            <th class="py-3.5 px-6">Status</th>
+                                            <th class="py-3.5 px-6">Last active</th>
+                                            <th class="py-3.5 px-6 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="user-table-body" class="divide-y divide-lineBorder">
+                                        <tr><td colspan="6" class="py-16 text-center"><i class="ph ph-spinner animate-spin text-3xl mb-2 block mx-auto text-neonBlue"></i> Loading secure database…</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </section>
 
-                <div class="glass-card rounded-3xl overflow-hidden shadow-2xl">
-                    <div class="p-6 border-b border-lineBorder flex items-center justify-between bg-panelDark/40">
-                        <h3 class="text-xs font-extrabold uppercase tracking-wider text-textPrimary">Active System Broadcasts</h3>
-                    </div>
-                    <div id="admin-updates-list" class="p-6 flex flex-col gap-4"></div>
-                </div>
-            </section>
+                    <!-- SITES -->
+                    <section id="tab-aisites" class="admin-section hidden flex-col gap-4">
+                        <div class="glass-card rounded-3xl overflow-hidden shadow-2xl">
+                            <div class="p-4 lg:p-6 border-b border-lineBorder flex flex-wrap items-center gap-3">
+                                <div class="relative flex-1 min-w-[200px]">
+                                    <i class="ph ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-textSecondary text-xs"></i>
+                                    <input type="text" id="site-search-input" data-search placeholder="Search subdomain, creator or prompt…  (/)" class="field w-full pl-9 pr-4 py-2.5 text-xs">
+                                </div>
+                                <span id="site-result-count" class="text-[11px] text-textSecondary font-mono"></span>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm text-textSecondary">
+                                    <thead class="bg-bgRoot/80 text-[10px] uppercase tracking-widest border-b border-lineBorder font-bold">
+                                        <tr>
+                                            <th class="py-3.5 px-6">Subdomain</th>
+                                            <th class="py-3.5 px-6">Creator</th>
+                                            <th class="py-3.5 px-6">Prompt</th>
+                                            <th class="py-3.5 px-6">Created</th>
+                                            <th class="py-3.5 px-6 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="site-table-body" class="divide-y divide-lineBorder"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
 
+                    <!-- CHATS -->
+                    <section id="tab-chats" class="admin-section hidden flex-col gap-4">
+                        <div class="glass-card rounded-3xl overflow-hidden shadow-2xl">
+                            <div class="p-4 lg:p-6 border-b border-lineBorder flex flex-wrap items-center gap-3">
+                                <div class="relative flex-1 min-w-[200px]">
+                                    <i class="ph ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-textSecondary text-xs"></i>
+                                    <input type="text" id="chat-search-input" data-search placeholder="Search channel, invite code or creator…  (/)" class="field w-full pl-9 pr-4 py-2.5 text-xs">
+                                </div>
+                                <span id="chat-result-count" class="text-[11px] text-textSecondary font-mono"></span>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm text-textSecondary">
+                                    <thead class="bg-bgRoot/80 text-[10px] uppercase tracking-widest border-b border-lineBorder font-bold">
+                                        <tr>
+                                            <th class="py-3.5 px-6">Channel</th>
+                                            <th class="py-3.5 px-6">Invite Code</th>
+                                            <th class="py-3.5 px-6">Creator</th>
+                                            <th class="py-3.5 px-6">Status</th>
+                                            <th class="py-3.5 px-6 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="chat-table-body" class="divide-y divide-lineBorder"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- AUDIT -->
+                    <section id="tab-audit" class="admin-section hidden flex-col gap-4">
+                        <div class="glass-card rounded-3xl overflow-hidden shadow-2xl">
+                            <div class="p-4 lg:p-6 border-b border-lineBorder flex flex-wrap items-center gap-3">
+                                <div class="relative flex-1 min-w-[200px]">
+                                    <i class="ph ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-textSecondary text-xs"></i>
+                                    <input type="text" id="audit-search-input" data-search placeholder="Search details or admin…  (/)" class="field w-full pl-9 pr-4 py-2.5 text-xs">
+                                </div>
+                                <select id="audit-action-filter" class="field px-3 py-2.5 text-xs font-semibold">
+                                    <option value="">All actions</option>
+                                </select>
+                                <button id="audit-export-btn" class="btn btn-ghost px-3 py-2.5"><i class="ph ph-download-simple"></i> CSV</button>
+                                <span id="audit-result-count" class="text-[11px] text-textSecondary font-mono"></span>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm text-textSecondary">
+                                    <thead class="bg-bgRoot/80 text-[10px] uppercase tracking-widest border-b border-lineBorder font-bold">
+                                        <tr>
+                                            <th class="py-3.5 px-6">When</th>
+                                            <th class="py-3.5 px-6">Administrator</th>
+                                            <th class="py-3.5 px-6">Action</th>
+                                            <th class="py-3.5 px-6">Details</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="audit-table-body" class="divide-y divide-lineBorder"></tbody>
+                                </table>
+                            </div>
+                            <p class="px-6 py-3 text-[10px] text-textSecondary border-t border-lineBorder">Showing the latest 500 entries.</p>
+                        </div>
+                    </section>
+
+                    <!-- UPDATES -->
+                    <section id="tab-updates" class="admin-section hidden flex-col gap-6">
+                        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                            <div class="glass-card p-6 rounded-3xl flex flex-col gap-4">
+                                <h3 class="text-xs font-extrabold uppercase tracking-wider flex items-center gap-2.5">
+                                    <i class="ph ph-broadcast text-lg text-neonBlue"></i> Compose Announcement
+                                </h3>
+                                <div class="flex flex-col gap-1.5">
+                                    <input type="text" id="admin-update-title" maxlength="120" placeholder="Announcement title" class="field px-4 py-3 text-xs">
+                                    <span class="text-[10px] text-textSecondary text-right font-mono"><span id="title-count">0</span>/120</span>
+                                </div>
+                                <div class="flex flex-col gap-1.5">
+                                    <textarea id="admin-update-content" rows="5" maxlength="2000" placeholder="Announcement details…" class="field p-4 text-xs resize-y"></textarea>
+                                    <span class="text-[10px] text-textSecondary text-right font-mono"><span id="content-count">0</span>/2000 · <kbd>Ctrl</kbd>+<kbd>Enter</kbd> to publish</span>
+                                </div>
+                                <div class="flex justify-end">
+                                    <button id="admin-publish-btn" class="btn btn-primary px-6 py-3 font-extrabold shadow-lg shadow-neonBlue/20">
+                                        <i class="ph ph-paper-plane-tilt"></i> Broadcast Live
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="glass-card p-6 rounded-3xl flex flex-col gap-3">
+                                <h3 class="text-xs font-extrabold uppercase tracking-wider text-textSecondary">Live Preview</h3>
+                                <div class="bg-bgRoot border border-lineBorder p-5 rounded-2xl flex flex-col gap-1.5">
+                                    <h4 id="preview-title" class="text-sm font-bold text-textPrimary">Announcement title</h4>
+                                    <p id="preview-content" class="text-xs text-textSecondary whitespace-pre-wrap break-words">Announcement details will appear here.</p>
+                                    <span id="preview-meta" class="text-[10px] text-textSecondary font-mono mt-1"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card rounded-3xl overflow-hidden shadow-2xl">
+                            <div class="px-6 py-4 border-b border-lineBorder flex items-center justify-between">
+                                <h3 class="text-xs font-extrabold uppercase tracking-wider">Active Broadcasts</h3>
+                                <span id="update-count" class="text-[11px] text-textSecondary font-mono"></span>
+                            </div>
+                            <div id="admin-updates-list" class="p-6 flex flex-col gap-4"></div>
+                        </div>
+                    </section>
+
+                </div>
+            </main>
         </div>
-    </main>
+    </div>
+
+    <!-- MODAL -->
+    <div id="modal" class="fixed inset-0 z-[60] hidden items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+        <div class="glass-card rounded-3xl w-full max-w-md p-6 flex flex-col gap-4 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <div class="flex items-start gap-3">
+                <div id="modal-icon" class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"></div>
+                <div class="min-w-0">
+                    <h3 id="modal-title" class="text-sm font-extrabold"></h3>
+                    <p id="modal-body" class="text-xs text-textSecondary mt-1 break-words"></p>
+                </div>
+            </div>
+            <input id="modal-input" class="field px-4 py-3 text-sm font-mono hidden">
+            <div class="flex justify-end gap-2">
+                <button id="modal-cancel" class="btn btn-ghost px-4 py-2.5">Cancel</button>
+                <button id="modal-confirm" class="btn btn-primary px-4 py-2.5">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SHORTCUTS HELP -->
+    <div id="help" class="fixed inset-0 z-[60] hidden items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+        <div class="glass-card rounded-3xl w-full max-w-sm p-6 flex flex-col gap-3 shadow-2xl">
+            <h3 class="text-sm font-extrabold">Keyboard shortcuts</h3>
+            <ul class="text-xs text-textSecondary flex flex-col gap-2">
+                <li class="flex justify-between"><span>Switch tab</span><span><kbd>1</kbd> – <kbd>6</kbd></span></li>
+                <li class="flex justify-between"><span>Focus search</span><kbd>/</kbd></li>
+                <li class="flex justify-between"><span>Save credits in row</span><kbd>Enter</kbd></li>
+                <li class="flex justify-between"><span>Lock matrix</span><kbd>L</kbd></li>
+                <li class="flex justify-between"><span>Close dialog</span><kbd>Esc</kbd></li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="toast-stack" class="fixed bottom-4 right-4 z-[70] flex flex-col gap-2 items-end pointer-events-none"></div>
 
     <!-- FIREBASE LOGIC SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getDatabase, ref as dbRef, onValue, update, remove, push, serverTimestamp, get, set } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        import { getDatabase, ref as dbRef, onValue, update, remove, push, serverTimestamp, get, set, increment, query, limitToLast } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAO_ffupJOIMPE9m4ARtaqSzC1vGDkIAco",
             authDomain: "nexus-web-development-official.firebaseapp.com",
             projectId: "nexus-web-development-official",
-            databaseURL: "https://nexus-web-development-official-default-rtdb.firebaseio.com" 
+            databaseURL: "https://nexus-web-development-official-default-rtdb.firebaseio.com"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        const ADMIN_PASSCODE = "022614"; 
+        const ADMIN_PASSCODE = "022614";
         const OWNER_EMAIL = "brodywilliams0226@gmail.com";
+        const DEFAULT_CREDITS = 10000;
 
+        // ---------- state ----------
         let currentUser = null;
         let isOwner = false;
-        let cachedUsers = {};
+        let subscribed = false;
+        let isMaintenanceActive = false;
+        const data = { users: {}, sites: {}, chats: {}, audit: {}, updates: {} };
+        const userView = { filter: 'all', sort: 'lastLogin' };
 
-        const lockScreen = document.getElementById('password-lock-screen');
-        const loginSection = document.getElementById('admin-login-section');
-        const lockForm = document.getElementById('lock-form');
-        const passInput = document.getElementById('admin-password-input');
-        const errorMsg = document.getElementById('lock-error-msg');
-        const authErrorMsg = document.getElementById('auth-error-msg');
-        const adminLoginBtn = document.getElementById('admin-login-btn');
-        const reLockBtn = document.getElementById('re-lock-btn');
-        const ownerCreditInput = document.getElementById('owner-credit-input');
-        const ownerSaveCreditsBtn = document.getElementById('owner-save-credits-btn');
-        const globalAirdropBtn = document.getElementById('global-airdrop-btn');
-        const userSearchInput = document.getElementById('user-search-input');
-        const maintenanceToggleBtn = document.getElementById('maintenance-toggle-btn');
-        const maintenanceThumb = document.getElementById('maintenance-thumb');
+        // ---------- helpers ----------
+        const $ = (id) => document.getElementById(id);
+        const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const fmt = (n) => Number(n || 0).toLocaleString();
+        const toList = (obj) => Object.keys(obj || {}).map(k => ({ id: k, ...obj[k] }));
+        const credits = (u) => u.credits ?? DEFAULT_CREDITS;
+        const isStaff = (u) => u.role === 'Admin' || u.role === 'Owner';
+        const has = (needle, ...fields) => !needle || fields.some(f => String(f ?? '').toLowerCase().includes(needle));
+
+        function timeAgo(ts) {
+            if (!ts || typeof ts !== 'number') return '—';
+            const s = Math.max(0, (Date.now() - ts) / 1000);
+            if (s < 60) return 'just now';
+            const units = [[60, 'm'], [24, 'h'], [30, 'd'], [12, 'mo']];
+            let v = s / 60, label = 'm';
+            for (let i = 1; i < units.length && v >= units[i][0]; i++) { v /= units[i][0]; label = units[i][1]; }
+            if (label === 'mo' && v >= 12) return `${Math.floor(v / 12)}y ago`;
+            return `${Math.floor(v)}${label} ago`;
+        }
+        const fullDate = (ts) => (ts && typeof ts === 'number') ? new Date(ts).toLocaleString() : '—';
+
+        function toast(message, type = 'ok') {
+            const styles = {
+                ok: ['ph-check-circle', 'text-emerald-400 border-emerald-500/25'],
+                err: ['ph-warning-circle', 'text-red-400 border-red-500/25'],
+                info: ['ph-info', 'text-neonBlue border-cyan-500/25']
+            }[type];
+            const el = document.createElement('div');
+            el.className = `toast pointer-events-auto glass-card border ${styles[1]} rounded-2xl px-4 py-3 text-xs font-semibold flex items-center gap-2 shadow-2xl max-w-sm`;
+            el.innerHTML = `<i class="ph ${styles[0]} text-base"></i><span class="text-textPrimary">${esc(message)}</span>`;
+            $('toast-stack').appendChild(el);
+            setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(() => el.remove(), 300); }, 3200);
+        }
+
+        // Run a write, toast the result, never throw into the UI.
+        async function run(fn, okMsg) {
+            try {
+                await fn();
+                if (okMsg) toast(okMsg);
+                return true;
+            } catch (err) {
+                console.error(err);
+                toast(err?.code === 'PERMISSION_DENIED' ? 'Permission denied by database rules.' : (err?.message || 'Something went wrong.'), 'err');
+                return false;
+            }
+        }
+
+        // Promise-based dialog replacing confirm()/prompt().
+        let modalResolve = null;
+        function dialog({ title, body = '', confirmText = 'Confirm', danger = false, input = null, icon = 'ph-question' }) {
+            $('modal-title').textContent = title;
+            $('modal-body').textContent = body;
+            const iconEl = $('modal-icon');
+            iconEl.className = `w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${danger ? 'bg-red-500/10 text-red-400' : 'bg-cyan-500/10 text-neonBlue'}`;
+            iconEl.innerHTML = `<i class="ph ${icon} text-xl"></i>`;
+            const confirmBtn = $('modal-confirm');
+            confirmBtn.textContent = confirmText;
+            confirmBtn.className = `btn px-4 py-2.5 ${danger ? 'btn-danger' : 'btn-primary'}`;
+            const inp = $('modal-input');
+            if (input) {
+                inp.classList.remove('hidden');
+                inp.type = input.type || 'text';
+                inp.value = input.value ?? '';
+                inp.placeholder = input.placeholder || '';
+            } else {
+                inp.classList.add('hidden');
+            }
+            $('modal').classList.replace('hidden', 'flex');
+            setTimeout(() => (input ? inp : confirmBtn).focus(), 30);
+            return new Promise(resolve => { modalResolve = resolve; });
+        }
+        function closeModal(result) {
+            $('modal').classList.replace('flex', 'hidden');
+            if (modalResolve) { modalResolve(result); modalResolve = null; }
+        }
+        $('modal-cancel').addEventListener('click', () => closeModal(null));
+        $('modal-confirm').addEventListener('click', () => closeModal($('modal-input').classList.contains('hidden') ? true : $('modal-input').value));
+        $('modal-input').addEventListener('keydown', e => { if (e.key === 'Enter') $('modal-confirm').click(); });
+        $('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(null); });
+        $('help').addEventListener('click', () => $('help').classList.replace('flex', 'hidden'));
+
+        function downloadCSV(filename, rows) {
+            const csv = rows.map(r => r.map(c => `"${String(c ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        // Broken avatar images fall back to placeholder.
+        document.addEventListener('error', e => {
+            if (e.target.tagName === 'IMG' && e.target.classList.contains('avatar') && !e.target.dataset.fallback) {
+                e.target.dataset.fallback = '1';
+                e.target.src = 'https://placehold.co/100';
+            }
+        }, true);
 
         async function logAudit(action, details) {
             if (!currentUser) return;
-            await push(dbRef(db, 'nexus/audit_logs'), {
-                timestamp: serverTimestamp(),
-                adminEmail: currentUser.email,
-                action,
-                details
-            });
+            try {
+                await push(dbRef(db, 'nexus/audit_logs'), { timestamp: serverTimestamp(), adminEmail: currentUser.email, action, details });
+            } catch (err) { console.error('Audit log failed', err); }
         }
 
-        adminLoginBtn.addEventListener('click', async () => {
+        // ---------- navigation ----------
+        const TABS = [
+            { id: 'overview', label: 'Overview', icon: 'ph-squares-four' },
+            { id: 'users', label: 'Users & Credits', icon: 'ph-users-three', count: () => Object.keys(data.users).length },
+            { id: 'aisites', label: 'AI Subdomains', icon: 'ph-globe-hemisphere-west', count: () => Object.keys(data.sites).length },
+            { id: 'chats', label: 'Chat Channels', icon: 'ph-chats-teardrop', count: () => Object.keys(data.chats).length },
+            { id: 'audit', label: 'Audit Trail', icon: 'ph-shield-warning' },
+            { id: 'updates', label: 'Announcements', icon: 'ph-broadcast', count: () => Object.keys(data.updates).length }
+        ];
+        let activeTab = 'overview';
+        try { activeTab = localStorage.getItem('nexus_admin_tab') || 'overview'; } catch {}
+        if (!TABS.some(t => t.id === activeTab)) activeTab = 'overview';
+
+        function renderNav() {
+            const side = TABS.map((t, i) => {
+                const c = t.count ? t.count() : null;
+                return `<button data-tab="${t.id}" class="nav-item ${t.id === activeTab ? 'active' : ''} flex items-center gap-3 px-3.5 py-2.5 rounded-xl border border-transparent text-xs font-bold text-textSecondary hover:text-textPrimary hover:bg-panelHover transition-all">
+                    <i class="ph ${t.icon} text-base"></i><span class="flex-1 text-left">${t.label}</span>
+                    ${c !== null ? `<span class="nav-badge text-[10px] font-mono px-2 py-0.5 rounded-full bg-panelHover">${fmt(c)}</span>` : `<kbd>${i + 1}</kbd>`}
+                </button>`;
+            }).join('');
+            $('side-nav').innerHTML = side;
+            $('top-nav').innerHTML = TABS.map(t => `<button data-tab="${t.id}" class="nav-item ${t.id === activeTab ? 'active' : ''} shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl border border-lineBorder text-xs font-bold text-textSecondary"><i class="ph ${t.icon}"></i>${t.label}</button>`).join('');
+        }
+
+        function switchTab(id) {
+            activeTab = id;
+            try { localStorage.setItem('nexus_admin_tab', id); } catch {}
+            document.querySelectorAll('.admin-section').forEach(s => { s.classList.add('hidden'); s.classList.remove('flex'); });
+            const section = $(`tab-${id}`);
+            section.classList.remove('hidden');
+            section.classList.add('flex');
+            $('page-title').textContent = TABS.find(t => t.id === id).label;
+            renderNav();
+        }
+        document.addEventListener('click', e => {
+            const t = e.target.closest('[data-tab],[data-goto]');
+            if (t) switchTab(t.dataset.tab || t.dataset.goto);
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                if (!$('modal').classList.contains('hidden')) closeModal(null);
+                $('help').classList.replace('flex', 'hidden');
+                if (document.activeElement?.matches('input,textarea')) document.activeElement.blur();
+                return;
+            }
+            if (e.target.matches('input,textarea,select') || e.ctrlKey || e.metaKey || e.altKey) return;
+            if (!$('password-lock-screen').classList.contains('hidden')) return;
+            if (/^[1-6]$/.test(e.key)) switchTab(TABS[+e.key - 1].id);
+            else if (e.key === '/') {
+                const search = $(`tab-${activeTab}`).querySelector('[data-search]');
+                if (search) { e.preventDefault(); search.focus(); }
+            } else if (e.key === '?') $('help').classList.replace('hidden', 'flex');
+            else if (e.key.toLowerCase() === 'l') lockMatrix();
+        });
+
+        // ---------- auth gate ----------
+        const lockScreen = $('password-lock-screen');
+        const loginSection = $('admin-login-section');
+        const lockForm = $('lock-form');
+        const passInput = $('admin-password-input');
+        const errorMsg = $('lock-error-msg');
+        const authErrorMsg = $('auth-error-msg');
+        const adminLoginBtn = $('admin-login-btn');
+
+        async function switchAccount() {
             try {
                 if (auth.currentUser) await signOut(auth);
                 await signInWithPopup(auth, new GoogleAuthProvider());
             } catch (err) {
-                console.error("Authentication failed", err);
+                if (err?.code !== 'auth/popup-closed-by-user') {
+                    authErrorMsg.textContent = `Sign-in failed: ${err?.message || err}`;
+                    authErrorMsg.classList.remove('hidden');
+                }
             }
+        }
+        adminLoginBtn.addEventListener('click', switchAccount);
+        $('lock-switch-btn').addEventListener('click', switchAccount);
+
+        function lockMatrix() {
+            sessionStorage.removeItem('nexus_admin_unlocked');
+            lockScreen.classList.remove('hidden');
+            setTimeout(() => passInput.focus(), 30);
+        }
+        $('re-lock-btn').addEventListener('click', lockMatrix);
+        $('re-lock-btn-mobile').addEventListener('click', lockMatrix);
+        $('sign-out-btn').addEventListener('click', async () => {
+            sessionStorage.removeItem('nexus_admin_unlocked');
+            await signOut(auth);
         });
 
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             isOwner = (user?.email === OWNER_EMAIL);
 
+            $('me-avatar').src = user?.photoURL || 'https://placehold.co/100';
+            $('me-name').textContent = user?.displayName || '—';
+            $('me-email').textContent = user?.email || '—';
+
             if (!isOwner) {
                 sessionStorage.removeItem('nexus_admin_unlocked');
                 lockScreen.classList.remove('hidden');
                 lockForm.classList.add('hidden');
                 loginSection.classList.remove('hidden');
-
                 if (user) {
-                    authErrorMsg.textContent = `Access Denied: ${user.email} is not authorized for OS 6.0 kernel commands.`;
+                    authErrorMsg.textContent = `Access denied: ${user.email} is not authorized for this panel.`;
                     authErrorMsg.classList.remove('hidden');
                     adminLoginBtn.innerHTML = `<i class="ph ph-arrows-left-right text-sm"></i> Switch Account`;
                 } else {
@@ -400,104 +665,33 @@
             } else {
                 loginSection.classList.add('hidden');
                 lockForm.classList.remove('hidden');
+                $('lock-identity').textContent = `Identity confirmed: ${user.email}`;
+                if (sessionStorage.getItem('nexus_admin_unlocked') === 'true') lockScreen.classList.add('hidden');
+                else setTimeout(() => passInput.focus(), 30);
 
-                if (sessionStorage.getItem('nexus_admin_unlocked') === 'true') {
-                    lockScreen.classList.add('hidden');
-                }
-
-                onValue(dbRef(db, `nexus/users/${user.uid}/credits`), (snapshot) => {
-                    const val = snapshot.val();
-                    if (val !== null) ownerCreditInput.value = val;
-                }, { onlyOnce: true });
+                get(dbRef(db, `nexus/users/${user.uid}/credits`)).then(s => {
+                    if (s.val() !== null) $('owner-credit-input').value = s.val();
+                }).catch(() => {});
             }
 
             if (user) {
-                const userRef = dbRef(db, `nexus/users/${user.uid}`);
-                await update(userRef, {
+                update(dbRef(db, `nexus/users/${user.uid}`), {
                     uid: user.uid,
                     name: user.displayName || 'Anonymous',
                     email: user.email,
                     photoURL: user.photoURL || 'https://placehold.co/100',
                     lastLogin: Date.now()
-                });
+                }).catch(err => console.error('Profile sync failed', err));
             }
 
-            listenToUsers();
-            listenToAiSites();
-            listenToChats();
-            listenToAuditLogs();
-            listenToUpdates();
-            listenToMaintenanceMode();
-        });
-
-        ownerSaveCreditsBtn.addEventListener('click', async () => {
-            if (!currentUser || !isOwner) return;
-            const newCredits = parseInt(ownerCreditInput.value);
-            if (isNaN(newCredits)) return alert("Please enter a valid number.");
-            await update(dbRef(db, `nexus/users/${currentUser.uid}`), { credits: newCredits });
-            await logAudit("UPDATE_OWNER_CREDITS", `Set own credits to ${newCredits}`);
-            alert("Credits updated successfully.");
-        });
-
-        globalAirdropBtn.addEventListener('click', async () => {
-            if (!isOwner) return;
-            if (!confirm("Are you sure you want to add +1,000 credits to ALL registered users?")) return;
-            
-            const snapshot = await get(dbRef(db, 'nexus/users'));
-            if (!snapshot.exists()) return alert("No users found.");
-            
-            const updates = {};
-            snapshot.forEach((child) => {
-                const userData = child.val();
-                const currentCredits = userData.credits ?? 10000;
-                updates[`nexus/users/${child.key}/credits`] = currentCredits + 1000;
-            });
-
-            await update(dbRef(db), updates);
-            await logAudit("GLOBAL_AIRDROP", "Airdropped +1,000 credits to all platform users");
-            alert("Successfully distributed +1,000 credits globally!");
-        });
-
-        let isMaintenanceActive = false;
-        function listenToMaintenanceMode() {
-            onValue(dbRef(db, 'nexus/system/maintenance'), async (snapshot) => {
-                isMaintenanceActive = !!snapshot.val();
-                if (isMaintenanceActive) {
-                    maintenanceToggleBtn.classList.remove('bg-lineBorder');
-                    maintenanceToggleBtn.classList.add('bg-neonBlue');
-                    maintenanceThumb.classList.add('translate-x-4');
-
-                    if (currentUser) {
-                        if (!isOwner) {
-                            const userSnap = await get(dbRef(db, `nexus/users/${currentUser.uid}/role`));
-                            const role = userSnap.val();
-                            if (role !== 'Admin' && role !== 'Owner') {
-                                window.location.href = 'nexus_maintenance.html';
-                            }
-                        }
-                    } else {
-                        window.location.href = 'nexus_maintenance.html';
-                    }
-                } else {
-                    maintenanceToggleBtn.classList.add('bg-lineBorder');
-                    maintenanceToggleBtn.classList.remove('bg-neonBlue');
-                    maintenanceThumb.classList.remove('translate-x-4');
-                }
-            });
-        }
-
-        maintenanceToggleBtn.addEventListener('click', async () => {
-            if (!isOwner) return;
-            const nextState = !isMaintenanceActive;
-            await set(dbRef(db, 'nexus/system/maintenance'), nextState);
-            await logAudit("TOGGLE_MAINTENANCE", `Set system maintenance mode to ${nextState}`);
+            if (isOwner) subscribeAll();
         });
 
         lockForm.addEventListener('submit', (e) => {
             e.preventDefault();
             if (passInput.value.trim() !== ADMIN_PASSCODE) {
-                errorMsg.textContent = "Incorrect secure passcode.";
                 errorMsg.classList.remove('hidden');
+                passInput.select();
                 return;
             }
             sessionStorage.setItem('nexus_admin_unlocked', 'true');
@@ -507,280 +701,511 @@
             logAudit("UNLOCK_MATRIX", "Unlocked OS 6.0 Command Matrix");
         });
 
-        reLockBtn.addEventListener('click', () => {
-            sessionStorage.removeItem('nexus_admin_unlocked');
-            lockScreen.classList.remove('hidden');
-        });
+        // ---------- subscriptions (attached once) ----------
+        function subscribeAll() {
+            if (subscribed) return;
+            subscribed = true;
 
-        window.switchAdminTab = (tabName, btn) => {
-            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.admin-section').forEach(s => s.classList.add('hidden'));
-            btn.classList.add('active');
-            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-        };
+            onValue(dbRef(db, '.info/connected'), s => {
+                const on = s.val() === true;
+                $('conn-dot').className = `w-2 h-2 rounded-full ${on ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`;
+                $('conn-label').textContent = on ? 'Real-time database online' : 'Offline — reconnecting…';
+            });
+            const listen = (path, key, ...renders) => onValue(path, s => {
+                data[key] = s.val() || {};
+                renders.forEach(r => r());
+                renderNav();
+                renderOverview();
+            }, err => toast(`Cannot read ${key}: ${err.message}`, 'err'));
 
-        function renderUsersTable() {
-            const tbody = document.getElementById('user-table-body');
-            tbody.innerHTML = '';
+            listen(dbRef(db, 'nexus/users'), 'users', renderUsers);
+            listen(dbRef(db, 'nexus/ai_sites'), 'sites', renderSites);
+            listen(dbRef(db, 'nexus/chats'), 'chats', renderChats);
+            listen(query(dbRef(db, 'nexus/audit_logs'), limitToLast(500)), 'audit', renderAudit);
+            listen(dbRef(db, 'nexus/updates'), 'updates', renderUpdates);
 
-            const usersArr = Object.keys(cachedUsers).map(k => ({ uid: k, ...cachedUsers[k] }));
-            const filterText = userSearchInput.value.toLowerCase();
-            const filtered = usersArr.filter(u => (u.name?.toLowerCase().includes(filterText) || u.email?.toLowerCase().includes(filterText)));
+            onValue(dbRef(db, 'nexus/system/maintenance'), s => {
+                isMaintenanceActive = !!s.val();
+                $('maintenance-track').classList.toggle('bg-amber-400', isMaintenanceActive);
+                $('maintenance-track').classList.toggle('bg-lineBorder', !isMaintenanceActive);
+                $('maintenance-thumb').classList.toggle('translate-x-4', isMaintenanceActive);
+                $('maintenance-banner').classList.toggle('hidden', !isMaintenanceActive);
+                $('maintenance-banner').classList.toggle('flex', isMaintenanceActive);
+            });
+        }
 
-            document.getElementById('stat-total-users').textContent = usersArr.length;
-            document.getElementById('stat-banned').textContent = usersArr.filter(u => u.isBanned).length;
+        // ---------- overview ----------
+        function statCard(label, value, icon, tone, sub = '') {
+            return `<div class="glass-card p-5 rounded-3xl flex flex-col gap-3">
+                <div class="flex items-center justify-between">
+                    <p class="text-[10px] uppercase tracking-wider text-textSecondary font-bold">${label}</p>
+                    <span class="w-8 h-8 rounded-xl flex items-center justify-center ${tone}"><i class="ph ${icon} text-base"></i></span>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-black text-textPrimary">${value}</h3>
+                    ${sub ? `<p class="text-[10px] text-textSecondary mt-0.5">${sub}</p>` : ''}
+                </div>
+            </div>`;
+        }
 
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="py-16 text-center text-textSecondary">No users found matching parameters.</td></tr>`;
-                return;
-            }
+        function userMini(u, right) {
+            return `<li class="px-6 py-3 flex items-center gap-3">
+                <img src="${esc(u.photoURL || 'https://placehold.co/100')}" alt="" class="avatar w-8 h-8 rounded-xl object-cover border border-lineBorder">
+                <div class="min-w-0 flex-1">
+                    <p class="text-xs font-bold text-textPrimary truncate">${esc(u.name || 'Anonymous')}</p>
+                    <p class="text-[10px] font-mono text-textSecondary truncate">${esc(u.email)}</p>
+                </div>
+                ${right}
+            </li>`;
+        }
 
-            filtered.forEach(u => {
-                const disableControls = !isOwner;
-                const userCredits = u.credits ?? 10000;
+        function renderOverview() {
+            const users = toList(data.users);
+            const weekAgo = Date.now() - 7 * 864e5;
+            const active7 = users.filter(u => u.lastLogin > weekAgo).length;
+            const banned = users.filter(u => u.isBanned).length;
+            const staff = users.filter(isStaff).length;
+            const totalCredits = users.reduce((sum, u) => sum + (Number(credits(u)) || 0), 0);
+            const chats = toList(data.chats);
 
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-panelHover/40 transition-colors';
-                row.innerHTML = `
-                    <td class="py-4 px-6 flex items-center gap-3">
-                        <img src="${u.photoURL || 'https://placehold.co/100'}" class="w-10 h-10 rounded-2xl object-cover border border-lineBorder shadow-sm">
-                        <div class="flex flex-col">
-                            <span class="font-bold text-textPrimary text-sm">${u.name}</span>
-                            <span class="text-[11px] font-mono text-textSecondary">${u.email}</span>
+            $('stat-grid').innerHTML = [
+                statCard('Total Users', fmt(users.length), 'ph-users', 'bg-panelHover text-textSecondary', `${fmt(staff)} staff`),
+                statCard('Active (7d)', fmt(active7), 'ph-pulse', 'bg-emerald-500/10 text-emerald-400', users.length ? `${Math.round(active7 / users.length * 100)}% of users` : ''),
+                statCard('AI Sites', fmt(Object.keys(data.sites).length), 'ph-globe', 'bg-cyan-500/10 text-neonBlue'),
+                statCard('Chat Channels', fmt(chats.length), 'ph-chat-circle-dots', 'bg-purple-500/10 text-purple-400', `${fmt(chats.filter(c => c.isDisabled).length)} disabled`),
+                statCard('Banned', fmt(banned), 'ph-user-minus', 'bg-red-500/10 text-red-400'),
+                statCard('Credits in Circulation', fmt(totalCredits), 'ph-coins', 'bg-amber-500/10 text-amber-400')
+            ].join('');
+
+            const logs = toList(data.audit).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)).slice(0, 8);
+            $('overview-audit').innerHTML = logs.length ? logs.map(l => `
+                <li class="px-6 py-3 flex items-center gap-3">
+                    <span class="pill bg-cyan-500/10 text-neonBlue border-cyan-500/20 font-mono">${esc(l.action)}</span>
+                    <span class="text-xs text-textSecondary truncate flex-1">${esc(l.details)}</span>
+                    <span class="text-[10px] font-mono text-textSecondary shrink-0" title="${esc(fullDate(l.timestamp))}">${timeAgo(l.timestamp)}</span>
+                </li>`).join('') : `<li class="px-6 py-10 text-center text-xs text-textSecondary">No activity yet.</li>`;
+
+            const recent = [...users].sort((a, b) => (b.lastLogin || 0) - (a.lastLogin || 0)).slice(0, 5);
+            $('overview-recent-users').innerHTML = recent.length
+                ? recent.map(u => userMini(u, `<span class="text-[10px] font-mono text-textSecondary shrink-0">${timeAgo(u.lastLogin)}</span>`)).join('')
+                : `<li class="px-6 py-8 text-center text-xs text-textSecondary">No users.</li>`;
+
+            const top = [...users].sort((a, b) => credits(b) - credits(a)).slice(0, 5);
+            $('overview-top-credits').innerHTML = top.length
+                ? top.map(u => userMini(u, `<span class="text-xs font-mono font-bold text-amber-400 shrink-0">${fmt(credits(u))}</span>`)).join('')
+                : `<li class="px-6 py-8 text-center text-xs text-textSecondary">No users.</li>`;
+        }
+
+        // ---------- users ----------
+        const emptyRow = (cols, msg) => `<tr><td colspan="${cols}" class="py-16 text-center text-xs text-textSecondary">${msg}</td></tr>`;
+
+        function renderUsers() {
+            const tbody = $('user-table-body');
+            const needle = $('user-search-input').value.trim().toLowerCase();
+            const users = toList(data.users)
+                .filter(u => has(needle, u.name, u.email, u.id))
+                .filter(u => userView.filter === 'all'
+                    || (userView.filter === 'active' && !u.isBanned)
+                    || (userView.filter === 'banned' && u.isBanned)
+                    || (userView.filter === 'staff' && isStaff(u)));
+
+            const sorters = {
+                lastLogin: (a, b) => (b.lastLogin || 0) - (a.lastLogin || 0),
+                name: (a, b) => String(a.name || '').localeCompare(String(b.name || '')),
+                credits: (a, b) => credits(b) - credits(a),
+                creditsAsc: (a, b) => credits(a) - credits(b)
+            };
+            users.sort(sorters[userView.sort]);
+            $('user-result-count').textContent = `${users.length} of ${Object.keys(data.users).length}`;
+
+            // Keep unsaved credit edits across live re-renders.
+            const pending = {};
+            tbody.querySelectorAll('.credit-input.dirty').forEach(i => { pending[i.dataset.uid] = i.value; });
+
+            if (!users.length) { tbody.innerHTML = emptyRow(6, 'No users match these filters.'); return; }
+
+            const dis = isOwner ? '' : 'disabled';
+            tbody.innerHTML = users.map(u => {
+                const uid = esc(u.id);
+                const isMe = currentUser && u.id === currentUser.uid;
+                const value = pending[u.id] ?? credits(u);
+                return `<tr class="hover:bg-panelHover/40 transition-colors" data-uid="${uid}">
+                    <td class="py-3.5 px-6">
+                        <div class="flex items-center gap-3 min-w-[220px]">
+                            <img src="${esc(u.photoURL || 'https://placehold.co/100')}" alt="" class="avatar w-10 h-10 rounded-xl object-cover border border-lineBorder">
+                            <div class="flex flex-col min-w-0">
+                                <span class="font-bold text-textPrimary text-sm truncate">${esc(u.name || 'Anonymous')}${isMe ? ' <span class="pill bg-cyan-500/10 text-neonBlue border-cyan-500/20 ml-1">You</span>' : ''}</span>
+                                <span class="text-[11px] font-mono text-textSecondary truncate">${esc(u.email)}</span>
+                                <button data-action="copy-uid" class="text-[10px] font-mono text-textSecondary/60 hover:text-neonBlue text-left truncate" title="Copy UID">${uid}</button>
+                            </div>
                         </div>
                     </td>
-                    <td class="py-4 px-6 font-mono text-xs">
-                        <div class="flex items-center gap-2">
-                            <input type="number" id="credits-${u.uid}" value="${userCredits}" class="w-24 bg-bgRoot border border-lineBorder rounded-xl px-3 py-2 text-amber-400 font-bold outline-none focus:border-neonBlue shadow-inner" ${disableControls ? 'disabled' : ''}>
-                            <button onclick="window.saveUserCredits('${u.uid}')" ${disableControls ? 'disabled' : ''} class="px-3 py-2 rounded-xl bg-panelHover border border-lineBorder text-textPrimary hover:bg-lineBorder disabled:opacity-30 font-bold">Set</button>
-                            <button onclick="window.resetCredits('${u.uid}')" ${disableControls ? 'disabled' : ''} class="px-3 py-2 rounded-xl bg-panelHover border border-lineBorder text-textSecondary hover:text-textPrimary disabled:opacity-30">Reset</button>
+                    <td class="py-3.5 px-6">
+                        <div class="flex items-center gap-1.5">
+                            <button data-action="adjust" data-delta="-100" ${dis} class="btn btn-ghost w-8 h-8" title="−100">−</button>
+                            <input type="number" data-uid="${uid}" value="${esc(value)}" ${dis} class="credit-input ${pending[u.id] !== undefined ? 'dirty' : ''} field w-24 px-2.5 py-2 text-xs font-mono font-bold text-amber-400 text-center">
+                            <button data-action="adjust" data-delta="100" ${dis} class="btn btn-ghost w-8 h-8" title="+100">+</button>
+                            <button data-action="save-credits" ${dis} class="btn btn-ghost px-3 py-2 text-textPrimary">Set</button>
+                            <button data-action="reset-credits" ${dis} class="btn btn-ghost w-8 h-8" title="Reset to ${fmt(DEFAULT_CREDITS)}"><i class="ph ph-arrow-counter-clockwise"></i></button>
                         </div>
                     </td>
-                    <td class="py-4 px-6">
-                        <select onchange="window.changeRole('${u.uid}', this.value)" ${disableControls ? 'disabled' : ''} class="bg-bgRoot border border-lineBorder text-textPrimary text-xs rounded-xl px-3.5 py-2 outline-none focus:border-neonBlue disabled:opacity-50 font-bold">
-                            <option value="User" ${u.role === 'User' ? 'selected' : ''}>User</option>
-                            <option value="Admin" ${u.role === 'Admin' ? 'selected' : ''}>Admin</option>
-                            <option value="Owner" ${u.role === 'Owner' ? 'selected' : ''}>Owner</option>
+                    <td class="py-3.5 px-6">
+                        <select data-action="role" ${dis} class="field px-3 py-2 text-xs font-bold text-textPrimary">
+                            ${['User', 'Admin', 'Owner'].map(r => `<option value="${r}" ${(u.role || 'User') === r ? 'selected' : ''}>${r}</option>`).join('')}
                         </select>
                     </td>
-                    <td class="py-4 px-6">
-                        ${u.isBanned 
-                            ? '<span class="px-3 py-1 rounded-full text-[10px] font-extrabold bg-red-500/10 text-red-400 border border-red-500/20">Banned</span>' 
-                            : '<span class="px-3 py-1 rounded-full text-[10px] font-extrabold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Active</span>'
-                        }
+                    <td class="py-3.5 px-6">
+                        ${u.isBanned
+                            ? '<span class="pill bg-red-500/10 text-red-400 border-red-500/20"><i class="ph ph-prohibit"></i>Banned</span>'
+                            : '<span class="pill bg-emerald-500/10 text-emerald-400 border-emerald-500/20"><i class="ph ph-check"></i>Active</span>'}
                     </td>
-                    <td class="py-4 px-6 text-right">
-                        <button onclick="window.toggleBan('${u.uid}', ${!!u.isBanned})" ${disableControls ? 'disabled' : ''} class="px-4 py-2 rounded-xl text-xs font-bold border ${u.isBanned ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'} disabled:opacity-30 shadow-sm">
-                            ${u.isBanned ? 'Unban User' : 'Ban Account'}
+                    <td class="py-3.5 px-6 text-xs font-mono whitespace-nowrap" title="${esc(fullDate(u.lastLogin))}">${timeAgo(u.lastLogin)}</td>
+                    <td class="py-3.5 px-6 text-right">
+                        <button data-action="ban" ${dis || (isMe ? 'disabled' : '')} class="btn px-3.5 py-2 ${u.isBanned ? 'btn-ok' : 'btn-danger'}">
+                            ${u.isBanned ? '<i class="ph ph-user-check"></i>Unban' : '<i class="ph ph-prohibit"></i>Ban'}
                         </button>
                     </td>
-                `;
-                tbody.appendChild(row);
-            });
+                </tr>`;
+            }).join('');
         }
 
-        function listenToUsers() {
-            onValue(dbRef(db, 'nexus/users'), (snapshot) => {
-                cachedUsers = snapshot.val() || {};
-                renderUsersTable();
-            });
-        }
-
-        userSearchInput.addEventListener('input', renderUsersTable);
-
-        window.saveUserCredits = async (uid) => {
-            if (!isOwner) return;
-            const val = parseInt(document.getElementById(`credits-${uid}`).value);
-            if (isNaN(val)) return alert("Invalid amount.");
-            await update(dbRef(db, `nexus/users/${uid}`), { credits: val });
-            await logAudit("UPDATE_USER_CREDITS", `Updated credits for user ${uid} to ${val}`);
-            alert("Credits successfully updated.");
-        };
-
-        window.resetCredits = async (uid) => {
-            if (!isOwner) return;
-            await update(dbRef(db, `nexus/users/${uid}`), { credits: 10000 });
-            await logAudit("RESET_USER_CREDITS", `Reset credits for user ${uid} to default (10,000)`);
-            alert("Credits reset to default.");
-        };
-
-        window.changeRole = async (uid, role) => {
-            if (!isOwner) return;
-            await update(dbRef(db, `nexus/users/${uid}`), { role });
-            await logAudit("CHANGE_USER_ROLE", `Changed role for user ${uid} to ${role}`);
-        };
-
-        window.toggleBan = async (uid, currentStatus) => {
-            if (!isOwner) return;
-            const nextStatus = !currentStatus;
-            await update(dbRef(db, `nexus/users/${uid}`), { isBanned: nextStatus });
-            await logAudit("TOGGLE_BAN", `Set banned status for user ${uid} to ${nextStatus}`);
-        };
-
-        function listenToAiSites() {
-            onValue(dbRef(db, 'nexus/ai_sites'), (snapshot) => {
-                const data = snapshot.val();
-                const tbody = document.getElementById('site-table-body');
-                tbody.innerHTML = '';
-                if (!data) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="py-16 text-center text-textSecondary">No AI subdomains deployed yet.</td></tr>`;
-                    document.getElementById('stat-total-sites').textContent = '0';
-                    return;
-                }
-                const sites = Object.keys(data).map(k => ({ id: k, ...data[k] }));
-                document.getElementById('stat-total-sites').textContent = sites.length;
-                sites.forEach(s => {
-                    const row = document.createElement('tr');
-                    row.className = 'hover:bg-panelHover/40 transition-colors';
-                    row.innerHTML = `
-                        <td class="py-4 px-6 font-mono text-xs text-textPrimary">${s.userEmail || 'Anonymous'}</td>
-                        <td class="py-4 px-6 font-mono text-xs text-neonBlue font-bold">${s.subdomain}.textnexus.me</td>
-                        <td class="py-4 px-6 text-xs text-textSecondary max-w-xs truncate">${s.prompt}</td>
-                        <td class="py-4 px-6 text-xs text-textSecondary">${new Date(s.createdAt).toLocaleDateString()}</td>
-                        <td class="py-4 px-6 text-right">
-                            <button onclick="window.deleteAiSite('${s.id}')" ${!isOwner ? 'disabled' : ''} class="p-2.5 rounded-xl bg-panelHover text-textSecondary hover:text-red-400 disabled:opacity-30 shadow-sm">
-                                <i class="ph ph-trash text-base"></i>
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            });
-        }
-
-        window.deleteAiSite = async (id) => {
-            if (!isOwner) return;
-            if (confirm("Purge this deployment record permanently?")) {
-                await remove(dbRef(db, `nexus/ai_sites/${id}`));
-                await logAudit("DELETE_AI_SITE", `Purged deployment ID: ${id}`);
-            }
-        };
-
-        function listenToChats() {
-            onValue(dbRef(db, 'nexus/chats'), (snapshot) => {
-                const data = snapshot.val();
-                const tbody = document.getElementById('chat-table-body');
-                tbody.innerHTML = '';
-                if (!data) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="py-16 text-center text-textSecondary">No active chat channels found.</td></tr>`;
-                    document.getElementById('stat-chats').textContent = '0';
-                    return;
-                }
-                const chats = Object.keys(data).map(k => ({ id: k, ...data[k] }));
-                document.getElementById('stat-chats').textContent = chats.length;
-                chats.forEach(c => {
-                    const row = document.createElement('tr');
-                    row.className = 'hover:bg-panelHover/40 transition-colors';
-                    row.innerHTML = `
-                        <td class="py-4 px-6 font-bold text-textPrimary text-sm">${c.name || 'Unnamed Chat'}</td>
-                        <td class="py-4 px-6 font-mono text-xs text-purple-400">${c.inviteCode || 'N/A'}</td>
-                        <td class="py-4 px-6 font-mono text-xs text-textSecondary">${c.creatorEmail || 'Unknown'}</td>
-                        <td class="py-4 px-6">
-                            ${c.isDisabled ? '<span class="px-3 py-1 rounded-full text-[10px] font-extrabold bg-red-500/10 text-red-400 border border-red-500/20">Disabled</span>' : '<span class="px-3 py-1 rounded-full text-[10px] font-extrabold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Active</span>'}
-                        </td>
-                        <td class="py-4 px-6 text-right flex items-center justify-end gap-2">
-                            <button onclick="window.toggleChat('${c.id}', ${!!c.isDisabled})" ${!isOwner ? 'disabled' : ''} class="px-4 py-2 rounded-xl bg-panelHover text-xs text-textPrimary hover:bg-lineBorder disabled:opacity-30 font-bold shadow-sm">
-                                ${c.isDisabled ? 'Enable' : 'Disable'}
-                            </button>
-                            <button onclick="window.deleteChat('${c.id}')" ${!isOwner ? 'disabled' : ''} class="p-2.5 rounded-xl bg-panelHover text-textSecondary hover:text-red-400 disabled:opacity-30 shadow-sm">
-                                <i class="ph ph-trash text-base"></i>
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            });
-        }
-
-        window.toggleChat = async (id, currentStatus) => {
-            if (!isOwner) return;
-            const nextStatus = !currentStatus;
-            await update(dbRef(db, `nexus/chats/${id}`), { isDisabled: nextStatus });
-            await logAudit("TOGGLE_CHAT", `Set chat channel ${id} disabled state to ${nextStatus}`);
-        };
-
-        window.deleteChat = async (id) => {
-            if (!isOwner) return;
-            if (confirm("Delete this chat channel?")) {
-                await remove(dbRef(db, `nexus/chats/${id}`));
-                await logAudit("DELETE_CHAT", `Deleted chat channel ${id}`);
-            }
-        };
-
-        function listenToAuditLogs() {
-            onValue(dbRef(db, 'nexus/audit_logs'), (snapshot) => {
-                const data = snapshot.val();
-                const tbody = document.getElementById('audit-table-body');
-                tbody.innerHTML = '';
-                if (!data) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="py-16 text-center text-textSecondary">No security audit logs recorded yet.</td></tr>`;
-                    return;
-                }
-                const logs = Object.keys(data).map(k => ({ id: k, ...data[k] })).sort((a,b) => b.timestamp - a.timestamp);
-                logs.forEach(l => {
-                    const row = document.createElement('tr');
-                    row.className = 'hover:bg-panelHover/40 transition-colors';
-                    row.innerHTML = `
-                        <td class="py-4 px-6 font-mono text-[11px] text-textSecondary">${new Date(l.timestamp).toLocaleString()}</td>
-                        <td class="py-4 px-6 font-mono text-xs text-textPrimary">${l.adminEmail}</td>
-                        <td class="py-4 px-6"><span class="px-3 py-1 rounded-xl text-[10px] font-mono font-bold bg-cyan-500/10 text-neonBlue border border-cyan-500/20">${l.action}</span></td>
-                        <td class="py-4 px-6 text-xs text-textSecondary">${l.details}</td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            });
-        }
-
-        document.getElementById('admin-publish-btn').addEventListener('click', async () => {
-            if (!isOwner) return;
-            const title = document.getElementById('admin-update-title').value.trim();
-            const content = document.getElementById('admin-update-content').value.trim();
-            if (!title || !content) return alert("Please fill in both title and content.");
-
-            await push(dbRef(db, 'nexus/updates'), {
-                title, content, createdAt: serverTimestamp(), author: currentUser.displayName || 'Owner'
-            });
-            document.getElementById('admin-update-title').value = '';
-            document.getElementById('admin-update-content').value = '';
-            await logAudit("PUBLISH_UPDATE", `Published announcement: "${title}"`);
-            alert("Announcement broadcasted successfully!");
+        $('user-search-input').addEventListener('input', renderUsers);
+        $('user-sort').addEventListener('change', e => { userView.sort = e.target.value; renderUsers(); });
+        $('user-filter-chips').addEventListener('click', e => {
+            const chip = e.target.closest('[data-filter]');
+            if (!chip) return;
+            userView.filter = chip.dataset.filter;
+            document.querySelectorAll('#user-filter-chips .chip').forEach(c => c.classList.toggle('active', c === chip));
+            renderUsers();
         });
 
-        function listenToUpdates() {
-            onValue(dbRef(db, 'nexus/updates'), (snapshot) => {
-                const data = snapshot.val();
-                const container = document.getElementById('admin-updates-list');
-                container.innerHTML = '';
-                if (!data) {
-                    container.innerHTML = `<p class="text-xs text-textSecondary text-center py-6">No platform updates broadcasted yet.</p>`;
-                    return;
-                }
-                const updates = Object.keys(data).map(k => ({ id: k, ...data[k] })).sort((a,b) => b.createdAt - a.createdAt);
-                updates.forEach(u => {
-                    const card = document.createElement('div');
-                    card.className = 'bg-bgRoot border border-lineBorder p-5 rounded-2xl flex items-start justify-between gap-4 shadow-sm';
-                    card.innerHTML = `
-                        <div class="flex flex-col gap-1.5">
-                            <h4 class="text-xs font-bold text-textPrimary">${u.title}</h4>
-                            <p class="text-xs text-textSecondary">${u.content}</p>
-                            <span class="text-[10px] text-textSecondary font-mono mt-1">${new Date(u.createdAt).toLocaleString()} by ${u.author}</span>
-                        </div>
-                        <button onclick="window.deleteUpdate('${u.id}')" ${!isOwner ? 'disabled' : ''} class="p-2.5 rounded-xl bg-panelHover text-textSecondary hover:text-red-400 disabled:opacity-30 shrink-0 shadow-sm">
-                            <i class="ph ph-trash text-base"></i>
-                        </button>
-                    `;
-                    container.appendChild(card);
-                });
-            });
+        const userTable = $('user-table-body');
+        const rowInput = (row) => row.querySelector('.credit-input');
+
+        async function saveCredits(uid, input) {
+            const val = parseInt(input.value, 10);
+            if (isNaN(val) || val < 0) return toast('Enter a valid non-negative number.', 'err');
+            const before = credits(data.users[uid] || {});
+            const ok = await run(() => update(dbRef(db, `nexus/users/${uid}`), { credits: val }), `Credits set to ${fmt(val)}.`);
+            if (ok) {
+                input.classList.remove('dirty');
+                logAudit("UPDATE_USER_CREDITS", `Updated credits for ${data.users[uid]?.email || uid} from ${before} to ${val}`);
+            }
         }
 
-        window.deleteUpdate = async (id) => {
-            if (!isOwner) return;
-            if (confirm("Delete this broadcast update?")) {
-                await remove(dbRef(db, `nexus/updates/${id}`));
-                await logAudit("DELETE_UPDATE", `Deleted broadcast announcement ID: ${id}`);
+        userTable.addEventListener('input', e => {
+            if (e.target.classList.contains('credit-input')) {
+                const uid = e.target.dataset.uid;
+                e.target.classList.toggle('dirty', String(credits(data.users[uid] || {})) !== e.target.value);
             }
-        };
+        });
+        userTable.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && e.target.classList.contains('credit-input')) saveCredits(e.target.dataset.uid, e.target);
+        });
+
+        userTable.addEventListener('click', async e => {
+            const btn = e.target.closest('[data-action]');
+            if (!btn || btn.tagName === 'SELECT') return;
+            const row = btn.closest('tr');
+            const uid = row?.dataset.uid;
+            if (!uid) return;
+            const u = data.users[uid] || {};
+            const who = u.email || uid;
+
+            switch (btn.dataset.action) {
+                case 'copy-uid':
+                    navigator.clipboard?.writeText(uid).then(() => toast('UID copied.', 'info'));
+                    break;
+                case 'adjust': {
+                    const input = rowInput(row);
+                    input.value = Math.max(0, (parseInt(input.value, 10) || 0) + Number(btn.dataset.delta));
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    break;
+                }
+                case 'save-credits':
+                    if (isOwner) saveCredits(uid, rowInput(row));
+                    break;
+                case 'reset-credits': {
+                    if (!isOwner) return;
+                    const ok = await dialog({ title: 'Reset credits?', body: `Reset ${who} to the default ${fmt(DEFAULT_CREDITS)} credits.`, confirmText: 'Reset', icon: 'ph-arrow-counter-clockwise' });
+                    if (ok && await run(() => update(dbRef(db, `nexus/users/${uid}`), { credits: DEFAULT_CREDITS }), 'Credits reset to default.'))
+                        logAudit("RESET_USER_CREDITS", `Reset credits for ${who} to default (${DEFAULT_CREDITS})`);
+                    break;
+                }
+                case 'ban': {
+                    if (!isOwner) return;
+                    const next = !u.isBanned;
+                    const ok = await dialog({
+                        title: next ? 'Ban this account?' : 'Unban this account?',
+                        body: next ? `${who} will lose access to the platform.` : `${who} will regain access to the platform.`,
+                        confirmText: next ? 'Ban account' : 'Unban', danger: next, icon: next ? 'ph-prohibit' : 'ph-user-check'
+                    });
+                    if (ok && await run(() => update(dbRef(db, `nexus/users/${uid}`), { isBanned: next }), next ? 'Account banned.' : 'Account unbanned.'))
+                        logAudit("TOGGLE_BAN", `Set banned status for ${who} to ${next}`);
+                    break;
+                }
+            }
+        });
+
+        userTable.addEventListener('change', async e => {
+            if (e.target.dataset.action !== 'role' || !isOwner) return;
+            const select = e.target;
+            const uid = select.closest('tr').dataset.uid;
+            const u = data.users[uid] || {};
+            const prev = u.role || 'User';
+            const role = select.value;
+            if (role !== 'User') {
+                const ok = await dialog({ title: `Grant ${role} role?`, body: `${u.email || uid} will get ${role.toLowerCase()} privileges, including bypassing maintenance mode.`, confirmText: `Make ${role}`, icon: 'ph-crown' });
+                if (!ok) { select.value = prev; return; }
+            }
+            if (await run(() => update(dbRef(db, `nexus/users/${uid}`), { role }), `Role changed to ${role}.`))
+                logAudit("CHANGE_USER_ROLE", `Changed role for ${u.email || uid} from ${prev} to ${role}`);
+            else select.value = prev;
+        });
+
+        $('users-export-btn').addEventListener('click', () => {
+            const rows = [['uid', 'name', 'email', 'credits', 'role', 'banned', 'lastLogin']];
+            toList(data.users).forEach(u => rows.push([u.id, u.name, u.email, credits(u), u.role || 'User', !!u.isBanned, u.lastLogin ? new Date(u.lastLogin).toISOString() : '']));
+            downloadCSV(`nexus-users-${new Date().toISOString().slice(0, 10)}.csv`, rows);
+        });
+
+        // ---------- owner credits & airdrop ----------
+        $('owner-save-credits-btn').addEventListener('click', async () => {
+            if (!currentUser || !isOwner) return;
+            const val = parseInt($('owner-credit-input').value, 10);
+            if (isNaN(val) || val < 0) return toast('Enter a valid non-negative number.', 'err');
+            if (await run(() => update(dbRef(db, `nexus/users/${currentUser.uid}`), { credits: val }), 'Your credits were updated.'))
+                logAudit("UPDATE_OWNER_CREDITS", `Set own credits to ${val}`);
+        });
+
+        $('global-airdrop-btn').addEventListener('click', async () => {
+            if (!isOwner) return;
+            const users = toList(data.users).filter(u => !u.isBanned);
+            const raw = await dialog({
+                title: 'Global credit airdrop',
+                body: `Amount of credits to add to each of ${fmt(users.length)} non-banned users.`,
+                confirmText: 'Airdrop', icon: 'ph-coins',
+                input: { type: 'number', value: '1000', placeholder: 'Amount' }
+            });
+            if (raw === null) return;
+            const amount = parseInt(raw, 10);
+            if (isNaN(amount) || amount <= 0) return toast('Enter a positive amount.', 'err');
+            if (!users.length) return toast('No eligible users.', 'info');
+
+            // increment() is atomic per user, so concurrent spends aren't overwritten.
+            const updates = {};
+            users.forEach(u => {
+                updates[`nexus/users/${u.id}/credits`] = u.credits == null ? DEFAULT_CREDITS + amount : increment(amount);
+            });
+            if (await run(() => update(dbRef(db), updates), `Airdropped +${fmt(amount)} credits to ${fmt(users.length)} users.`))
+                logAudit("GLOBAL_AIRDROP", `Airdropped +${amount} credits to ${users.length} users`);
+        });
+
+        // ---------- maintenance ----------
+        $('maintenance-toggle-btn').addEventListener('click', async () => {
+            if (!isOwner) return;
+            const next = !isMaintenanceActive;
+            const ok = await dialog({
+                title: next ? 'Enable maintenance mode?' : 'Disable maintenance mode?',
+                body: next ? 'All non-admin users will be redirected to the maintenance page immediately.' : 'The platform will become available to everyone again.',
+                confirmText: next ? 'Enable' : 'Disable', danger: next, icon: 'ph-wrench'
+            });
+            if (ok && await run(() => set(dbRef(db, 'nexus/system/maintenance'), next), `Maintenance mode ${next ? 'enabled' : 'disabled'}.`))
+                logAudit("TOGGLE_MAINTENANCE", `Set system maintenance mode to ${next}`);
+        });
+
+        // ---------- sites ----------
+        function renderSites() {
+            const tbody = $('site-table-body');
+            const needle = $('site-search-input').value.trim().toLowerCase();
+            const all = toList(data.sites);
+            const sites = all.filter(s => has(needle, s.subdomain, s.userEmail, s.prompt)).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            $('site-result-count').textContent = `${sites.length} of ${all.length}`;
+            if (!sites.length) { tbody.innerHTML = emptyRow(5, all.length ? 'No sites match your search.' : 'No AI subdomains deployed yet.'); return; }
+
+            tbody.innerHTML = sites.map(s => {
+                const sub = String(s.subdomain || '');
+                const safeSub = /^[a-z0-9-]+$/i.test(sub);
+                return `<tr class="hover:bg-panelHover/40 transition-colors" data-id="${esc(s.id)}">
+                    <td class="py-3.5 px-6 font-mono text-xs font-bold whitespace-nowrap">
+                        ${safeSub
+                            ? `<a href="https://${sub}.textnexus.me" target="_blank" rel="noopener" class="text-neonBlue hover:underline inline-flex items-center gap-1.5">${esc(sub)}.textnexus.me <i class="ph ph-arrow-square-out"></i></a>`
+                            : `<span class="text-textSecondary">${esc(sub) || '—'}</span>`}
+                    </td>
+                    <td class="py-3.5 px-6 font-mono text-xs text-textPrimary">${esc(s.userEmail || 'Anonymous')}</td>
+                    <td class="py-3.5 px-6 text-xs max-w-sm">
+                        <button data-action="view-prompt" class="text-left truncate block max-w-sm hover:text-textPrimary" title="View full prompt">${esc(s.prompt || '—')}</button>
+                    </td>
+                    <td class="py-3.5 px-6 text-xs font-mono whitespace-nowrap" title="${esc(fullDate(s.createdAt))}">${timeAgo(s.createdAt)}</td>
+                    <td class="py-3.5 px-6 text-right">
+                        <button data-action="delete" ${isOwner ? '' : 'disabled'} class="btn btn-ghost w-9 h-9 hover:!text-red-400" title="Purge"><i class="ph ph-trash text-base"></i></button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+        $('site-search-input').addEventListener('input', renderSites);
+        $('site-table-body').addEventListener('click', async e => {
+            const btn = e.target.closest('[data-action]');
+            if (!btn) return;
+            const id = btn.closest('tr').dataset.id;
+            const s = data.sites[id] || {};
+            if (btn.dataset.action === 'view-prompt') {
+                dialog({ title: `${s.subdomain || 'Site'} — prompt`, body: s.prompt || '—', confirmText: 'Close', icon: 'ph-text-align-left' });
+            } else if (btn.dataset.action === 'delete' && isOwner) {
+                const ok = await dialog({ title: 'Purge deployment record?', body: `${s.subdomain}.textnexus.me will be removed permanently.`, confirmText: 'Purge', danger: true, icon: 'ph-trash' });
+                if (ok && await run(() => remove(dbRef(db, `nexus/ai_sites/${id}`)), 'Deployment purged.'))
+                    logAudit("DELETE_AI_SITE", `Purged deployment ${s.subdomain || id}`);
+            }
+        });
+
+        // ---------- chats ----------
+        function renderChats() {
+            const tbody = $('chat-table-body');
+            const needle = $('chat-search-input').value.trim().toLowerCase();
+            const all = toList(data.chats);
+            const chats = all.filter(c => has(needle, c.name, c.inviteCode, c.creatorEmail));
+            $('chat-result-count').textContent = `${chats.length} of ${all.length}`;
+            if (!chats.length) { tbody.innerHTML = emptyRow(5, all.length ? 'No channels match your search.' : 'No chat channels found.'); return; }
+
+            const dis = isOwner ? '' : 'disabled';
+            tbody.innerHTML = chats.map(c => `
+                <tr class="hover:bg-panelHover/40 transition-colors" data-id="${esc(c.id)}">
+                    <td class="py-3.5 px-6 font-bold text-textPrimary text-sm">${esc(c.name || 'Unnamed Chat')}</td>
+                    <td class="py-3.5 px-6"><button data-action="copy" class="font-mono text-xs text-purple-400 hover:underline" title="Copy">${esc(c.inviteCode || 'N/A')}</button></td>
+                    <td class="py-3.5 px-6 font-mono text-xs">${esc(c.creatorEmail || 'Unknown')}</td>
+                    <td class="py-3.5 px-6">${c.isDisabled
+                        ? '<span class="pill bg-red-500/10 text-red-400 border-red-500/20">Disabled</span>'
+                        : '<span class="pill bg-emerald-500/10 text-emerald-400 border-emerald-500/20">Active</span>'}</td>
+                    <td class="py-3.5 px-6">
+                        <div class="flex items-center justify-end gap-2">
+                            <button data-action="toggle" ${dis} class="btn btn-ghost px-3.5 py-2 text-textPrimary">${c.isDisabled ? 'Enable' : 'Disable'}</button>
+                            <button data-action="delete" ${dis} class="btn btn-ghost w-9 h-9 hover:!text-red-400" title="Delete"><i class="ph ph-trash text-base"></i></button>
+                        </div>
+                    </td>
+                </tr>`).join('');
+        }
+        $('chat-search-input').addEventListener('input', renderChats);
+        $('chat-table-body').addEventListener('click', async e => {
+            const btn = e.target.closest('[data-action]');
+            if (!btn) return;
+            const id = btn.closest('tr').dataset.id;
+            const c = data.chats[id] || {};
+            const label = c.name || id;
+            if (btn.dataset.action === 'copy' && c.inviteCode) {
+                navigator.clipboard?.writeText(c.inviteCode).then(() => toast('Invite code copied.', 'info'));
+            } else if (btn.dataset.action === 'toggle' && isOwner) {
+                const next = !c.isDisabled;
+                if (await run(() => update(dbRef(db, `nexus/chats/${id}`), { isDisabled: next }), `Channel ${next ? 'disabled' : 'enabled'}.`))
+                    logAudit("TOGGLE_CHAT", `Set chat channel "${label}" disabled state to ${next}`);
+            } else if (btn.dataset.action === 'delete' && isOwner) {
+                const ok = await dialog({ title: 'Delete chat channel?', body: `"${label}" and its data will be removed permanently.`, confirmText: 'Delete', danger: true, icon: 'ph-trash' });
+                if (ok && await run(() => remove(dbRef(db, `nexus/chats/${id}`)), 'Channel deleted.'))
+                    logAudit("DELETE_CHAT", `Deleted chat channel "${label}"`);
+            }
+        });
+
+        // ---------- audit ----------
+        function renderAudit() {
+            const tbody = $('audit-table-body');
+            const all = toList(data.audit).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+            const filterSel = $('audit-action-filter');
+            const current = filterSel.value;
+            const actions = [...new Set(all.map(l => l.action).filter(Boolean))].sort();
+            filterSel.innerHTML = `<option value="">All actions</option>` + actions.map(a => `<option value="${esc(a)}">${esc(a)}</option>`).join('');
+            filterSel.value = actions.includes(current) ? current : '';
+
+            const needle = $('audit-search-input').value.trim().toLowerCase();
+            const logs = all.filter(l => (!filterSel.value || l.action === filterSel.value) && has(needle, l.details, l.adminEmail, l.action));
+            $('audit-result-count').textContent = `${logs.length} of ${all.length}`;
+            if (!logs.length) { tbody.innerHTML = emptyRow(4, all.length ? 'No entries match.' : 'No audit logs recorded yet.'); return; }
+
+            const tone = (a = '') => /DELETE|BAN|PURGE/.test(a) ? 'bg-red-500/10 text-red-400 border-red-500/20'
+                : /CREDIT|AIRDROP/.test(a) ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                : 'bg-cyan-500/10 text-neonBlue border-cyan-500/20';
+            tbody.innerHTML = logs.map(l => `
+                <tr class="hover:bg-panelHover/40 transition-colors">
+                    <td class="py-3 px-6 font-mono text-[11px] whitespace-nowrap" title="${esc(fullDate(l.timestamp))}">${timeAgo(l.timestamp)}</td>
+                    <td class="py-3 px-6 font-mono text-xs text-textPrimary">${esc(l.adminEmail)}</td>
+                    <td class="py-3 px-6"><span class="pill font-mono ${tone(l.action)}">${esc(l.action)}</span></td>
+                    <td class="py-3 px-6 text-xs">${esc(l.details)}</td>
+                </tr>`).join('');
+        }
+        $('audit-search-input').addEventListener('input', renderAudit);
+        $('audit-action-filter').addEventListener('change', renderAudit);
+        $('audit-export-btn').addEventListener('click', () => {
+            const rows = [['timestamp', 'admin', 'action', 'details']];
+            toList(data.audit).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+                .forEach(l => rows.push([l.timestamp ? new Date(l.timestamp).toISOString() : '', l.adminEmail, l.action, l.details]));
+            downloadCSV(`nexus-audit-${new Date().toISOString().slice(0, 10)}.csv`, rows);
+        });
+
+        // ---------- announcements ----------
+        const titleInput = $('admin-update-title');
+        const contentInput = $('admin-update-content');
+        function renderPreview() {
+            $('title-count').textContent = titleInput.value.length;
+            $('content-count').textContent = contentInput.value.length;
+            $('preview-title').textContent = titleInput.value || 'Announcement title';
+            $('preview-content').textContent = contentInput.value || 'Announcement details will appear here.';
+            $('preview-meta').textContent = `${new Date().toLocaleString()} by ${currentUser?.displayName || 'Owner'}`;
+        }
+        titleInput.addEventListener('input', renderPreview);
+        contentInput.addEventListener('input', renderPreview);
+        contentInput.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) $('admin-publish-btn').click(); });
+
+        $('admin-publish-btn').addEventListener('click', async () => {
+            if (!isOwner) return;
+            const title = titleInput.value.trim();
+            const content = contentInput.value.trim();
+            if (!title || !content) return toast('Fill in both title and content.', 'err');
+            const ok = await dialog({ title: 'Broadcast to everyone?', body: `"${title}" will be visible to all users immediately.`, confirmText: 'Broadcast', icon: 'ph-broadcast' });
+            if (!ok) return;
+            const btn = $('admin-publish-btn');
+            btn.disabled = true;
+            if (await run(() => push(dbRef(db, 'nexus/updates'), { title, content, createdAt: serverTimestamp(), author: currentUser.displayName || 'Owner' }), 'Announcement broadcast.')) {
+                titleInput.value = '';
+                contentInput.value = '';
+                renderPreview();
+                logAudit("PUBLISH_UPDATE", `Published announcement: "${title}"`);
+            }
+            btn.disabled = false;
+        });
+
+        function renderUpdates() {
+            const container = $('admin-updates-list');
+            const updates = toList(data.updates).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+            $('update-count').textContent = `${updates.length} live`;
+            if (!updates.length) { container.innerHTML = `<p class="text-xs text-textSecondary text-center py-6">No announcements broadcast yet.</p>`; return; }
+            container.innerHTML = updates.map(u => `
+                <div class="bg-bgRoot border border-lineBorder p-5 rounded-2xl flex items-start justify-between gap-4" data-id="${esc(u.id)}">
+                    <div class="flex flex-col gap-1.5 min-w-0">
+                        <h4 class="text-sm font-bold text-textPrimary break-words">${esc(u.title)}</h4>
+                        <p class="text-xs text-textSecondary whitespace-pre-wrap break-words">${esc(u.content)}</p>
+                        <span class="text-[10px] text-textSecondary font-mono mt-1" title="${esc(fullDate(u.createdAt))}">${timeAgo(u.createdAt)} · by ${esc(u.author)}</span>
+                    </div>
+                    <button data-action="delete" ${isOwner ? '' : 'disabled'} class="btn btn-ghost w-9 h-9 shrink-0 hover:!text-red-400" title="Delete"><i class="ph ph-trash text-base"></i></button>
+                </div>`).join('');
+        }
+        $('admin-updates-list').addEventListener('click', async e => {
+            const btn = e.target.closest('[data-action="delete"]');
+            if (!btn || !isOwner) return;
+            const id = btn.closest('[data-id]').dataset.id;
+            const title = data.updates[id]?.title || id;
+            const ok = await dialog({ title: 'Delete announcement?', body: `"${title}" will be removed for everyone.`, confirmText: 'Delete', danger: true, icon: 'ph-trash' });
+            if (ok && await run(() => remove(dbRef(db, `nexus/updates/${id}`)), 'Announcement deleted.'))
+                logAudit("DELETE_UPDATE", `Deleted announcement "${title}"`);
+        });
+
+        // Refresh relative timestamps every minute.
+        setInterval(() => { if (!subscribed) return;
+            renderOverview(); renderSites(); renderAudit(); renderUpdates();
+            if (!userTable.contains(document.activeElement)) renderUsers(); }, 60000);
+
+        renderNav();
+        switchTab(activeTab);
+        renderOverview();
+        renderPreview();
     </script>
 </body>
 </html>
