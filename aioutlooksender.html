@@ -3,30 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Customer Email Assistant</title>
+    <title>AI Email Assistant</title>
     <style>
         body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #f4f4f9; }
         .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         textarea, input { width: 100%; padding: 10px; margin-top: 8px; margin-bottom: 16px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { background: #0051c3; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+        button { background: #0051c3; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; }
         button:hover { background: #003b95; }
-        #response { margin-top: 20px; white-space: pre-wrap; background: #eef2f7; padding: 10px; border-radius: 4px; }
+        #response { margin-top: 20px; white-space: pre-wrap; background: #eef2f7; padding: 12px; border-radius: 4px; min-height: 50px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>Customer Email AI Assistant</h2>
-    <label for="prompt">What should the AI tell the customer?</label>
-    <textarea id="prompt" rows="4" placeholder="e.g., Write a polite reply to a customer asking about shipping times."></textarea>
+    <h2>AI Customer Email Assistant</h2>
+    
+    <label for="prompt">What should the AI say?</label>
+    <textarea id="prompt" rows="4" placeholder="e.g., Thank the customer for reaching out and inform them that their order ships tomorrow."></textarea>
     
     <label for="customerEmail">Customer Email Address:</label>
     <input type="email" id="customerEmail" placeholder="customer@example.com">
 
     <button onclick="generateAndSend()">Generate & Send Email</button>
 
-    <h3>Status / AI Output:</h3>
-    <div id="response">Ready...</div>
+    <h3>Status / AI Response:</h3>
+    <div id="response">Waiting for input...</div>
 </div>
 
 <script>
@@ -35,23 +36,32 @@
         const customerEmail = document.getElementById('customerEmail').value;
         const outputDiv = document.getElementById('response');
 
-        outputDiv.innerText = "Processing with Cloudflare AI...";
+        if (!customerEmail) {
+            outputDiv.innerText = "Please enter a destination email address.";
+            return;
+        }
+
+        outputDiv.innerText = "Generating message with Cloudflare Workers AI & sending email...";
 
         try {
-            // Replace with your actual Cloudflare Worker URL once deployed
-            const response = await fetch('emailsendercloudflareworker.textnexus.me', {
+            const response = await fetch('https://emailsendercloudflareworker.textnexus.me', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: document.getElementById('prompt').value ? JSON.stringify({
+                body: JSON.stringify({
                     prompt: promptText,
                     email: customerEmail
-                }) : null
+                })
             });
 
             const result = await response.json();
-            outputDiv.innerText = JSON.stringify(result, null, 2);
+            
+            if (result.success) {
+                outputDiv.innerText = "Email successfully sent!\n\nAI Draft:\n" + result.reply;
+            } else {
+                outputDiv.innerText = "Error: " + (result.error || "Failed to process request.");
+            }
         } catch (error) {
-            outputDiv.innerText = "Error: " + error.message;
+            outputDiv.innerText = "Connection Error: " + error.message;
         }
     }
 </script>
