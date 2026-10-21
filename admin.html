@@ -433,7 +433,7 @@
         const db = getDatabase(app);
 
         const ADMIN_PASSCODE = "022614";
-        const OWNER_EMAIL = "brodywilliams0226@gmail.com";
+        const OWNER_EMAILS = ["brodywilliams0226@gmail.com", "imcrabfr@gmail.com"];
         const DEFAULT_CREDITS = 10000;
 
         // ---------- state ----------
@@ -643,7 +643,7 @@
 
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
-            isOwner = (user?.email === OWNER_EMAIL);
+            isOwner = OWNER_EMAILS.includes(user?.email);
 
             $('me-avatar').src = user?.photoURL || 'https://placehold.co/100';
             $('me-name').textContent = user?.displayName || '—';
