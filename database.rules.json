@@ -1,0 +1,171 @@
+{
+  "rules": {
+    ".read": "auth != null && auth.token.email_verified === true && (auth.token.email === 'brodywilliams0226@gmail.com' || auth.token.email === 'imcrabfr@gmail.com')",
+
+    "maintenance": {
+      ".read": true,
+      ".write": "auth != null && auth.token.email_verified === true && (auth.token.email === 'brodywilliams0226@gmail.com' || auth.token.email === 'imcrabfr@gmail.com')"
+    },
+
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && (auth.uid === $uid || (auth.token.email_verified === true && (auth.token.email === 'brodywilliams0226@gmail.com' || auth.token.email === 'imcrabfr@gmail.com')))"
+      }
+    },
+
+    "nexus": {
+      ".read": "auth != null && auth.token.email_verified === true && (auth.token.email === 'brodywilliams0226@gmail.com' || auth.token.email === 'imcrabfr@gmail.com')",
+      ".write": "auth != null && auth.token.email_verified === true && (auth.token.email === 'brodywilliams0226@gmail.com' || auth.token.email === 'imcrabfr@gmail.com')",
+
+      "system": {
+        ".read": true
+      },
+
+      "updates": {
+        ".read": true
+      },
+
+      "users": {
+        "$uid": {
+          ".read": "auth != null && auth.uid === $uid",
+
+          "uid":       { ".write": "auth != null && auth.uid === $uid" },
+          "name":      { ".write": "auth != null && auth.uid === $uid" },
+          "email":     { ".write": "auth != null && auth.uid === $uid" },
+          "photoURL":  { ".write": "auth != null && auth.uid === $uid" },
+          "lastLogin": { ".write": "auth != null && auth.uid === $uid" }
+        }
+      }
+    },
+
+    "system": {
+      ".read": true,
+      ".write": "auth != null && auth.token.email_verified === true && (auth.token.email === 'brodywilliams0226@gmail.com' || auth.token.email === 'imcrabfr@gmail.com')"
+    },
+
+    "workspace_updates": {
+      ".read": true,
+      ".write": "auth != null && auth.token.email_verified === true && (auth.token.email === 'brodywilliams0226@gmail.com' || auth.token.email === 'imcrabfr@gmail.com')"
+    },
+
+    "textnexus": {
+      ".read": "auth != null",
+
+      "users": {
+        "$uid": {
+          ".write": "auth != null && (auth.uid === $uid || (auth.token.email_verified === true && (auth.token.email === 'brodywilliams0226@gmail.com' || auth.token.email === 'imcrabfr@gmail.com')))"
+        }
+      },
+
+      "ai_sites": {
+        "$siteId": {
+          ".write": "auth != null && ((!data.exists() && newData.child('userEmail').val() === auth.token.email) || (auth.token.email_verified === true && (auth.token.email === 'brodywilliams0226@gmail.com' || auth.token.email === 'imcrabfr@gmail.com')))"
+        }
+      },
+
+      "chats": {
+        ".read": "auth != null",
+
+        "$chatId": {
+          ".write": "auth != null",
+
+          "messages": {
+            ".read": "auth != null",
+
+            "$messageId": {
+              ".write": "auth != null && root.child('textnexus').child('users').child(auth.uid).child('isBanned').val() != true"
+            }
+          }
+        }
+      }
+    },
+
+    "textylabs": {
+      ".read": "auth != null",
+
+      "users": {
+        "$uid": {
+          ".read": "auth != null",
+          ".write": "auth != null && (auth.uid === $uid || auth.token.email === 'brodywilliams0226@gmail.com' || auth.token.email === 'imcrabfr@gmail.com' || auth.token.email === 'jcruz016@stpaul.k12.mn.us')"
+        }
+      },
+
+      "chats": {
+        ".read": "auth != null",
+
+        "$chatId": {
+          ".write": "auth != null && (!data.exists() || data.child('metadata').child('ownerUid').val() === auth.uid || auth.token.email === 'brodywilliams0226@gmail.com' || auth.token.email === 'imcrabfr@gmail.com' || auth.token.email === 'jcruz016@stpaul.k12.mn.us')",
+
+          "metadata": {
+            ".read": "auth != null",
+            ".write": "auth != null && (!data.exists() && newData.child('ownerUid').val() === auth.uid || data.child('ownerUid').val() === auth.uid || auth.token.email === 'brodywilliams0226@gmail.com' || auth.token.email === 'imcrabfr@gmail.com' || auth.token.email === 'jcruz016@stpaul.k12.mn.us')"
+          },
+
+          "messages": {
+            ".read": "auth != null",
+
+            "$messageId": {
+              ".write": "auth != null && (root.child('textylabs').child('chats').child($chatId).child('metadata').child('textingEnabled').val() !== false || root.child('textylabs').child('chats').child($chatId).child('metadata').child('ownerUid').val() === auth.uid || auth.token.email === 'brodywilliams0226@gmail.com' || auth.token.email === 'imcrabfr@gmail.com' || auth.token.email === 'jcruz016@stpaul.k12.mn.us')"
+            }
+          }
+        }
+      }
+    },
+
+    "pinkping": {
+
+      "squads": {
+        ".read": "auth != null",
+
+        "$squadId": {
+          ".read": "auth != null",
+
+          ".write": "auth != null && (!data.exists() || data.child('ownerId').val() === auth.uid)"
+        }
+      },
+
+      "users": {
+        "$uid": {
+          ".read": "auth != null && auth.uid === $uid",
+
+          "joinedSquads": {
+            ".read": "auth != null && auth.uid === $uid",
+
+            "$squadId": {
+              ".write": "auth != null && auth.uid === $uid"
+            }
+          }
+        }
+      },
+
+      "messages": {
+        "$squadId": {
+          ".read": "auth != null",
+
+          ".write": "auth != null && !newData.exists() && root.child('pinkping').child('squads').child($squadId).child('ownerId').val() === auth.uid",
+
+          "$messageId": {
+            ".write": "auth != null && root.child('pinkping').child('squads').child($squadId).exists() && root.child('pinkping').child('squads').child($squadId).child('paused').val() != true"
+          }
+        }
+      }
+    },
+
+    "pinkping_groups": {
+      ".read": "auth != null",
+
+      "$groupId": {
+        ".write": "auth != null && (!data.exists() || data.child('ownerId').val() === auth.uid)"
+      }
+    },
+
+    "pinkping_messages": {
+      "$groupId": {
+        ".read": "auth != null",
+
+        ".write": "auth != null && root.child('pinkping_groups').child($groupId).child('isDisabled').val() !== true"
+      }
+    }
+  }
+}
