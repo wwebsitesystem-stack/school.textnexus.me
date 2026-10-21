@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Customer Email Assistant</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #f4f4f9; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        textarea, input { width: 100%; padding: 10px; margin-top: 8px; margin-bottom: 16px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background: #0051c3; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #003b95; }
+        #response { margin-top: 20px; white-space: pre-wrap; background: #eef2f7; padding: 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Customer Email AI Assistant</h2>
+    <label for="prompt">What should the AI tell the customer?</label>
+    <textarea id="prompt" rows="4" placeholder="e.g., Write a polite reply to a customer asking about shipping times."></textarea>
+    
+    <label for="customerEmail">Customer Email Address:</label>
+    <input type="email" id="customerEmail" placeholder="customer@example.com">
+
+    <button onclick="generateAndSend()">Generate & Send Email</button>
+
+    <h3>Status / AI Output:</h3>
+    <div id="response">Ready...</div>
+</div>
+
+<script>
+    async function generateAndSend() {
+        const promptText = document.getElementById('prompt').value;
+        const customerEmail = document.getElementById('customerEmail').value;
+        const outputDiv = document.getElementById('response');
+
+        outputDiv.innerText = "Processing with Cloudflare AI...";
+
+        try {
+            // Replace with your actual Cloudflare Worker URL once deployed
+            const response = await fetch('https://your-worker.your-subdomain.workers.dev', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: document.getElementById('prompt').value ? JSON.stringify({
+                    prompt: promptText,
+                    email: customerEmail
+                }) : null
+            });
+
+            const result = await response.json();
+            outputDiv.innerText = JSON.stringify(result, null, 2);
+        } catch (error) {
+            outputDiv.innerText = "Error: " + error.message;
+        }
+    }
+</script>
+
+</body>
+</html>
