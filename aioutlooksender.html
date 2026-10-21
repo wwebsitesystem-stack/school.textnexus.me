@@ -39,7 +39,7 @@
 
         try {
             // Replace with your actual Cloudflare Worker URL once deployed
-            const response = await fetch('https://your-worker.your-subdomain.workers.dev', {
+            const response = await fetch('emailsendercloudflareworker.textnexus.me', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: document.getElementById('prompt').value ? JSON.stringify({
