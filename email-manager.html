@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus OS - Email Assistant</title>
+    <title>Nexus OS - Secure Email Assistant</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAO_ffupJOIMPE9m4ARtaqSzC1vGDkIAco",
@@ -23,8 +24,56 @@
 
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        // Authorized admin/owner emails
+        const ADMIN_EMAILS = [
+            "brodywilliams0226@gmail.com",
+            "imcrabfr@gmail.com"
+        ];
 
         window.allFirebaseEmails = [];
+
+        // Handle Google Sign-In
+        window.loginAsOwner = async function() {
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (err) {
+                console.error("Login error:", err);
+                alert("Authentication failed: " + err.message);
+            }
+        };
+
+        window.logoutOwner = async function() {
+            await signOut(auth);
+        };
+
+        // Listen to Auth State Changes
+        onAuthStateChanged(auth, async (user) => {
+            const loginOverlay = document.getElementById('loginOverlay');
+            const dashboardContent = document.getElementById('dashboardContent');
+            const userBadge = document.getElementById('userBadge');
+
+            if (user) {
+                // Check if user is authorized admin/owner
+                if (ADMIN_EMAILS.includes(user.email)) {
+                    loginOverlay.style.display = 'none';
+                    dashboardContent.style.display = 'flex';
+                    userBadge.innerText = `Logged in as: ${user.email} (Owner)`;
+                    loadFirebaseUsers();
+                } else {
+                    loginOverlay.style.display = 'flex';
+                    dashboardContent.style.display = 'none';
+                    document.getElementById('loginError').innerText = `Access Denied: ${user.email} is not an authorized owner/admin.`;
+                    await signOut(auth);
+                }
+            } else {
+                loginOverlay.style.display = 'flex';
+                dashboardContent.style.display = 'none';
+                document.getElementById('loginError').innerText = "";
+            }
+        });
 
         async function loadFirebaseUsers() {
             const userSelect = document.getElementById('userSelect');
@@ -57,7 +106,7 @@
 
                 if (window.allFirebaseEmails.length > 0) {
                     userSelect.options[0].textContent = `-- Select Target Customer (${window.allFirebaseEmails.length} loaded) --`;
-                    if (totalCountBadge) totalCountBadge.innerText = `${window.allFirebaseEmails.length} Users Syncing`;
+                    if (totalCountBadge) totalCountBadge.innerText = `${window.allFirebaseEmails.length} Users Synced`;
                 } else {
                     userSelect.innerHTML = '<option value="">No registered emails found</option>';
                 }
@@ -66,8 +115,6 @@
                 userSelect.innerHTML = '<option value="">Error syncing database</option>';
             }
         }
-
-        window.addEventListener('DOMContentLoaded', loadFirebaseUsers);
     </script>
 
     <style>
@@ -80,16 +127,77 @@
             font-size: 14px;
         }
 
-        /* Nexus Header Banner */
+        /* Login Overlay */
+        #loginOverlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #0a0a0c;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            gap: 16px;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: #111114;
+            border: 1px solid #1c1c21;
+            padding: 32px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .login-card h2 { font-size: 20px; margin-bottom: 8px; color: #fff; }
+        .login-card p { font-size: 13px; color: #888892; margin-bottom: 20px; }
+        
+        .btn-google {
+            background: #ffffff;
+            color: #000;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            font-size: 14px;
+            transition: opacity 0.2s;
+        }
+        .btn-google:hover { opacity: 0.9; }
+
+        #loginError { color: #ff4757; font-size: 12px; margin-top: 10px; }
+
+        /* Dashboard Styles */
+        #dashboardContent { display: none; flex-direction: column; gap: 20px; }
+
+        .nexus-title-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
         .nexus-title {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 600;
             color: #ffffff;
-            margin-bottom: 24px;
             letter-spacing: -0.5px;
         }
 
-        /* Nexus Glass Grid */
+        .logout-btn {
+            background: #18181c;
+            border: 1px solid #26262e;
+            color: #ff4757;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .logout-btn:hover { background: #24242c; }
+
         .nexus-grid {
             display: grid;
             grid-template-columns: 1.2fr 1fr;
@@ -100,7 +208,6 @@
             .nexus-grid { grid-template-columns: 1fr; }
         }
 
-        /* Nexus Card Style */
         .nexus-card {
             background: #111114;
             border: 1px solid #1c1c21;
@@ -142,7 +249,6 @@
             border-radius: 50%;
         }
 
-        /* Form Controls */
         .field-group {
             display: flex;
             flex-direction: column;
@@ -197,7 +303,6 @@
             font-weight: 500;
         }
 
-        /* Dispatch Button */
         .btn-dispatch {
             background: #ffffff;
             color: #000000;
@@ -210,11 +315,8 @@
             transition: opacity 0.15s ease;
         }
 
-        .btn-dispatch:hover {
-            opacity: 0.9;
-        }
+        .btn-dispatch:hover { opacity: 0.9; }
 
-        /* Terminal Console Output */
         .terminal-box {
             background: #08080a;
             border: 1px solid #1c1c21;
@@ -230,7 +332,6 @@
             line-height: 1.5;
         }
 
-        /* Quick Prompt Tags */
         .prompt-chips {
             display: flex;
             flex-wrap: wrap;
@@ -257,75 +358,92 @@
 </head>
 <body>
 
-    <h1 class="nexus-title">Email Assistant</h1>
+    <!-- Secure Login Overlay -->
+    <div id="loginOverlay">
+        <div class="login-card">
+            <h2>Restricted Access</h2>
+            <p>You must be signed in as an authorized Owner or Admin to access the Email Assistant.</p>
+            <button class="btn-google" onclick="loginAsOwner()">Sign In with Google</button>
+            <div id="loginError"></div>
+        </div>
+    </div>
 
-    <div class="nexus-grid">
-        
-        <!-- Main Form Panel -->
-        <div class="nexus-card">
-            <div class="card-header">
-                <h3>Dispatch Controls</h3>
-                <div class="status-badge">
-                    <div class="status-dot"></div>
-                    <span id="totalCountBadge">Workers AI Active</span>
-                </div>
+    <!-- Main Dashboard Content (Hidden until authenticated) -->
+    <div id="dashboardContent">
+        <div class="nexus-title-bar">
+            <div>
+                <h1 class="nexus-title">Email Assistant</h1>
+                <span id="userBadge" style="font-size: 12px; color: #2ed573;"></span>
             </div>
-
-            <div class="field-group">
-                <label>Target Audience</label>
-                <div class="radio-options">
-                    <div class="radio-btn active" id="modeSingle" onclick="setMode('single')">Specific User</div>
-                    <div class="radio-btn" id="modeAll" onclick="setMode('all')">Send to Everyone</div>
-                </div>
-            </div>
-
-            <div class="field-group" id="singleUserContainer">
-                <label>Select Customer Email</label>
-                <select id="userSelect">
-                    <option value="">Loading database users...</option>
-                </select>
-            </div>
-
-            <div class="field-group">
-                <label>Send From Alias</label>
-                <select id="senderSelect">
-                    <option value="support@textnexus.me">support@textnexus.me</option>
-                    <option value="owner@textnexus.me">owner@textnexus.me</option>
-                </select>
-            </div>
-
-            <div class="field-group">
-                <label>Quick Templates</label>
-                <div class="prompt-chips">
-                    <div class="chip" onclick="fillPrompt('Notice: Scheduled system maintenance will take place tonight at 11:00 PM UTC.')">System Maintenance</div>
-                    <div class="chip" onclick="fillPrompt('Welcome to TextNexus! We are thrilled to have you on board.')">Welcome Email</div>
-                    <div class="chip" onclick="fillPrompt('Update: New features and enhancements are now live in your workspace.')">Feature Update</div>
-                </div>
-            </div>
-
-            <div class="field-group">
-                <label>AI Instructions / Topic Prompt</label>
-                <textarea id="promptText" rows="4" placeholder="e.g. Write a brief message letting users know about our upcoming system updates."></textarea>
-            </div>
-
-            <button class="btn-dispatch" onclick="dispatchWorker()">Generate & Dispatch Message</button>
+            <button class="logout-btn" onclick="logoutOwner()">Sign Out</button>
         </div>
 
-        <!-- System Output Panel -->
-        <div class="nexus-card">
-            <div class="card-header">
-                <h3>Live Status & Execution Logs</h3>
+        <div class="nexus-grid">
+            
+            <div class="nexus-card">
+                <div class="card-header">
+                    <h3>Dispatch Controls</h3>
+                    <div class="status-badge">
+                        <div class="status-dot"></div>
+                        <span id="totalCountBadge">Workers AI Active</span>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label>Target Audience</label>
+                    <div class="radio-options">
+                        <div class="radio-btn active" id="modeSingle" onclick="setMode('single')">Specific User</div>
+                        <div class="radio-btn" id="modeAll" onclick="setMode('all')">Send to Everyone</div>
+                    </div>
+                </div>
+
+                <div class="field-group" id="singleUserContainer">
+                    <label>Select Customer Email</label>
+                    <select id="userSelect">
+                        <option value="">Loading database users...</option>
+                    </select>
+                </div>
+
+                <div class="field-group">
+                    <label>Send From Alias</label>
+                    <select id="senderSelect">
+                        <option value="support@textnexus.me">support@textnexus.me</option>
+                        <option value="owner@textnexus.me">owner@textnexus.me</option>
+                    </select>
+                </div>
+
+                <div class="field-group">
+                    <label>Quick Templates</label>
+                    <div class="prompt-chips">
+                        <div class="chip" onclick="fillPrompt('Notice: Scheduled system maintenance will take place tonight at 11:00 PM UTC.')">System Maintenance</div>
+                        <div class="chip" onclick="fillPrompt('Welcome to TextNexus! We are thrilled to have you on board.')">Welcome Email</div>
+                        <div class="chip" onclick="fillPrompt('Update: New features and enhancements are now live in your workspace.')">Feature Update</div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label>AI Instructions / Topic Prompt</label>
+                    <textarea id="promptText" rows="4" placeholder="e.g. Write a brief message letting users know about our upcoming system updates."></textarea>
+                </div>
+
+                <button class="btn-dispatch" onclick="dispatchWorker()">Generate & Dispatch Message</button>
             </div>
 
-            <p style="font-size: 13px; color: #888892;">
-                Requests are processed directly by your Cloudflare Worker backend and dispatched dynamically.
-            </p>
+            <div class="nexus-card">
+                <div class="card-header">
+                    <h3>Live Status & Execution Logs</h3>
+                </div>
 
-            <div class="terminal-box" id="terminalLog">System Standby...
+                <p style="font-size: 13px; color: #888892;">
+                    Requests are authenticated securely and processed via Brevo & Cloudflare Workers AI.
+                </p>
+
+                <div class="terminal-box" id="terminalLog">System Standby...
 Connected Endpoint: https://emailsendercloudflareworker.textnexus.me
+                </div>
             </div>
-        </div>
 
+        </div>
     </div>
 
     <script>
@@ -344,8 +462,10 @@ Connected Endpoint: https://emailsendercloudflareworker.textnexus.me
 
         async function dispatchWorker() {
             const sender = document.getElementById('senderSelect').value;
-            const prompt = document.getElementById('promptText').value;
+            const promptInput = document.getElementById('promptText').value.trim();
             const logBox = document.getElementById('terminalLog');
+
+            const prompt = promptInput || "Hello from TextNexus support team.";
 
             let recipients = [];
             if (currentMode === 'single') {
@@ -363,14 +483,15 @@ Connected Endpoint: https://emailsendercloudflareworker.textnexus.me
                 recipients = window.allFirebaseEmails;
             }
 
-            logBox.innerText = `[INFO] Initializing Workers AI generation...\n[INFO] Recipients: ${recipients.length}\n[INFO] Sender: ${sender}\n[STATUS] Dispatching payload...`;
+            logBox.innerText = `[INFO] Initializing Workers AI generation...\n[INFO] Recipients: ${recipients.length}\n[INFO] Sender: ${sender}\n[STATUS] Dispatching payload via Brevo...`;
 
             try {
                 const res = await fetch('https://emailsendercloudflareworker.textnexus.me', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        prompt: prompt || "Hello from TextNexus support.",
+                        prompt: prompt,
+                        recipients: recipients,
                         emails: recipients,
                         sender: sender
                     })
@@ -378,7 +499,7 @@ Connected Endpoint: https://emailsendercloudflareworker.textnexus.me
 
                 const data = await res.json();
                 if (data.success) {
-                    logBox.innerText = `[SUCCESS] Dispatch completed (${data.count} sent).\n\nAI Message Output:\n${data.reply}`;
+                    logBox.innerText = `[SUCCESS] Dispatch completed (${data.count} target recipient(s)).\n\nAI Generated Message:\n${data.reply}`;
                 } else {
                     logBox.innerText = `[FAIL] Worker returned an error:\n${data.error || JSON.stringify(data)}`;
                 }
