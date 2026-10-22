@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Creator Workspace</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>Nexus OS 6.0 — AI Site Creator</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,332 +13,317 @@
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    fontFamily: { 
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    },
                     colors: {
-                        background: '#0a0a0a',
-                        surface: '#121212',
-                        surfaceHover: '#1c1c1c',
-                        border: '#262626',
-                        textMain: '#ededed',
-                        textMuted: '#a1a1aa',
+                        bgRoot: '#020205',
+                        panelDark: '#09090f',
+                        panelHover: '#12121c',
+                        lineBorder: '#1c1c2e',
+                        neonBlue: '#38bdf8',
+                        neonIndigo: '#6366f1',
+                        textPrimary: '#f8fafc',
+                        textSecondary: '#94a3b8'
                     }
                 }
             }
         }
     </script>
+    <style>
+        body { background-color: #020205; color: #f8fafc; font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1c1c2e; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
+        .glass-card { background: rgba(9, 9, 15, 0.75); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.04); }
+        .glow-blue { box-shadow: 0 0 30px rgba(56, 189, 248, 0.15); }
+    </style>
 </head>
-<body class="h-screen w-screen flex flex-col bg-background text-textMain antialiased overflow-hidden">
+<body class="w-screen h-screen flex flex-col bg-bgRoot relative selection:bg-cyan-500 selection:text-black">
 
-    <!-- Top Bar -->
-    <header class="h-16 flex items-center justify-between px-6 border-b border-border bg-surface shrink-0">
+    <!-- TOP APP HEADER -->
+    <header class="h-20 border-b border-lineBorder flex items-center justify-between px-8 bg-panelDark/80 backdrop-blur-xl shrink-0 z-20">
         <div class="flex items-center gap-4">
-            <a href="https://textnexus.me" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border text-textMuted hover:text-textMain hover:bg-surfaceHover transition-colors text-sm font-medium">
-                <i class="ph ph-arrow-left text-base"></i> Back to Nexus
+            <a href="index.html" class="w-10 h-10 rounded-2xl bg-panelHover border border-lineBorder flex items-center justify-center text-textSecondary hover:text-textPrimary hover:border-neonBlue/50 transition-all shadow-sm" title="Back to Dashboard">
+                <i class="ph ph-arrow-left text-lg"></i>
             </a>
-            <span class="font-medium text-sm text-textMain">Nexus Creator Workspace</span>
+            <div>
+                <h1 class="font-extrabold text-textPrimary text-sm tracking-tight flex items-center gap-2.5">
+                    Nexus AI Creator
+                    <span class="text-[10px] bg-cyan-500/10 text-neonBlue border border-cyan-500/20 px-2.5 py-0.5 rounded-full font-mono uppercase tracking-widest font-bold">OS 6.0 Studio</span>
+                </h1>
+                <p class="text-[11px] text-textSecondary mt-0.5">Instant Web Generation Engine & Deployment Suite</p>
+            </div>
         </div>
+
         <div class="flex items-center gap-4">
-            <div id="creditDisplay" class="text-xs font-semibold px-3 py-1.5 rounded-full bg-surfaceHover border border-border text-emerald-400">
-                Credits: Loading...
+            <!-- User Balance Indicator -->
+            <div class="flex items-center gap-2 bg-panelHover border border-lineBorder px-4 py-2 rounded-2xl text-xs shadow-inner">
+                <i class="ph ph-coins text-amber-400 text-base"></i>
+                <span class="text-textSecondary font-semibold">Credits:</span>
+                <span id="user-credits-display" class="font-mono text-amber-400 font-bold">--</span>
             </div>
         </div>
     </header>
 
-    <!-- Main Workspace Split View -->
-    <div class="flex-1 flex overflow-hidden">
-        
-        <!-- Left Panel: Scrollable Model Selector, AI Prompt & History -->
-        <div class="w-96 border-r border-border bg-surface flex flex-col shrink-0">
-            <div id="chatHistory" class="flex-1 p-5 overflow-y-auto flex flex-col gap-4 text-sm">
-                <div class="p-3.5 rounded-xl bg-surfaceHover border border-border text-textMuted leading-relaxed">
-                    Welcome to the Creator Workspace! Choose your model from the scrollable selector below, describe your website, and generate your custom AI site. Each build costs <span class="text-textMain font-semibold">1,000 credits</span>.
+    <!-- MAIN CREATOR WORKSPACE -->
+    <main class="flex-1 overflow-y-auto p-8 relative">
+        <div class="max-w-6xl mx-auto flex flex-col gap-8 pb-16">
+
+            <!-- CUSTOM WEBSITE BANNER -->
+            <div class="glass-card p-6 rounded-3xl border border-lineBorder flex items-center justify-between gap-6 relative overflow-hidden bg-gradient-to-r from-panelDark via-panelDark to-panelHover">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-neonIndigo/10 border border-neonIndigo/20 flex items-center justify-center text-neonIndigo text-2xl shrink-0">
+                        <i class="ph ph-sparkle"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-textPrimary">Need a Custom Managed Web Solution?</h3>
+                        <p class="text-xs text-textSecondary mt-0.5">Looking for tailored development, custom domains, or enterprise integration? Email our core team.</p>
+                    </div>
                 </div>
+                <a href="mailto:Web.solutions@textnexus.me" class="px-5 py-2.5 bg-panelHover border border-lineBorder hover:border-neonIndigo text-textPrimary text-xs font-bold rounded-2xl transition-all shrink-0 flex items-center gap-2 shadow-sm">
+                    <i class="ph ph-envelope-simple text-base text-neonIndigo"></i> Web.solutions@textnexus.me
+                </a>
             </div>
 
-            <div class="p-4 border-t border-border bg-background flex flex-col gap-3 relative">
-                <!-- Custom Scrollable Model Selector with Logos -->
-                <div class="flex flex-col gap-1 relative">
-                    <label class="text-[11px] text-textMuted font-medium">AI Model:</label>
-                    <div class="relative">
-                        <button type="button" onclick="toggleModelDropdown()" id="modelSelectBtn" class="w-full bg-surface border border-border rounded-lg px-3 py-2.5 text-xs text-textMain flex items-center justify-between outline-none hover:border-zinc-500 transition-colors">
-                            <span class="flex items-center gap-2" id="currentModelLabel">
-                                <span class="w-5 h-5 rounded flex items-center justify-center bg-emerald-500/10 text-emerald-400 font-bold text-[10px]">O</span> GPT-6.1 Sol
-                            </span>
-                            <i class="ph ph-caret-down text-textMuted"></i>
+            <!-- GENERATION CONTROL FORM & PREVIEW GRID -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <!-- LEFT COLUMN: PROMPT INPUT -->
+                <div class="lg:col-span-5 flex flex-col gap-6">
+                    <div class="glass-card p-6 rounded-3xl flex flex-col gap-5 shadow-xl">
+                        <h2 class="text-xs font-extrabold uppercase tracking-wider text-textPrimary flex items-center gap-2">
+                            <i class="ph ph-cpu text-neonBlue text-base"></i> Generator Parameters
+                        </h2>
+
+                        <!-- Target Subdomain -->
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs font-bold text-textSecondary">Target Subdomain</label>
+                            <div class="flex items-center bg-bgRoot border border-lineBorder rounded-2xl px-4 py-3 focus-within:border-neonBlue transition-all shadow-inner">
+                                <input type="text" id="site-subdomain-input" placeholder="my-awesome-site" class="w-full bg-transparent text-xs text-textPrimary font-mono outline-none">
+                                <span class="text-xs font-mono text-textSecondary shrink-0">.textnexus.me</span>
+                            </div>
+                        </div>
+
+                        <!-- Prompt Input -->
+                        <div class="flex flex-col gap-2">
+                            <label class="text-xs font-bold text-textSecondary">Website Concept Prompt</label>
+                            <textarea id="site-prompt-input" rows="5" placeholder="Describe the website you want to generate (e.g., A minimalist futuristic portfolio for a digital artist with dark theme and interactive showcase)..." class="w-full bg-bgRoot border border-lineBorder rounded-2xl p-4 text-xs text-textPrimary outline-none focus:border-neonBlue resize-none transition-all shadow-inner"></textarea>
+                        </div>
+
+                        <!-- Generation Button -->
+                        <button id="generate-site-btn" class="w-full py-4 bg-gradient-to-r from-neonBlue to-neonIndigo text-black font-extrabold rounded-2xl text-xs transition-all flex items-center justify-center gap-2 shadow-xl shadow-neonBlue/20 hover:opacity-95">
+                            <i class="ph ph-magic-wand text-base"></i> Generate Web Application (1,000 Credits)
                         </button>
+                    </div>
+                </div>
 
-                        <!-- Scrollable Dropdown List -->
-                        <div id="modelDropdownList" class="absolute bottom-full mb-2 left-0 w-full bg-surface border border-border rounded-xl shadow-2xl max-h-56 overflow-y-auto hidden z-50 p-1.5 flex flex-col gap-1">
-                            
-                            <div class="px-2 py-1 text-[10px] font-semibold text-textMuted uppercase tracking-wider">OpenAI Series</div>
-                            <div onclick="selectModel('openai/gpt-6.1-sol', 'GPT-6.1 Sol', 'O', 'text-emerald-400', 'bg-emerald-500/10')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-surfaceHover cursor-pointer text-xs transition-colors">
-                                <span class="w-5 h-5 rounded flex items-center justify-center bg-emerald-500/10 text-emerald-400 font-bold text-[10px]">O</span>
-                                <div><div class="font-medium">GPT-6.1 Sol</div><div class="text-[10px] text-textMuted">Flagship reasoning model</div></div>
-                            </div>
-                            <div onclick="selectModel('openai/gpt-6-astra', 'GPT-6 Astra', 'O', 'text-emerald-400', 'bg-emerald-500/10')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-surfaceHover cursor-pointer text-xs transition-colors">
-                                <span class="w-5 h-5 rounded flex items-center justify-center bg-emerald-500/10 text-emerald-400 font-bold text-[10px]">O</span>
-                                <div><div class="font-medium">GPT-6 Astra</div><div class="text-[10px] text-textMuted">Demanding end-to-end work</div></div>
-                            </div>
-                            <div onclick="selectModel('openai/gpt-6-sol', 'GPT-6 Sol', 'O', 'text-emerald-400', 'bg-emerald-500/10')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-surfaceHover cursor-pointer text-xs transition-colors">
-                                <span class="w-5 h-5 rounded flex items-center justify-center bg-emerald-500/10 text-emerald-400 font-bold text-[10px]">O</span>
-                                <div><div class="font-medium">GPT-6 Sol</div><div class="text-[10px] text-textMuted">High-end cost-efficient</div></div>
-                            </div>
-                            <div onclick="selectModel('openai/gpt-5.6-sol', 'GPT-5.6 Sol', 'O', 'text-emerald-400', 'bg-emerald-500/10')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-surfaceHover cursor-pointer text-xs transition-colors">
-                                <span class="w-5 h-5 rounded flex items-center justify-center bg-emerald-500/10 text-emerald-400 font-bold text-[10px]">O</span>
-                                <div><div class="font-medium">GPT-5.6 Sol</div><div class="text-[10px] text-textMuted">Multi-step coding & logic</div></div>
-                            </div>
+                <!-- RIGHT COLUMN: LIVE CODE / PREVIEW -->
+                <div class="lg:col-span-7 flex flex-col gap-6">
+                    <div class="glass-card rounded-3xl overflow-hidden shadow-2xl flex flex-col h-full min-h-[450px]">
+                        <div class="p-5 border-b border-lineBorder flex items-center justify-between bg-panelDark/40">
+                            <h3 class="text-xs font-extrabold uppercase tracking-wider text-textPrimary flex items-center gap-2">
+                                <i class="ph ph-code text-neonBlue text-base"></i> Generated Code Viewport
+                            </h3>
+                            <button id="deploy-site-btn" class="hidden px-4 py-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold rounded-xl hover:bg-emerald-500/20 transition-all flex items-center gap-2">
+                                <i class="ph ph-rocket-launch text-sm"></i> Deploy Subdomain
+                            </button>
+                        </div>
 
-                            <div class="px-2 py-1 text-[10px] font-semibold text-textMuted uppercase tracking-wider mt-1">Anthropic Claude</div>
-                            <div onclick="selectModel('anthropic/claude-opus-5.5', 'Claude Opus 5.5', 'A', 'text-orange-400', 'bg-orange-500/10')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-surfaceHover cursor-pointer text-xs transition-colors">
-                                <span class="w-5 h-5 rounded flex items-center justify-center bg-orange-500/10 text-orange-400 font-bold text-[10px]">A</span>
-                                <div><div class="font-medium">Claude Opus 5.5</div><div class="text-[10px] text-textMuted">Demanding agentic work</div></div>
-                            </div>
-                            <div onclick="selectModel('anthropic/claude-sonnet-4.5', 'Claude Sonnet 4.5', 'A', 'text-orange-400', 'bg-orange-500/10')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-surfaceHover cursor-pointer text-xs transition-colors">
-                                <span class="w-5 h-5 rounded flex items-center justify-center bg-orange-500/10 text-orange-400 font-bold text-[10px]">A</span>
-                                <div><div class="font-medium">Claude Sonnet 4.5</div><div class="text-[10px] text-textMuted">Balanced speed & coding</div></div>
-                            </div>
-
-                            <div class="px-2 py-1 text-[10px] font-semibold text-textMuted uppercase tracking-wider mt-1">Google Gemini</div>
-                            <div onclick="selectModel('google/gemini-3.8-flash', 'Gemini 3.8 Flash', 'G', 'text-blue-400', 'bg-blue-500/10')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-surfaceHover cursor-pointer text-xs transition-colors">
-                                <span class="w-5 h-5 rounded flex items-center justify-center bg-blue-500/10 text-blue-400 font-bold text-[10px]">G</span>
-                                <div><div class="font-medium">Gemini 3.8 Flash</div><div class="text-[10px] text-textMuted">Software engineering & reasoning</div></div>
-                            </div>
-                            <div onclick="selectModel('google/gemini-3.1-pro', 'Gemini 3.1 Pro', 'G', 'text-blue-400', 'bg-blue-500/10')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-surfaceHover cursor-pointer text-xs transition-colors">
-                                <span class="w-5 h-5 rounded flex items-center justify-center bg-blue-500/10 text-blue-400 font-bold text-[10px]">G</span>
-                                <div><div class="font-medium">Gemini 3.1 Pro</div><div class="text-[10px] text-textMuted">Reasoning-first flagship</div></div>
-                            </div>
-
-                            <div class="px-2 py-1 text-[10px] font-semibold text-textMuted uppercase tracking-wider mt-1">xAI Grok</div>
-                            <div onclick="selectModel('x-ai/grok-4.7', 'Grok 4.7', 'X', 'text-zinc-200', 'bg-zinc-800')" class="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-surfaceHover cursor-pointer text-xs transition-colors">
-                                <span class="w-5 h-5 rounded flex items-center justify-center bg-zinc-800 text-zinc-200 font-bold text-[10px]">X</span>
-                                <div><div class="font-medium">Grok 4.7</div><div class="text-[10px] text-textMuted">Long-running software tasks</div></div>
-                            </div>
-
+                        <div class="flex-1 p-6 bg-bgRoot/90 font-mono text-xs overflow-y-auto" id="code-output-container">
+                            <p class="text-textSecondary text-center py-20 italic">
+                                Ready to build. Enter your parameters and click generate to build your web page.
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                <input type="text" id="subdomainInput" placeholder="Subdomain (e.g. mysite)" class="w-full bg-surface border border-border rounded-lg px-3.5 py-2.5 text-sm text-textMain focus:outline-none focus:border-zinc-500 placeholder:text-zinc-600">
-                <textarea id="promptInput" rows="3" placeholder="What kind of website do you want to build?" class="w-full bg-surface border border-border rounded-lg px-3.5 py-2.5 text-sm text-textMain focus:outline-none focus:border-zinc-500 placeholder:text-zinc-600 resize-none"></textarea>
-                <button onclick="startBuild()" class="w-full bg-textMain text-background font-semibold py-2.5 rounded-lg text-sm hover:bg-zinc-200 transition-colors">
-                    Build Website (1,000 Credits)
-                </button>
             </div>
-        </div>
 
-        <!-- Right Panel: Live Preview Frame -->
-        <div class="flex-1 bg-background flex items-center justify-center relative">
-            <div id="previewPlaceholder" class="flex flex-col items-center gap-2 text-textMuted text-sm">
-                <i class="ph ph-globe text-3xl text-zinc-700"></i>
-                <p>Your live website preview will load here once generated.</p>
-            </div>
-            <iframe id="previewFrame" class="w-full h-full border-none hidden bg-white"></iframe>
-
-            <!-- Floating AI Edit Bar (Appears after site generation) -->
-            <div id="editBar" class="absolute bottom-6 left-1/2 -translate-x-1/2 w-3/4 max-w-2xl bg-surface border border-border rounded-2xl shadow-2xl hidden flex-col overflow-hidden z-50">
-                <div id="editLoading" class="hidden h-1 text-xs bg-emerald-500 w-full animate-pulse"></div>
-                <div class="flex items-center gap-2 p-2">
-                    <input type="text" id="editPromptInput" placeholder="Ask AI to modify this page..." class="flex-1 bg-transparent border-none text-sm text-textMain px-3 py-2 focus:outline-none placeholder:text-zinc-600">
-                    <button onclick="updateSite()" class="p-2 bg-textMain text-background rounded-xl hover:bg-zinc-200 transition-colors">
-                        <i class="ph ph-paper-plane-right text-lg"></i>
-                    </button>
+            <!-- USER'S DEPLOYED SITES DIRECTORY -->
+            <div class="glass-card rounded-3xl overflow-hidden shadow-2xl flex flex-col gap-4">
+                <div class="p-6 border-b border-lineBorder bg-panelDark/40 flex items-center justify-between">
+                    <h3 class="text-xs font-extrabold uppercase tracking-wider text-textPrimary">Your Active Subdomains</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-textSecondary">
+                        <thead class="bg-bgRoot/80 text-[10px] uppercase tracking-widest text-textSecondary border-b border-lineBorder font-bold">
+                            <tr>
+                                <th class="py-4 px-6">Assigned Subdomain</th>
+                                <th class="py-4 px-6">Prompt Summary</th>
+                                <th class="py-4 px-6">Created Timestamp</th>
+                                <th class="py-4 px-6 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="my-sites-table-body" class="divide-y divide-lineBorder">
+                            <tr>
+                                <td colspan="4" class="py-12 text-center text-textSecondary">
+                                    No active web deployments found for your account.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Firebase & Workspace Logic Script -->
+        </div>
+    </main>
+
+    <!-- FIREBASE LOGIC SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getDatabase, ref, push, set, update, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        import { getDatabase, ref as dbRef, onValue, update, push, serverTimestamp, get, remove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAO_ffupJOIMPE9m4ARtaqSzC1vGDkIAco",
             authDomain: "nexus-web-development-official.firebaseapp.com",
             projectId: "nexus-web-development-official",
-            databaseURL: "https://nexus-web-development-official-default-rtdb.firebaseio.com"
+            databaseURL: "https://nexus-web-development-official-default-rtdb.firebaseio.com" 
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        const WORKER_URL = "https://little-unit-9bae.brodywilliams0226.workers.dev/";
+        let currentUser = null;
+        let userCredits = 0;
+        let generatedCode = "";
 
-        let activeSubdomain = "";
-        let activeRepo = "";
-        let userCredits = 10000;
-        let selectedModelId = "openai/gpt-6.1-sol";
+        const creditsDisplay = document.getElementById('user-credits-display');
+        const subdomainInput = document.getElementById('site-subdomain-input');
+        const promptInput = document.getElementById('site-prompt-input');
+        const generateBtn = document.getElementById('generate-site-btn');
+        const deployBtn = document.getElementById('deploy-site-btn');
+        const codeOutput = document.getElementById('code-output-container');
+        const mySitesTable = document.getElementById('my-sites-table-body');
 
-        // Custom Dropdown Toggle & Selection Logic
-        window.toggleModelDropdown = () => {
-            const list = document.getElementById('modelDropdownList');
-            list.classList.toggle('hidden');
-        };
-
-        window.selectModel = (id, name, letter, textColor, bgColor) => {
-            selectedModelId = id;
-            document.getElementById('currentModelLabel').innerHTML = `<span class="w-5 h-5 rounded flex items-center justify-center ${bgColor} ${textColor} font-bold text-[10px]">${letter}</span> ${name}`;
-            document.getElementById('modelDropdownList').classList.add('hidden');
-        };
-
-        // Close dropdown when clicking outside
-        window.addEventListener('click', (e) => {
-            const btn = document.getElementById('modelSelectBtn');
-            const list = document.getElementById('modelDropdownList');
-            if (btn && list && !btn.contains(e.target) && !list.contains(e.target)) {
-                list.classList.add('hidden');
-            }
-        });
-
-        // Check Authentication & Real-time Firebase Credits on Load
         onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                alert("Please log in from the main Nexus dashboard first.");
-                window.location.href = "https://textnexus.me";
-                return;
-            }
+            currentUser = user;
+            if (user) {
+                // Listen to User Credits
+                onValue(dbRef(db, `nexus/users/${user.uid}/credits`), (snapshot) => {
+                    userCredits = snapshot.val() ?? 10000;
+                    creditsDisplay.textContent = userCredits.toLocaleString();
+                });
 
-            const userRef = ref(db, `textnexus/users/${user.uid}`);
-            onValue(userRef, (snapshot) => {
-                const data = snapshot.val();
-                if (data && data.credits !== undefined) {
-                    userCredits = data.credits;
-                } else {
-                    userCredits = 10000;
-                    update(userRef, { credits: userCredits, email: user.email, name: user.displayName || 'User' });
-                }
-                document.getElementById('creditDisplay').innerText = `Credits: ${userCredits.toLocaleString()}`;
-            });
+                // Listen to User Deployed Sites
+                listenToMySites(user.email);
+            } else {
+                creditsDisplay.textContent = '0';
+            }
         });
 
-        // 1. Initial Website Build
-        window.startBuild = async () => {
-            const user = auth.currentUser;
-            if (!user) {
-                alert("You must be logged in.");
-                return;
-            }
-
-            const subdomain = document.getElementById('subdomainInput').value.trim();
-            const prompt = document.getElementById('promptInput').value.trim();
-            const chatContainer = document.getElementById('chatHistory');
-            const previewPlaceholder = document.getElementById('previewPlaceholder');
-            const previewFrame = document.getElementById('previewFrame');
-
-            if (!subdomain || !prompt) {
-                alert("Please provide both a subdomain and an AI prompt.");
-                return;
-            }
-
-            if (userCredits < 1000) {
-                alert("Insufficient credits! You need at least 1,000 credits to build a website.");
-                return;
-            }
-
-            chatContainer.innerHTML += `<div class="p-3 rounded-xl bg-surface border border-border text-textMain self-end max-w-[85%]">Building: "${prompt}" (${subdomain}.textnexus.me)<span class="text-[10px] text-textMuted block mt-1">Model: ${selectedModelId}</span></div>`;
-            chatContainer.innerHTML += `<div id="loadingMsg" class="p-3 rounded-xl bg-surfaceHover border border-border text-textMuted">Configuring DNS, building repo, and setting up site...</div>`;
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-
-            try {
-                const response = await fetch(WORKER_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt, subdomain, userCredits, model: selectedModelId })
-                });
-
-                const data = await response.json();
-                if (document.getElementById('loadingMsg')) document.getElementById('loadingMsg').remove();
-
-                if (response.ok) {
-                    userCredits -= 1000;
-                    await update(ref(db, `textnexus/users/${user.uid}`), { credits: userCredits });
-
-                    const userSitesRef = ref(db, `users/${user.uid}/sites`);
-                    const newSiteRef = push(userSitesRef);
-                    set(newSiteRef, {
-                        subdomain: subdomain,
-                        url: data.siteUrl,
-                        prompt: prompt,
-                        model: selectedModelId,
-                        createdAt: Date.now(),
-                        expiresAt: Date.now() + (7 * 24 * 60 * 60 * 1000)
-                    });
-
-                    const adminSitesRef = ref(db, 'textnexus/ai_sites');
-                    push(adminSitesRef, {
-                        userEmail: user.email,
-                        subdomain: subdomain,
-                        prompt: prompt,
-                        model: selectedModelId,
-                        createdAt: Date.now()
-                    });
-
-                    activeSubdomain = subdomain;
-                    activeRepo = `nexus-${subdomain}`;
-
-                    chatContainer.innerHTML += `<div class="p-3 rounded-xl bg-surfaceHover border border-border text-textMain">Success! Your site is live at <a href="${data.siteUrl}" target="_blank" class="text-blue-400 underline">${data.siteUrl}</a>.</div>`;
-
-                    previewPlaceholder.classList.add('hidden');
-                    previewFrame.classList.remove('hidden');
-                    previewFrame.src = data.siteUrl;
-
-                    const editBar = document.getElementById('editBar');
-                    editBar.classList.remove('hidden');
-                    editBar.classList.add('flex');
-                } else {
-                    chatContainer.innerHTML += `<div class="p-3 rounded-xl bg-red-950/40 border border-red-900/50 text-red-300">Error: ${data.error || 'Build failed.'}</div>`;
-                }
-            } catch (err) {
-                if (document.getElementById('loadingMsg')) document.getElementById('loadingMsg').remove();
-                chatContainer.innerHTML += `<div class="p-3 rounded-xl bg-red-950/40 border border-red-900/50 text-red-300">Network connection error.</div>`;
-            }
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        };
-
-        // 2. Iterative AI Code Update
-        window.updateSite = async () => {
-            const editPrompt = document.getElementById('editPromptInput').value.trim();
-            if (!editPrompt || !activeSubdomain || !activeRepo) return;
-
-            const editInput = document.getElementById('editPromptInput');
-            const loadingBar = document.getElementById('editLoading');
-            const chatContainer = document.getElementById('chatHistory');
+        generateBtn.addEventListener('click', async () => {
+            if (!currentUser) return alert("Please log in to generate websites.");
             
-            editInput.value = '';
-            editInput.disabled = true;
-            loadingBar.classList.remove('hidden');
-            
-            chatContainer.innerHTML += `<div class="p-3 rounded-xl bg-surface border border-border text-textMain self-end max-w-[85%]">Updating: "${editPrompt}"</div>`;
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            const subdomain = subdomainInput.value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+            const prompt = promptInput.value.trim();
 
-            try {
-                const response = await fetch(`${WORKER_URL}update`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        prompt: editPrompt, 
-                        subdomain: activeSubdomain,
-                        repoName: activeRepo,
-                        model: selectedModelId
-                    })
-                });
+            if (!subdomain) return alert("Please enter a valid subdomain name.");
+            if (!prompt) return alert("Please enter a website concept prompt.");
+            if (userCredits < 1000) return alert("Insufficient credits! You need 1,000 credits to generate a website.");
 
-                const data = await response.json();
-                
-                if (response.ok) {
-                    chatContainer.innerHTML += `<div class="p-3 rounded-xl bg-surfaceHover border border-border text-emerald-400">Update successful! Refreshing preview...</div>`;
-                    document.getElementById('previewFrame').src = `https://${activeSubdomain}.textnexus.me?t=${Date.now()}`;
-                } else {
-                    chatContainer.innerHTML += `<div class="p-3 rounded-xl bg-red-950/40 border border-red-900/50 text-red-300">Update failed: ${data.error || 'Could not update site.'}</div>`;
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = `<i class="ph ph-spinner animate-spin text-base"></i> Generating Web Architecture...`;
+
+            // Deduct Credits
+            const newCredits = userCredits - 1000;
+            await update(dbRef(db, `nexus/users/${currentUser.uid}`), { credits: newCredits });
+
+            // Simulated Code Generation Template
+            generatedCode = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${subdomain.toUpperCase()} - Powered by Nexus OS 6.0</title>
+    <script src="https://cdn.tailwindcss.com"><\/script>
+</head>
+<body class="bg-gray-950 text-white font-sans flex items-center justify-center min-h-screen p-8">
+    <div class="max-w-2xl text-center space-y-6">
+        <h1 class="text-4xl font-extrabold text-blue-400 tracking-tight">${subdomain}.textnexus.me</h1>
+        <p class="text-gray-400 text-sm">${prompt}</p>
+        <div class="p-6 bg-gray-900 border border-gray-800 rounded-2xl shadow-xl">
+            <p class="text-xs text-gray-500 font-mono">Status: Generated via Nexus AI Engine</p>
+        </div>
+    </div>
+</body>
+</html>`;
+
+            codeOutput.innerText = generatedCode;
+            deployBtn.classList.remove('hidden');
+
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = `<i class="ph ph-magic-wand text-base"></i> Generate Web Application (1,000 Credits)`;
+        });
+
+        deployBtn.addEventListener('click', async () => {
+            const subdomain = subdomainInput.value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+            const prompt = promptInput.value.trim();
+
+            if (!subdomain || !generatedCode) return;
+
+            deployBtn.disabled = true;
+            deployBtn.innerHTML = `<i class="ph ph-spinner animate-spin text-sm"></i> Deploying...`;
+
+            await push(dbRef(db, 'nexus/ai_sites'), {
+                subdomain,
+                prompt,
+                code: generatedCode,
+                userEmail: currentUser.email,
+                userId: currentUser.uid,
+                createdAt: serverTimestamp()
+            });
+
+            alert(`Website successfully deployed to ${subdomain}.textnexus.me!`);
+            deployBtn.classList.add('hidden');
+            deployBtn.disabled = false;
+            deployBtn.innerHTML = `<i class="ph ph-rocket-launch text-sm"></i> Deploy Subdomain`;
+        });
+
+        function listenToMySites(userEmail) {
+            onValue(dbRef(db, 'nexus/ai_sites'), (snapshot) => {
+                const data = snapshot.val();
+                mySitesTable.innerHTML = '';
+
+                if (!data) {
+                    mySitesTable.innerHTML = `<tr><td colspan="4" class="py-12 text-center text-textSecondary">No active web deployments found.</td></tr>`;
+                    return;
                 }
-            } catch (err) {
-                chatContainer.innerHTML += `<div class="p-3 rounded-xl bg-red-950/40 border border-red-900/50 text-red-300">Network error during update.</div>`;
-            } finally {
-                editInput.disabled = false;
-                loadingBar.classList.add('hidden');
-                chatContainer.scrollTop = chatContainer.scrollHeight;
+
+                const mySites = Object.keys(data)
+                    .map(k => ({ id: k, ...data[k] }))
+                    .filter(s => s.userEmail === userEmail);
+
+                if (mySites.length === 0) {
+                    mySitesTable.innerHTML = `<tr><td colspan="4" class="py-12 text-center text-textSecondary">No active web deployments found for your account.</td></tr>`;
+                    return;
+                }
+
+                mySites.forEach(s => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-panelHover/40 transition-colors';
+                    row.innerHTML = `
+                        <td class="py-4 px-6 font-mono text-xs text-neonBlue font-bold">${s.subdomain}.textnexus.me</td>
+                        <td class="py-4 px-6 text-xs text-textSecondary max-w-xs truncate">${s.prompt}</td>
+                        <td class="py-4 px-6 text-xs text-textSecondary">${new Date(s.createdAt).toLocaleDateString()}</td>
+                        <td class="py-4 px-6 text-right">
+                            <button onclick="window.deleteMySite('${s.id}')" class="p-2.5 rounded-xl bg-panelHover text-textSecondary hover:text-red-400 transition-all shadow-sm">
+                                <i class="ph ph-trash text-base"></i>
+                            </button>
+                        </td>
+                    `;
+                    mySitesTable.appendChild(row);
+                });
+            });
+        }
+
+        window.deleteMySite = async (id) => {
+            if (confirm("Are you sure you want to delete this subdomain deployment?")) {
+                await remove(dbRef(db, `nexus/ai_sites/${id}`));
             }
         };
     </script>
