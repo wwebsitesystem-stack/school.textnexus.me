@@ -98,6 +98,8 @@
       color: #a1a1aa;
       display: none;
       white-space: pre-wrap;
+      max-height: 250px;
+      overflow-y: auto;
     }
   </style>
 </head>
@@ -109,7 +111,7 @@
         <div class="brand-icon"><i class="fa-solid fa-cube"></i></div>
         <div>
           <div class="brand-title">Nexus OS Assistant</div>
-          <div style="font-size:12px; color:#71717a;">Bulk Email Manager</div>
+          <div style="font-size:12px; color:#71717a;">Individual Bulk Dispatcher</div>
         </div>
       </div>
       <span class="status-tag">ACTIVE</span>
@@ -140,8 +142,8 @@
     </div>
 
     <!-- Submit Button -->
-    <button class="btn-send" id="sendBtn" onclick="dispatchEmails()">
-      <i class="fa-solid fa-paper-plane"></i> Send Bulk Message
+    <button class="btn-send" id="sendBtn" onclick="dispatchEmailsIndividually()">
+      <i class="fa-solid fa-paper-plane"></i> Send Emails
     </button>
 
     <!-- Response Log -->
@@ -151,11 +153,9 @@
   <script>
     const WORKER_URL = "https://emailsendercloudflareworker.textnexus.me";
 
-    // Helper to extract clean emails and names from text blob
     function parseRecipients(text) {
       if (!text.trim()) return [];
       
-      // Matches both standard "email@domain.com" and "Name <email@domain.com>"
       const rawEntries = text.split(/[\n,;]+/).map(s => s.trim()).filter(Boolean);
       const parsed = [];
 
@@ -170,7 +170,6 @@
           if (emailMatch && emailMatch[1]) email = emailMatch[1].trim();
         }
 
-        // Basic clean regex check
         const cleanEmailMatch = email.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
         if (cleanEmailMatch) {
           parsed.push({
@@ -189,7 +188,7 @@
       document.getElementById("recipientCount").innerText = `Detected: ${count} recipient(s)`;
     }
 
-    async function dispatchEmails() {
+    async function dispatchEmailsIndividually() {
       const sender = document.getElementById("senderSelect").value;
       const recipientRaw = document.getElementById("recipientInput").value;
       const prompt = document.getElementById("promptInput").value;
@@ -209,34 +208,49 @@
       }
 
       sendBtn.disabled = true;
-      sendBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Dispatching to ${recipients.length} Recipient(s)...`;
       logBox.style.display = "block";
-      logBox.innerText = `Sending payload to Cloudflare Worker...\nRecipients: ${recipients.map(r => r.email).join(", ")}`;
+      logBox.innerText = `Starting individual dispatches to ${recipients.length} recipient(s)...\n\n`;
 
-      try {
-        const response = await fetch(WORKER_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            sender: sender,
-            recipients: recipients,
-            prompt: prompt
-          })
-        });
+      let successCount = 0;
+      let failCount = 0;
 
-        const resData = await response.json();
+      for (let i = 0; i < recipients.length; i++) {
+        const recipient = recipients[i];
+        sendBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sending ${i + 1}/${recipients.length}...`;
 
-        if (resData.success) {
-          logBox.innerText = ` Success! Sent ${resData.count} email(s).\n\nAI Message Preview:\n${resData.reply}`;
-        } else {
-          logBox.innerText = ` Error Sending Emails:\n${JSON.stringify(resData, null, 2)}`;
+        try {
+          // Send request with ONLY this specific recipient
+          const response = await fetch(WORKER_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              sender: sender,
+              recipients: [recipient],
+              prompt: prompt
+            })
+          });
+
+          const resData = await response.json();
+
+          if (resData.success) {
+            successCount++;
+            logBox.innerText += `[${i + 1}/${recipients.length}] Sent to ${recipient.email} (${recipient.name})\n`;
+          } else {
+            failCount++;
+            logBox.innerText += `[${i + 1}/${recipients.length}]  Failed for ${recipient.email}: ${resData.error || "Unknown error"}\n`;
+          }
+        } catch (err) {
+          failCount++;
+          logBox.innerText += `[${i + 1}/${recipients.length}]  Network error for ${recipient.email}: ${err.message}\n`;
         }
-      } catch (err) {
-        logBox.innerText = ` Network Error: ${err.message}`;
-      } finally {
-        sendBtn.disabled = false;
-        sendBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Send Bulk Message`;
+
+        // Scroll log box to bottom automatically
+        logBox.scrollTop = logBox.scrollHeight;
       }
+
+      logBox.innerText += `\n--- Dispatch Complete ---\nTotal Sent: ${successCount} | Failed: ${failCount}`;
+      sendBtn.disabled = false;
+      sendBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Send Individual Emails`;
     }
   </script>
 </body>
