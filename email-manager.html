@@ -60,13 +60,33 @@
     }
     select:focus, input:focus, textarea:focus { border-color: #a1a1aa; }
     textarea { resize: vertical; min-height: 100px; font-family: inherit; }
-    
-    .recipient-badge {
-      display: inline-block;
-      margin-top: 6px;
-      font-size: 12px;
-      color: #3b82f6;
+
+    /* Target Mode Selector Tabs */
+    .tab-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      background: #18181b;
+      border: 1px solid #27272a;
+      color: #a1a1aa;
+      border-radius: 8px;
+      font-size: 13px;
       font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
     }
 
     .btn-send {
@@ -111,10 +131,20 @@
         <div class="brand-icon"><i class="fa-solid fa-cube"></i></div>
         <div>
           <div class="brand-title">Nexus OS Assistant</div>
-          <div style="font-size:12px; color:#71717a;">Individual Bulk Dispatcher</div>
+          <div style="font-size:12px; color:#71717a;">Email Dashboard</div>
         </div>
       </div>
       <span class="status-tag">ACTIVE</span>
+    </div>
+
+    <!-- Mode Selector -->
+    <div class="tab-group">
+      <button class="tab-btn active" id="modeCustomBtn" onclick="setMode('custom')">
+        <i class="fa-solid fa-user"></i> Custom Recipient
+      </button>
+      <button class="tab-btn" id="modeAllBtn" onclick="setMode('all')">
+        <i class="fa-solid fa-users"></i> All Database Users
+      </button>
     </div>
 
     <!-- Sender Selection -->
@@ -128,98 +158,165 @@
       </select>
     </div>
 
-    <!-- Bulk Recipients Input -->
-    <div class="form-group">
-      <label for="recipientInput"><i class="fa-solid fa-users"></i> Recipient Email(s)</label>
-      <textarea id="recipientInput" placeholder="Paste multiple emails here (separated by lines, commas, or spaces)&#10;e.g.&#10;john@example.com&#10;Jane Doe <jane@example.com>, staff@textnexus.me" oninput="updateRecipientCount()"></textarea>
-      <div id="recipientCount" class="recipient-badge">Detected: 0 recipient(s)</div>
+    <!-- Custom Recipient Field (Shown in Custom Mode) -->
+    <div class="form-group" id="customRecipientGroup">
+      <label for="recipientInput"><i class="fa-solid fa-user"></i> Recipient Email</label>
+      <input type="text" id="recipientInput" placeholder="Lindsey Mortinson <lindseybeth0226@gmail.com>">
+    </div>
+
+    <!-- All Users Info Box (Shown in All Mode) -->
+    <div class="form-group" id="allUsersGroup" style="display: none;">
+      <label><i class="fa-solid fa-database"></i> Database Target</label>
+      <div style="background: #18181b; border: 1px solid #27272a; padding: 12px 14px; border-radius: 10px; font-size: 13px; color: #a1a1aa;">
+        Will pull all active user records from Firebase and send individual emails to each person.
+      </div>
     </div>
 
     <!-- Prompt / Instructions -->
     <div class="form-group">
-      <label for="promptInput"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Email Instructions / Prompt</label>
-      <textarea id="promptInput" rows="4" placeholder="Write a welcoming message to updated user accounts informing them that Nexus OS v6.0 is active..."></textarea>
+      <label for="promptInput"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Instructions / Prompt</label>
+      <textarea id="promptInput" rows="4" placeholder="Write an email explaining..."></textarea>
     </div>
 
-    <!-- Submit Button -->
-    <button class="btn-send" id="sendBtn" onclick="dispatchEmailsIndividually()">
-      <i class="fa-solid fa-paper-plane"></i> Send Emails
+    <!-- Send Button -->
+    <button class="btn-send" id="sendBtn" onclick="dispatchEmail()">
+      <i class="fa-solid fa-paper-plane"></i> Send Email
     </button>
 
-    <!-- Response Log -->
+    <!-- Output Log -->
     <div id="log-container"></div>
   </div>
 
   <script>
     const WORKER_URL = "https://emailsendercloudflareworker.textnexus.me";
+    let targetMode = "custom"; // "custom" or "all"
 
-    function parseRecipients(text) {
-      if (!text.trim()) return [];
+    function setMode(mode) {
+      targetMode = mode;
+      const customBtn = document.getElementById("modeCustomBtn");
+      const allBtn = document.getElementById("modeAllBtn");
+      const customGroup = document.getElementById("customRecipientGroup");
+      const allGroup = document.getElementById("allUsersGroup");
+
+      if (mode === "custom") {
+        customBtn.classList.add("active");
+        allBtn.classList.remove("active");
+        customGroup.style.display = "block";
+        allGroup.style.display = "none";
+      } else {
+        allBtn.classList.add("active");
+        customBtn.classList.remove("active");
+        customGroup.style.display = "none";
+        allGroup.style.display = "block";
+      }
+    }
+
+    function parseRecipient(text) {
+      if (!text || !text.trim()) return null;
       
-      const rawEntries = text.split(/[\n,;]+/).map(s => s.trim()).filter(Boolean);
-      const parsed = [];
+      let name = "Valued Customer";
+      let email = text.trim();
 
-      for (const entry of rawEntries) {
-        let name = "Valued Customer";
-        let email = entry;
-
-        if (entry.includes("<")) {
-          const namePart = entry.split("<")[0].trim();
-          const emailMatch = entry.match(/<([^>]+)>/);
-          if (namePart) name = namePart;
-          if (emailMatch && emailMatch[1]) email = emailMatch[1].trim();
-        }
-
-        const cleanEmailMatch = email.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-        if (cleanEmailMatch) {
-          parsed.push({
-            name: name,
-            email: cleanEmailMatch[0].trim()
-          });
-        }
+      if (text.includes("<")) {
+        const namePart = text.split("<")[0].trim();
+        const emailMatch = text.match(/<([^>]+)>/);
+        if (namePart) name = namePart;
+        if (emailMatch && emailMatch[1]) email = emailMatch[1].trim();
       }
 
-      return parsed;
+      const cleanEmailMatch = email.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+      if (cleanEmailMatch) {
+        return { name: name, email: cleanEmailMatch[0].trim() };
+      }
+      return null;
     }
 
-    function updateRecipientCount() {
-      const input = document.getElementById("recipientInput").value;
-      const count = parseRecipients(input).length;
-      document.getElementById("recipientCount").innerText = `Detected: ${count} recipient(s)`;
+    // Helper to fetch all database users from Firebase Realtime DB
+    async function fetchDatabaseUsers() {
+      const paths = [
+        "https://textnexus-default-rtdb.firebaseio.com/textnexus/users.json",
+        "https://textnexus-default-rtdb.firebaseio.com/nexus/users.json",
+        "https://textnexus-default-rtdb.firebaseio.com/pinkping/users.json"
+      ];
+
+      let users = [];
+      for (const url of paths) {
+        try {
+          const res = await fetch(url);
+          if (res.ok) {
+            const data = await res.json();
+            if (data) {
+              Object.values(data).forEach(u => {
+                if (u && u.email) {
+                  users.push({
+                    name: u.name || u.displayName || "Valued Customer",
+                    email: u.email.trim()
+                  });
+                }
+              });
+            }
+          }
+        } catch (e) {
+          console.error("Error fetching path:", url, e);
+        }
+      }
+      
+      // Deduplicate by email
+      const uniqueMap = new Map();
+      users.forEach(u => uniqueMap.set(u.email.toLowerCase(), u));
+      return Array.from(uniqueMap.values());
     }
 
-    async function dispatchEmailsIndividually() {
+    async function dispatchEmail() {
       const sender = document.getElementById("senderSelect").value;
-      const recipientRaw = document.getElementById("recipientInput").value;
       const prompt = document.getElementById("promptInput").value;
       const sendBtn = document.getElementById("sendBtn");
       const logBox = document.getElementById("log-container");
-
-      const recipients = parseRecipients(recipientRaw);
-
-      if (recipients.length === 0) {
-        alert("Please paste at least one valid recipient email address.");
-        return;
-      }
 
       if (!prompt.trim()) {
         alert("Please enter prompt instructions for the AI.");
         return;
       }
 
+      let recipientsList = [];
+
+      if (targetMode === "custom") {
+        const recipientRaw = document.getElementById("recipientInput").value;
+        const recipient = parseRecipient(recipientRaw);
+        if (!recipient) {
+          alert("Please enter a valid recipient email address.");
+          return;
+        }
+        recipientsList.push(recipient);
+      } else {
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Fetching DB Users...`;
+        logBox.style.display = "block";
+        logBox.innerText = "Fetching user list from Firebase database...";
+
+        recipientsList = await fetchDatabaseUsers();
+
+        if (recipientsList.length === 0) {
+          logBox.innerText = " No valid user records found in database.";
+          sendBtn.disabled = false;
+          sendBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Send Email`;
+          return;
+        }
+      }
+
       sendBtn.disabled = true;
       logBox.style.display = "block";
-      logBox.innerText = `Starting individual dispatches to ${recipients.length} recipient(s)...\n\n`;
+      logBox.innerText = `Dispatching individual messages to ${recipientsList.length} recipient(s)...\n\n`;
 
       let successCount = 0;
       let failCount = 0;
 
-      for (let i = 0; i < recipients.length; i++) {
-        const recipient = recipients[i];
-        sendBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sending ${i + 1}/${recipients.length}...`;
+      for (let i = 0; i < recipientsList.length; i++) {
+        const recipient = recipientsList[i];
+        sendBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sending ${i + 1}/${recipientsList.length}...`;
 
         try {
-          // Send request with ONLY this specific recipient
+          // Send request strictly to this single recipient
           const response = await fetch(WORKER_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -234,23 +331,22 @@
 
           if (resData.success) {
             successCount++;
-            logBox.innerText += `[${i + 1}/${recipients.length}] Sent to ${recipient.email} (${recipient.name})\n`;
+            logBox.innerText += `[${i + 1}/${recipientsList.length}]  Sent to ${recipient.email} (${recipient.name})\n`;
           } else {
             failCount++;
-            logBox.innerText += `[${i + 1}/${recipients.length}]  Failed for ${recipient.email}: ${resData.error || "Unknown error"}\n`;
+            logBox.innerText += `[${i + 1}/${recipientsList.length}]  Failed for ${recipient.email}: ${resData.error || "Failed"}\n`;
           }
         } catch (err) {
           failCount++;
-          logBox.innerText += `[${i + 1}/${recipients.length}]  Network error for ${recipient.email}: ${err.message}\n`;
+          logBox.innerText += `[${i + 1}/${recipientsList.length}] Network error for ${recipient.email}: ${err.message}\n`;
         }
 
-        // Scroll log box to bottom automatically
         logBox.scrollTop = logBox.scrollHeight;
       }
 
       logBox.innerText += `\n--- Dispatch Complete ---\nTotal Sent: ${successCount} | Failed: ${failCount}`;
       sendBtn.disabled = false;
-      sendBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Send Individual Emails`;
+      sendBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Send Email`;
     }
   </script>
 </body>
