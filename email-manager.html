@@ -1,335 +1,243 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus OS - Secure Email Assistant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus OS // Email Assistant</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #09090b;
+      color: #f4f4f5;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .container {
+      width: 100%;
+      max-width: 650px;
+      background: #121215;
+      border: 1px solid #27272a;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #27272a;
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-icon {
+      width: 36px; height: 36px; background: #ffffff; color: #000;
+      border-radius: 8px; display: flex; align-items: center;
+      justify-content: center; font-weight: bold; font-size: 18px;
+    }
+    .brand-title { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
+    .status-tag {
+      font-size: 11px; font-weight: 600; background: rgba(46, 213, 115, 0.1);
+      color: #2ed573; padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(46, 213, 115, 0.2);
+    }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: #a1a1aa; margin-bottom: 8px; }
+    select, input, textarea {
+      width: 100%;
+      background: #18181b;
+      border: 1px solid #27272a;
+      color: #f4f4f5;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    select:focus, input:focus, textarea:focus { border-color: #a1a1aa; }
+    textarea { resize: vertical; min-height: 100px; font-family: inherit; }
     
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    .recipient-badge {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 12px;
+      color: #3b82f6;
+      font-weight: 600;
+    }
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAO_ffupJOIMPE9m4ARtaqSzC1vGDkIAco",
-            authDomain: "nexus-web-development-official.firebaseapp.com",
-            databaseURL: "https://nexus-web-development-official-default-rtdb.firebaseio.com",
-            projectId: "nexus-web-development-official",
-            storageBucket: "nexus-web-development-official.firebasestorage.app",
-            messagingSenderId: "553556577139",
-            appId: "1:553556577139:web:67c4aebebb033acf999306"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
-
-        const ADMIN_EMAILS = [
-            "brodywilliams0226@gmail.com",
-            "imcrabfr@gmail.com"
-        ];
-
-        window.firebaseUsersMap = new Map();
-
-        window.loginAsOwner = async function() {
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (err) {
-                console.error("Login error:", err);
-                alert("Authentication failed: " + err.message);
-            }
-        };
-
-        window.logoutOwner = async function() {
-            await signOut(auth);
-        };
-
-        onAuthStateChanged(auth, async (user) => {
-            const loginOverlay = document.getElementById('loginOverlay');
-            const dashboardContent = document.getElementById('dashboardContent');
-            const userBadge = document.getElementById('userBadge');
-
-            if (user) {
-                if (ADMIN_EMAILS.includes(user.email)) {
-                    loginOverlay.style.display = 'none';
-                    dashboardContent.style.display = 'flex';
-                    userBadge.innerText = `Logged in as: ${user.email} (Owner)`;
-                    loadFirebaseUsers();
-                } else {
-                    loginOverlay.style.display = 'flex';
-                    dashboardContent.style.display = 'none';
-                    document.getElementById('loginError').innerText = `Access Denied: ${user.email} is not an authorized owner/admin.`;
-                    await signOut(auth);
-                }
-            } else {
-                loginOverlay.style.display = 'flex';
-                dashboardContent.style.display = 'none';
-                document.getElementById('loginError').innerText = "";
-            }
-        });
-
-        async function loadFirebaseUsers() {
-            const userSelect = document.getElementById('userSelect');
-            const totalCountBadge = document.getElementById('totalCountBadge');
-            
-            userSelect.innerHTML = '<option value="">Loading users from database...</option>';
-            window.firebaseUsersMap.clear();
-            const userPaths = ['textnexus/users', 'nexus/users', 'pinkping/users'];
-
-            try {
-                for (const path of userPaths) {
-                    const snapshot = await get(ref(database, path));
-                    if (snapshot.exists()) {
-                        const data = snapshot.val();
-                        for (let uid in data) {
-                            const email = data[uid].email;
-                            const name = data[uid].name || "Valued Customer";
-                            if (email && !window.firebaseUsersMap.has(email)) {
-                                window.firebaseUsersMap.set(email, { email, name });
-
-                                const option = document.createElement('option');
-                                option.value = email;
-                                option.textContent = `${name} (${email})`;
-                                userSelect.appendChild(option);
-                            }
-                        }
-                    }
-                }
-
-                if (window.firebaseUsersMap.size > 0) {
-                    userSelect.options[0].textContent = `-- Select Target Customer (${window.firebaseUsersMap.size} loaded) --`;
-                    if (totalCountBadge) totalCountBadge.innerText = `${window.firebaseUsersMap.size} Users Synced`;
-                } else {
-                    userSelect.innerHTML = '<option value="">No registered emails found</option>';
-                }
-            } catch (err) {
-                console.error("Firebase sync error:", err);
-                userSelect.innerHTML = '<option value="">Error syncing database</option>';
-            }
-        }
-    </script>
-
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
-        body { background-color: #050507; color: #ffffff; padding: 16px; font-size: 14px; }
-        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0c; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; gap: 16px; padding: 20px; }
-        .login-card { background: #111114; border: 1px solid #1c1c21; padding: 32px; border-radius: 12px; text-align: center; max-width: 400px; width: 100%; }
-        .login-card h2 { font-size: 20px; margin-bottom: 8px; color: #fff; }
-        .login-card p { font-size: 13px; color: #888892; margin-bottom: 20px; }
-        .btn-google { background: #ffffff; color: #000; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; font-size: 14px; transition: opacity 0.2s; }
-        .btn-google:hover { opacity: 0.9; }
-        #loginError { color: #ff4757; font-size: 12px; margin-top: 10px; }
-        #dashboardContent { display: none; flex-direction: column; gap: 20px; max-width: 1200px; margin: 0 auto; }
-        .nexus-title-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .nexus-title { font-size: 24px; font-weight: 600; color: #ffffff; letter-spacing: -0.5px; }
-        .logout-btn { background: #18181c; border: 1px solid #26262e; color: #ff4757; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
-        .logout-btn:hover { background: #24242c; }
-        .nexus-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; }
-        @media (max-width: 900px) { .nexus-grid { grid-template-columns: 1fr; } }
-        .nexus-card { background: #111114; border: 1px solid #1c1c21; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 18px; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; }
-        .card-header h3 { font-size: 16px; font-weight: 500; color: #ffffff; }
-        .status-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #2ed573; background: rgba(46, 213, 115, 0.08); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(46, 213, 115, 0.2); }
-        .status-dot { width: 6px; height: 6px; background: #2ed573; border-radius: 50%; }
-        .field-group { display: flex; flex-direction: column; gap: 8px; }
-        label { font-size: 12px; color: #888892; font-weight: 500; }
-        select, textarea, input[type="text"], input[type="email"] { width: 100%; background: #18181c; border: 1px solid #26262e; color: #ffffff; padding: 12px 14px; border-radius: 8px; font-size: 13px; outline: none; transition: border-color 0.15s ease; }
-        select:focus, textarea:focus, input[type="text"]:focus, input[type="email"]:focus { border-color: #3b3b47; }
-        .radio-options { display: flex; gap: 8px; background: #18181c; padding: 6px; border-radius: 8px; border: 1px solid #26262e; }
-        .radio-btn { flex: 1; text-align: center; padding: 8px 10px; font-size: 12px; color: #888892; border-radius: 6px; cursor: pointer; transition: all 0.15s ease; }
-        .radio-btn.active { background: #24242c; color: #ffffff; font-weight: 500; }
-        .btn-dispatch { background: #ffffff; color: #000000; font-weight: 600; border: none; padding: 14px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: opacity 0.15s ease; }
-        .btn-dispatch:hover { opacity: 0.9; }
-        .terminal-box { background: #08080a; border: 1px solid #1c1c21; border-radius: 8px; padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #a0a0ab; min-height: 180px; max-height: 280px; overflow-y: auto; white-space: pre-wrap; line-height: 1.5; }
-        .prompt-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-        .chip { background: #18181c; border: 1px solid #26262e; color: #a0a0ab; font-size: 12px; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: all 0.15s ease; }
-        .chip:hover { color: #ffffff; border-color: #3b3b47; background: #202026; }
-    </style>
+    .btn-send {
+      width: 100%;
+      background: #ffffff;
+      color: #000000;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.2s;
+    }
+    .btn-send:hover { opacity: 0.9; }
+    .btn-send:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    #log-container {
+      margin-top: 20px;
+      padding: 14px;
+      background: #000000;
+      border: 1px solid #27272a;
+      border-radius: 10px;
+      font-size: 13px;
+      color: #a1a1aa;
+      display: none;
+      white-space: pre-wrap;
+    }
+  </style>
 </head>
 <body>
 
-    <div id="loginOverlay">
-        <div class="login-card">
-            <h2>Restricted Access</h2>
-            <p>You must be signed in as an authorized Owner or Admin to access the Email Assistant.</p>
-            <button class="btn-google" onclick="loginAsOwner()">Sign In with Google</button>
-            <div id="loginError"></div>
+  <div class="container">
+    <div class="header">
+      <div class="brand">
+        <div class="brand-icon"><i class="fa-solid fa-cube"></i></div>
+        <div>
+          <div class="brand-title">Nexus OS Assistant</div>
+          <div style="font-size:12px; color:#71717a;">Bulk Email Manager</div>
         </div>
+      </div>
+      <span class="status-tag">ACTIVE</span>
     </div>
 
-    <div id="dashboardContent">
-        <div class="nexus-title-bar">
-            <div>
-                <h1 class="nexus-title">Email Assistant</h1>
-                <span id="userBadge" style="font-size: 12px; color: #2ed573;"></span>
-            </div>
-            <button class="logout-btn" onclick="logoutOwner()">Sign Out</button>
-        </div>
-
-        <div class="nexus-grid">
-            
-            <div class="nexus-card">
-                <div class="card-header">
-                    <h3>Dispatch Controls</h3>
-                    <div class="status-badge">
-                        <div class="status-dot"></div>
-                        <span id="totalCountBadge">Workers AI Active</span>
-                    </div>
-                </div>
-
-                <div class="field-group">
-                    <label>Target Audience</label>
-                    <div class="radio-options">
-                        <div class="radio-btn active" id="modeSingle" onclick="setMode('single')">Specific User</div>
-                        <div class="radio-btn" id="modeCustom" onclick="setMode('custom')">Custom Email</div>
-                        <div class="radio-btn" id="modeAll" onclick="setMode('all')">Send to Everyone</div>
-                    </div>
-                </div>
-
-                <div class="field-group" id="singleUserContainer">
-                    <label>Select Customer Email</label>
-                    <select id="userSelect">
-                        <option value="">Loading database users...</option>
-                    </select>
-                </div>
-
-                <div class="field-group" id="customEmailContainer" style="display: none;">
-                    <label>Recipient Details</label>
-                    <input type="text" id="customNameInput" placeholder="Name (e.g. joe dart)" style="margin-bottom: 8px;">
-                    <input type="email" id="customEmailInput" placeholder="Email (e.g. example@gmail.com)">
-                </div>
-
-                <div class="field-group">
-                    <label>Send From Alias</label>
-                    <select id="senderSelect">
-                        <option value="support@textnexus.me">support@textnexus.me</option>
-                        <option value="staff@textnexus.me">staff@textnexus.me</option>
-                        <option value="owner@textnexus.me">owner@textnexus.me</option>
-                        <option value="epstien@textnexus.me">epstien@textnexus.me</option>
-                        <option value="news@textnexus.me">news@textnexus.me</option>
-                        <option value="brodywilliams0226@gmail.com">brodywilliams0226@gmail.com</option>
-                    </select>
-                </div>
-
-                <div class="field-group">
-                    <label>Quick Templates</label>
-                    <div class="prompt-chips">
-                        <div class="chip" onclick="fillPrompt('Notice: Scheduled system maintenance will take place tonight at 11:00 PM UTC.\n\nSincerely, (your name)')">System Maintenance</div>
-                        <div class="chip" onclick="fillPrompt('Welcome to TextNexus! We are thrilled to have you on board.\n\nSincerely, (your name)')">Welcome Email</div>
-                        <div class="chip" onclick="fillPrompt('Update: New features and enhancements are now live in your workspace.\n\nSincerely, (your name)')">Feature Update</div>
-                    </div>
-                </div>
-
-                <div class="field-group">
-                    <label>AI Instructions / Topic Prompt</label>
-                    <textarea id="promptText" rows="4" placeholder="e.g. Write a brief message letting users know about our upcoming updates. End with 'Sincerely, (your name)'"></textarea>
-                </div>
-
-                <button class="btn-dispatch" onclick="dispatchWorker()">Generate & Dispatch Message</button>
-            </div>
-
-            <div class="nexus-card">
-                <div class="card-header">
-                    <h3>Live Status & Execution Logs</h3>
-                </div>
-
-                <p style="font-size: 13px; color: #888892;">
-                    Requests are authenticated securely and processed via Brevo & Cloudflare Workers AI.
-                </p>
-
-                <div class="terminal-box" id="terminalLog">System Standby...
-Connected Endpoint: https://emailsendercloudflareworker.textnexus.me
-                </div>
-            </div>
-
-        </div>
+    <!-- Sender Selection -->
+    <div class="form-group">
+      <label for="senderSelect"><i class="fa-solid fa-paper-plane"></i> Sender Alias</label>
+      <select id="senderSelect">
+        <option value="support@textnexus.me">support@textnexus.me</option>
+        <option value="staff@textnexus.me">staff@textnexus.me</option>
+        <option value="owner@textnexus.me">owner@textnexus.me</option>
+        <option value="brodywilliams0226@gmail.com">brodywilliams0226@gmail.com</option>
+      </select>
     </div>
 
-    <script>
-        let currentMode = 'single';
+    <!-- Bulk Recipients Input -->
+    <div class="form-group">
+      <label for="recipientInput"><i class="fa-solid fa-users"></i> Recipient Email(s)</label>
+      <textarea id="recipientInput" placeholder="Paste multiple emails here (separated by lines, commas, or spaces)&#10;e.g.&#10;john@example.com&#10;Jane Doe <jane@example.com>, staff@textnexus.me" oninput="updateRecipientCount()"></textarea>
+      <div id="recipientCount" class="recipient-badge">Detected: 0 recipient(s)</div>
+    </div>
 
-        function setMode(mode) {
-            currentMode = mode;
-            document.getElementById('modeSingle').classList.toggle('active', mode === 'single');
-            document.getElementById('modeCustom').classList.toggle('active', mode === 'custom');
-            document.getElementById('modeAll').classList.toggle('active', mode === 'all');
+    <!-- Prompt / Instructions -->
+    <div class="form-group">
+      <label for="promptInput"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Email Instructions / Prompt</label>
+      <textarea id="promptInput" rows="4" placeholder="Write a welcoming message to updated user accounts informing them that Nexus OS v6.0 is active..."></textarea>
+    </div>
 
-            document.getElementById('singleUserContainer').style.display = (mode === 'single') ? 'flex' : 'none';
-            document.getElementById('customEmailContainer').style.display = (mode === 'custom') ? 'flex' : 'none';
+    <!-- Submit Button -->
+    <button class="btn-send" id="sendBtn" onclick="dispatchEmails()">
+      <i class="fa-solid fa-paper-plane"></i> Send Bulk Message
+    </button>
+
+    <!-- Response Log -->
+    <div id="log-container"></div>
+  </div>
+
+  <script>
+    const WORKER_URL = "https://emailsendercloudflareworker.textnexus.me";
+
+    // Helper to extract clean emails and names from text blob
+    function parseRecipients(text) {
+      if (!text.trim()) return [];
+      
+      // Matches both standard "email@domain.com" and "Name <email@domain.com>"
+      const rawEntries = text.split(/[\n,;]+/).map(s => s.trim()).filter(Boolean);
+      const parsed = [];
+
+      for (const entry of rawEntries) {
+        let name = "Valued Customer";
+        let email = entry;
+
+        if (entry.includes("<")) {
+          const namePart = entry.split("<")[0].trim();
+          const emailMatch = entry.match(/<([^>]+)>/);
+          if (namePart) name = namePart;
+          if (emailMatch && emailMatch[1]) email = emailMatch[1].trim();
         }
 
-        function fillPrompt(text) {
-            document.getElementById('promptText').value = text;
+        // Basic clean regex check
+        const cleanEmailMatch = email.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+        if (cleanEmailMatch) {
+          parsed.push({
+            name: name,
+            email: cleanEmailMatch[0].trim()
+          });
         }
+      }
 
-        async function dispatchWorker() {
-            const sender = document.getElementById('senderSelect').value;
-            const promptInput = document.getElementById('promptText').value.trim();
-            const logBox = document.getElementById('terminalLog');
+      return parsed;
+    }
 
-            const prompt = promptInput || "Hello from TextNexus support team.";
+    function updateRecipientCount() {
+      const input = document.getElementById("recipientInput").value;
+      const count = parseRecipients(input).length;
+      document.getElementById("recipientCount").innerText = `Detected: ${count} recipient(s)`;
+    }
 
-            let recipients = [];
+    async function dispatchEmails() {
+      const sender = document.getElementById("senderSelect").value;
+      const recipientRaw = document.getElementById("recipientInput").value;
+      const prompt = document.getElementById("promptInput").value;
+      const sendBtn = document.getElementById("sendBtn");
+      const logBox = document.getElementById("log-container");
 
-            if (currentMode === 'single') {
-                const selectedEmail = document.getElementById('userSelect').value;
-                if (!selectedEmail || !selectedEmail.includes('@')) {
-                    logBox.innerText = "[ERROR] Please select a valid customer email address.";
-                    return;
-                }
-                const userObj = window.firebaseUsersMap.get(selectedEmail) || { email: selectedEmail, name: "Valued Customer" };
-                recipients.push(userObj);
+      const recipients = parseRecipients(recipientRaw);
 
-            } else if (currentMode === 'custom') {
-                const customEmail = document.getElementById('customEmailInput').value.trim();
-                const customName = document.getElementById('customNameInput').value.trim() || "Valued Customer";
+      if (recipients.length === 0) {
+        alert("Please paste at least one valid recipient email address.");
+        return;
+      }
 
-                if (!customEmail || !customEmail.includes('@')) {
-                    logBox.innerText = "[ERROR] Please enter a valid email address (e.g. name@domain.com).";
-                    return;
-                }
-                recipients.push({ email: customEmail, name: customName });
+      if (!prompt.trim()) {
+        alert("Please enter prompt instructions for the AI.");
+        return;
+      }
 
-            } else if (currentMode === 'all') {
-                if (!window.firebaseUsersMap || window.firebaseUsersMap.size === 0) {
-                    logBox.innerText = "[ERROR] No database users available for broadcast.";
-                    return;
-                }
-                recipients = Array.from(window.firebaseUsersMap.values()).filter(u => u.email && u.email.includes('@'));
-            }
+      sendBtn.disabled = true;
+      sendBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Dispatching to ${recipients.length} Recipient(s)...`;
+      logBox.style.display = "block";
+      logBox.innerText = `Sending payload to Cloudflare Worker...\nRecipients: ${recipients.map(r => r.email).join(", ")}`;
 
-            if (recipients.length === 0) {
-                logBox.innerText = "[ERROR] No valid recipients found.";
-                return;
-            }
+      try {
+        const response = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sender: sender,
+            recipients: recipients,
+            prompt: prompt
+          })
+        });
 
-            logBox.innerText = `[INFO] Initializing Workers AI generation...\n[INFO] Recipients: ${recipients.length}\n[INFO] Sender: ${sender}\n[STATUS] Dispatching personalized payload via Brevo...`;
+        const resData = await response.json();
 
-            try {
-                const res = await fetch('https://emailsendercloudflareworker.textnexus.me', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        prompt: prompt,
-                        recipients: recipients,
-                        emails: recipients,
-                        sender: sender
-                    })
-                });
-
-                const data = await res.json();
-                if (data.success) {
-                    logBox.innerText = `[SUCCESS] Dispatch completed (${data.count} target recipient(s)).\n\nAI Generated Message:\n${data.reply}`;
-                } else {
-                    logBox.innerText = `[FAIL] Worker returned an error:\n${JSON.stringify(data, null, 2)}`;
-                }
-            } catch (err) {
-                logBox.innerText = `[NETWORK ERROR] Execution failed:\n${err.message}`;
-            }
+        if (resData.success) {
+          logBox.innerText = ` Success! Sent ${resData.count} email(s).\n\nAI Message Preview:\n${resData.reply}`;
+        } else {
+          logBox.innerText = ` Error Sending Emails:\n${JSON.stringify(resData, null, 2)}`;
         }
-    </script>
+      } catch (err) {
+        logBox.innerText = ` Network Error: ${err.message}`;
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i> Send Bulk Message`;
+      }
+    }
+  </script>
 </body>
 </html>
