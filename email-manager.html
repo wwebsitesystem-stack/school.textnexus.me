@@ -27,15 +27,13 @@
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
-        // Authorized admin/owner emails
         const ADMIN_EMAILS = [
             "brodywilliams0226@gmail.com",
             "imcrabfr@gmail.com"
         ];
 
-        window.allFirebaseEmails = [];
+        window.firebaseUsersMap = new Map();
 
-        // Handle Google Sign-In
         window.loginAsOwner = async function() {
             try {
                 await signInWithPopup(auth, provider);
@@ -49,7 +47,6 @@
             await signOut(auth);
         };
 
-        // Listen to Auth State Changes
         onAuthStateChanged(auth, async (user) => {
             const loginOverlay = document.getElementById('loginOverlay');
             const dashboardContent = document.getElementById('dashboardContent');
@@ -79,8 +76,7 @@
             const totalCountBadge = document.getElementById('totalCountBadge');
             
             userSelect.innerHTML = '<option value="">Loading users from database...</option>';
-            window.allFirebaseEmails = [];
-            const emailSet = new Set();
+            window.firebaseUsersMap.clear();
             const userPaths = ['textnexus/users', 'nexus/users', 'pinkping/users'];
 
             try {
@@ -90,22 +86,22 @@
                         const data = snapshot.val();
                         for (let uid in data) {
                             const email = data[uid].email;
-                            if (email && !emailSet.has(email)) {
-                                emailSet.add(email);
-                                window.allFirebaseEmails.push(email);
+                            const name = data[uid].name || "Valued Customer";
+                            if (email && !window.firebaseUsersMap.has(email)) {
+                                window.firebaseUsersMap.set(email, { email, name });
 
                                 const option = document.createElement('option');
                                 option.value = email;
-                                option.textContent = data[uid].name ? `${data[uid].name} (${email})` : email;
+                                option.textContent = `${name} (${email})`;
                                 userSelect.appendChild(option);
                             }
                         }
                     }
                 }
 
-                if (window.allFirebaseEmails.length > 0) {
-                    userSelect.options[0].textContent = `-- Select Target Customer (${window.allFirebaseEmails.length} loaded) --`;
-                    if (totalCountBadge) totalCountBadge.innerText = `${window.allFirebaseEmails.length} Users Synced`;
+                if (window.firebaseUsersMap.size > 0) {
+                    userSelect.options[0].textContent = `-- Select Target Customer (${window.firebaseUsersMap.size} loaded) --`;
+                    if (totalCountBadge) totalCountBadge.innerText = `${window.firebaseUsersMap.size} Users Synced`;
                 } else {
                     userSelect.innerHTML = '<option value="">No registered emails found</option>';
                 }
@@ -118,244 +114,43 @@
 
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
-        
-        body {
-            background-color: transparent;
-            color: #ffffff;
-            padding: 16px;
-            font-size: 14px;
-        }
-
-        #loginOverlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #0a0a0c;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            gap: 16px;
-            padding: 20px;
-        }
-
-        .login-card {
-            background: #111114;
-            border: 1px solid #1c1c21;
-            padding: 32px;
-            border-radius: 12px;
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-        }
-
+        body { background-color: transparent; color: #ffffff; padding: 16px; font-size: 14px; }
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0c; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; gap: 16px; padding: 20px; }
+        .login-card { background: #111114; border: 1px solid #1c1c21; padding: 32px; border-radius: 12px; text-align: center; max-width: 400px; width: 100%; }
         .login-card h2 { font-size: 20px; margin-bottom: 8px; color: #fff; }
         .login-card p { font-size: 13px; color: #888892; margin-bottom: 20px; }
-        
-        .btn-google {
-            background: #ffffff;
-            color: #000;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            font-size: 14px;
-            transition: opacity 0.2s;
-        }
+        .btn-google { background: #ffffff; color: #000; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; font-size: 14px; transition: opacity 0.2s; }
         .btn-google:hover { opacity: 0.9; }
-
         #loginError { color: #ff4757; font-size: 12px; margin-top: 10px; }
-
         #dashboardContent { display: none; flex-direction: column; gap: 20px; }
-
-        .nexus-title-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .nexus-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #ffffff;
-            letter-spacing: -0.5px;
-        }
-
-        .logout-btn {
-            background: #18181c;
-            border: 1px solid #26262e;
-            color: #ff4757;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-        }
+        .nexus-title-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .nexus-title { font-size: 24px; font-weight: 600; color: #ffffff; letter-spacing: -0.5px; }
+        .logout-btn { background: #18181c; border: 1px solid #26262e; color: #ff4757; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
         .logout-btn:hover { background: #24242c; }
-
-        .nexus-grid {
-            display: grid;
-            grid-template-columns: 1.2fr 1fr;
-            gap: 20px;
-        }
-
-        @media (max-width: 900px) {
-            .nexus-grid { grid-template-columns: 1fr; }
-        }
-
-        .nexus-card {
-            background: #111114;
-            border: 1px solid #1c1c21;
-            border-radius: 12px;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .card-header h3 {
-            font-size: 16px;
-            font-weight: 500;
-            color: #ffffff;
-        }
-
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            color: #2ed573;
-            background: rgba(46, 213, 115, 0.08);
-            padding: 4px 10px;
-            border-radius: 20px;
-            border: 1px solid rgba(46, 213, 115, 0.2);
-        }
-
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            background: #2ed573;
-            border-radius: 50%;
-        }
-
-        .field-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        label {
-            font-size: 12px;
-            color: #888892;
-            font-weight: 500;
-        }
-
-        select, textarea, input[type="text"], input[type="email"] {
-            width: 100%;
-            background: #18181c;
-            border: 1px solid #26262e;
-            color: #ffffff;
-            padding: 12px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-            outline: none;
-            transition: border-color 0.15s ease;
-        }
-
-        select:focus, textarea:focus, input[type="text"]:focus, input[type="email"]:focus {
-            border-color: #3b3b47;
-        }
-
-        .radio-options {
-            display: flex;
-            gap: 8px;
-            background: #18181c;
-            padding: 6px;
-            border-radius: 8px;
-            border: 1px solid #26262e;
-        }
-
-        .radio-btn {
-            flex: 1;
-            text-align: center;
-            padding: 8px 10px;
-            font-size: 12px;
-            color: #888892;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.15s ease;
-        }
-
-        .radio-btn.active {
-            background: #24242c;
-            color: #ffffff;
-            font-weight: 500;
-        }
-
-        .btn-dispatch {
-            background: #ffffff;
-            color: #000000;
-            font-weight: 600;
-            border: none;
-            padding: 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: opacity 0.15s ease;
-        }
-
+        .nexus-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; }
+        @media (max-width: 900px) { .nexus-grid { grid-template-columns: 1fr; } }
+        .nexus-card { background: #111114; border: 1px solid #1c1c21; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 18px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; }
+        .card-header h3 { font-size: 16px; font-weight: 500; color: #ffffff; }
+        .status-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #2ed573; background: rgba(46, 213, 115, 0.08); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(46, 213, 115, 0.2); }
+        .status-dot { width: 6px; height: 6px; background: #2ed573; border-radius: 50%; }
+        .field-group { display: flex; flex-direction: column; gap: 8px; }
+        label { font-size: 12px; color: #888892; font-weight: 500; }
+        select, textarea, input[type="text"], input[type="email"] { width: 100%; background: #18181c; border: 1px solid #26262e; color: #ffffff; padding: 12px 14px; border-radius: 8px; font-size: 13px; outline: none; transition: border-color 0.15s ease; }
+        select:focus, textarea:focus, input[type="text"]:focus, input[type="email"]:focus { border-color: #3b3b47; }
+        .radio-options { display: flex; gap: 8px; background: #18181c; padding: 6px; border-radius: 8px; border: 1px solid #26262e; }
+        .radio-btn { flex: 1; text-align: center; padding: 8px 10px; font-size: 12px; color: #888892; border-radius: 6px; cursor: pointer; transition: all 0.15s ease; }
+        .radio-btn.active { background: #24242c; color: #ffffff; font-weight: 500; }
+        .btn-dispatch { background: #ffffff; color: #000000; font-weight: 600; border: none; padding: 14px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: opacity 0.15s ease; }
         .btn-dispatch:hover { opacity: 0.9; }
-
-        .terminal-box {
-            background: #08080a;
-            border: 1px solid #1c1c21;
-            border-radius: 8px;
-            padding: 16px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-            color: #a0a0ab;
-            min-height: 180px;
-            max-height: 280px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            line-height: 1.5;
-        }
-
-        .prompt-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .chip {
-            background: #18181c;
-            border: 1px solid #26262e;
-            color: #a0a0ab;
-            font-size: 12px;
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.15s ease;
-        }
-
-        .chip:hover {
-            color: #ffffff;
-            border-color: #3b3b47;
-            background: #202026;
-        }
+        .terminal-box { background: #08080a; border: 1px solid #1c1c21; border-radius: 8px; padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #a0a0ab; min-height: 180px; max-height: 280px; overflow-y: auto; white-space: pre-wrap; line-height: 1.5; }
+        .prompt-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+        .chip { background: #18181c; border: 1px solid #26262e; color: #a0a0ab; font-size: 12px; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: all 0.15s ease; }
+        .chip:hover { color: #ffffff; border-color: #3b3b47; background: #202026; }
     </style>
 </head>
 <body>
 
-    <!-- Secure Login Overlay -->
     <div id="loginOverlay">
         <div class="login-card">
             <h2>Restricted Access</h2>
@@ -365,7 +160,6 @@
         </div>
     </div>
 
-    <!-- Main Dashboard Content -->
     <div id="dashboardContent">
         <div class="nexus-title-bar">
             <div>
@@ -395,7 +189,6 @@
                     </div>
                 </div>
 
-                <!-- Database User Selector -->
                 <div class="field-group" id="singleUserContainer">
                     <label>Select Customer Email</label>
                     <select id="userSelect">
@@ -403,10 +196,10 @@
                     </select>
                 </div>
 
-                <!-- Manual Custom Email Input -->
                 <div class="field-group" id="customEmailContainer" style="display: none;">
-                    <label>Type Recipient Email</label>
-                    <input type="email" id="customEmailInput" placeholder="e.g. customer@example.com">
+                    <label>Recipient Details</label>
+                    <input type="text" id="customNameInput" placeholder="Name (e.g. Alex Smith)" style="margin-bottom: 8px;">
+                    <input type="email" id="customEmailInput" placeholder="Email (e.g. customer@example.com)">
                 </div>
 
                 <div class="field-group">
@@ -421,15 +214,15 @@
                 <div class="field-group">
                     <label>Quick Templates</label>
                     <div class="prompt-chips">
-                        <div class="chip" onclick="fillPrompt('Notice: Scheduled system maintenance will take place tonight at 11:00 PM UTC.')">System Maintenance</div>
-                        <div class="chip" onclick="fillPrompt('Welcome to TextNexus! We are thrilled to have you on board.')">Welcome Email</div>
-                        <div class="chip" onclick="fillPrompt('Update: New features and enhancements are now live in your workspace.')">Feature Update</div>
+                        <div class="chip" onclick="fillPrompt('Notice: Scheduled system maintenance will take place tonight at 11:00 PM UTC.\n\nSincerely, (your name)')">System Maintenance</div>
+                        <div class="chip" onclick="fillPrompt('Welcome to TextNexus! We are thrilled to have you on board.\n\nSincerely, (your name)')">Welcome Email</div>
+                        <div class="chip" onclick="fillPrompt('Update: New features and enhancements are now live in your workspace.\n\nSincerely, (your name)')">Feature Update</div>
                     </div>
                 </div>
 
                 <div class="field-group">
                     <label>AI Instructions / Topic Prompt</label>
-                    <textarea id="promptText" rows="4" placeholder="e.g. Write a brief message letting users know about our upcoming system updates."></textarea>
+                    <textarea id="promptText" rows="4" placeholder="e.g. Write a brief message letting users know about our upcoming updates. End with 'Sincerely, (your name)'"></textarea>
                 </div>
 
                 <button class="btn-dispatch" onclick="dispatchWorker()">Generate & Dispatch Message</button>
@@ -478,28 +271,30 @@ Connected Endpoint: https://emailsendercloudflareworker.textnexus.me
 
             let recipients = [];
             if (currentMode === 'single') {
-                const target = document.getElementById('userSelect').value;
-                if (!target) {
+                const targetEmail = document.getElementById('userSelect').value;
+                if (!targetEmail) {
                     logBox.innerText = "[ERROR] Please select a customer email address.";
                     return;
                 }
-                recipients.push(target);
+                const userObj = window.firebaseUsersMap.get(targetEmail) || { email: targetEmail, name: "Valued Customer" };
+                recipients.push(userObj);
             } else if (currentMode === 'custom') {
-                const customTarget = document.getElementById('customEmailInput').value.trim();
-                if (!customTarget) {
+                const customEmail = document.getElementById('customEmailInput').value.trim();
+                const customName = document.getElementById('customNameInput').value.trim() || "Valued Customer";
+                if (!customEmail) {
                     logBox.innerText = "[ERROR] Please enter a custom recipient email address.";
                     return;
                 }
-                recipients.push(customTarget);
+                recipients.push({ email: customEmail, name: customName });
             } else {
-                if (!window.allFirebaseEmails || window.allFirebaseEmails.length === 0) {
+                if (!window.firebaseUsersMap || window.firebaseUsersMap.size === 0) {
                     logBox.innerText = "[ERROR] No database users available for broadcast.";
                     return;
                 }
-                recipients = window.allFirebaseEmails;
+                recipients = Array.from(window.firebaseUsersMap.values());
             }
 
-            logBox.innerText = `[INFO] Initializing Workers AI generation...\n[INFO] Recipients: ${recipients.length}\n[INFO] Sender: ${sender}\n[STATUS] Dispatching payload via Brevo...`;
+            logBox.innerText = `[INFO] Initializing Workers AI generation...\n[INFO] Recipients: ${recipients.length}\n[INFO] Sender: ${sender}\n[STATUS] Dispatching personalized payload via Brevo...`;
 
             try {
                 const res = await fetch('https://emailsendercloudflareworker.textnexus.me', {
