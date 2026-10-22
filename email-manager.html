@@ -114,7 +114,7 @@
 
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
-        body { background-color: transparent; color: #ffffff; padding: 16px; font-size: 14px; }
+        body { background-color: #050507; color: #ffffff; padding: 16px; font-size: 14px; }
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a0a0c; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; gap: 16px; padding: 20px; }
         .login-card { background: #111114; border: 1px solid #1c1c21; padding: 32px; border-radius: 12px; text-align: center; max-width: 400px; width: 100%; }
         .login-card h2 { font-size: 20px; margin-bottom: 8px; color: #fff; }
@@ -122,7 +122,7 @@
         .btn-google { background: #ffffff; color: #000; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; font-size: 14px; transition: opacity 0.2s; }
         .btn-google:hover { opacity: 0.9; }
         #loginError { color: #ff4757; font-size: 12px; margin-top: 10px; }
-        #dashboardContent { display: none; flex-direction: column; gap: 20px; }
+        #dashboardContent { display: none; flex-direction: column; gap: 20px; max-width: 1200px; margin: 0 auto; }
         .nexus-title-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .nexus-title { font-size: 24px; font-weight: 600; color: #ffffff; letter-spacing: -0.5px; }
         .logout-btn { background: #18181c; border: 1px solid #26262e; color: #ff4757; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
@@ -198,8 +198,8 @@
 
                 <div class="field-group" id="customEmailContainer" style="display: none;">
                     <label>Recipient Details</label>
-                    <input type="text" id="customNameInput" placeholder="Name (e.g. Alex Smith)" style="margin-bottom: 8px;">
-                    <input type="email" id="customEmailInput" placeholder="Email (e.g. customer@example.com)">
+                    <input type="text" id="customNameInput" placeholder="Name (e.g. Brody Williams)" style="margin-bottom: 8px;">
+                    <input type="email" id="customEmailInput" placeholder="Email (e.g. brodywilliams0226@gmail.com)">
                 </div>
 
                 <div class="field-group">
@@ -207,8 +207,8 @@
                     <select id="senderSelect">
                         <option value="support@textnexus.me">support@textnexus.me</option>
                         <option value="staff@textnexus.me">staff@textnexus.me</option>
-                        <option value="brodywilliams0226@gmail.com">brodywilliams0226@gmail.com</option>
                         <option value="owner@textnexus.me">owner@textnexus.me</option>
+                        <option value="brodywilliams0226@gmail.com">brodywilliams0226@gmail.com</option>
                     </select>
                 </div>
 
@@ -271,28 +271,37 @@ Connected Endpoint: https://emailsendercloudflareworker.textnexus.me
             const prompt = promptInput || "Hello from TextNexus support team.";
 
             let recipients = [];
+
             if (currentMode === 'single') {
-                const targetEmail = document.getElementById('userSelect').value;
-                if (!targetEmail) {
-                    logBox.innerText = "[ERROR] Please select a customer email address.";
+                const selectedEmail = document.getElementById('userSelect').value;
+                if (!selectedEmail || !selectedEmail.includes('@')) {
+                    logBox.innerText = "[ERROR] Please select a valid customer email address.";
                     return;
                 }
-                const userObj = window.firebaseUsersMap.get(targetEmail) || { email: targetEmail, name: "Valued Customer" };
+                const userObj = window.firebaseUsersMap.get(selectedEmail) || { email: selectedEmail, name: "Valued Customer" };
                 recipients.push(userObj);
+
             } else if (currentMode === 'custom') {
                 const customEmail = document.getElementById('customEmailInput').value.trim();
                 const customName = document.getElementById('customNameInput').value.trim() || "Valued Customer";
-                if (!customEmail) {
-                    logBox.innerText = "[ERROR] Please enter a custom recipient email address.";
+
+                if (!customEmail || !customEmail.includes('@')) {
+                    logBox.innerText = "[ERROR] Please enter a valid email address (e.g. name@domain.com).";
                     return;
                 }
                 recipients.push({ email: customEmail, name: customName });
-            } else {
+
+            } else if (currentMode === 'all') {
                 if (!window.firebaseUsersMap || window.firebaseUsersMap.size === 0) {
                     logBox.innerText = "[ERROR] No database users available for broadcast.";
                     return;
                 }
-                recipients = Array.from(window.firebaseUsersMap.values());
+                recipients = Array.from(window.firebaseUsersMap.values()).filter(u => u.email && u.email.includes('@'));
+            }
+
+            if (recipients.length === 0) {
+                logBox.innerText = "[ERROR] No valid recipients found.";
+                return;
             }
 
             logBox.innerText = `[INFO] Initializing Workers AI generation...\n[INFO] Recipients: ${recipients.length}\n[INFO] Sender: ${sender}\n[STATUS] Dispatching personalized payload via Brevo...`;
@@ -313,7 +322,7 @@ Connected Endpoint: https://emailsendercloudflareworker.textnexus.me
                 if (data.success) {
                     logBox.innerText = `[SUCCESS] Dispatch completed (${data.count} target recipient(s)).\n\nAI Generated Message:\n${data.reply}`;
                 } else {
-                    logBox.innerText = `[FAIL] Worker returned an error:\n${data.error || JSON.stringify(data)}`;
+                    logBox.innerText = `[FAIL] Worker returned an error:\n${JSON.stringify(data, null, 2)}`;
                 }
             } catch (err) {
                 logBox.innerText = `[NETWORK ERROR] Execution failed:\n${err.message}`;
