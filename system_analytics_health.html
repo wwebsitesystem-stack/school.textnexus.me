@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus OS - Real-Time System Analytics & Health</title>
+    <!-- Modern Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAO_ffupJOIMPE9m4ARtaqSzC1vGDkIAco",
+            authDomain: "nexus-web-development-official.firebaseapp.com",
+            databaseURL: "https://nexus-web-development-official-default-rtdb.firebaseio.com",
+            projectId: "nexus-web-development-official",
+            storageBucket: "nexus-web-development-official.firebasestorage.app",
+            messagingSenderId: "553556577139",
+            appId: "1:553556577139:web:67c4aebebb033acf999306"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        const ADMIN_EMAILS = [
+            "brodywilliams0226@gmail.com",
+            "imcrabfr@gmail.com"
+        ];
+
+        window.loginAsOwner = async function() {
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (err) {
+                console.error("Login error:", err);
+                const errBox = document.getElementById('loginError');
+                if (errBox) errBox.innerText = "Authentication failed: " + err.message;
+            }
+        };
+
+        window.logoutOwner = async function() {
+            await signOut(auth);
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            const loginOverlay = document.getElementById('loginOverlay');
+            const dashboardContent = document.getElementById('dashboardContent');
+            const userBadge = document.getElementById('userBadge');
+
+            if (user) {
+                if (ADMIN_EMAILS.includes(user.email)) {
+                    if (loginOverlay) loginOverlay.style.display = 'none';
+                    if (dashboardContent) dashboardContent.style.display = 'flex';
+                    if (userBadge) userBadge.innerText = `OWNER // ${user.email}`;
+                    window.fetchAnalyticsData();
+                } else {
+                    if (loginOverlay) loginOverlay.style.display = 'flex';
+                    if (dashboardContent) dashboardContent.style.display = 'none';
+                    const errBox = document.getElementById('loginError');
+                    if (errBox) errBox.innerText = `Access Denied: ${user.email} is not authorized.`;
+                    await signOut(auth);
+                }
+            } else {
+                if (loginOverlay) loginOverlay.style.display = 'flex';
+                if (dashboardContent) dashboardContent.style.display = 'none';
+                const errBox = document.getElementById('loginError');
+                if (errBox) errBox.innerText = "";
+            }
+        });
+
+        // Global function to sync real user counts per path into chart
+        window.fetchAnalyticsData = async function() {
+            const pathCounts = { 'textnexus/users': 0, 'nexus/users': 0, 'pinkping/users': 0 };
+            let totalUsers = 0;
+
+            try {
+                for (const path in pathCounts) {
+                    const snapshot = await get(ref(database, path));
+                    if (snapshot.exists()) {
+                        const count = Object.keys(snapshot.val() || {}).length;
+                        pathCounts[path] = count;
+                        totalUsers += count;
+                    }
+                }
+
+                // Update Metric Card
+                const totalUsersElem = document.getElementById('statTotalUsers');
+                if (totalUsersElem) totalUsersElem.innerText = totalUsers.toLocaleString();
+
+                // Update Doughnut Chart
+                if (window.targetDistributionChart) {
+                    window.targetDistributionChart.data.datasets[0].data = [
+                        pathCounts['textnexus/users'],
+                        pathCounts['nexus/users'],
+                        pathCounts['pinkping/users']
+                    ];
+                    window.targetDistributionChart.update();
+                }
+            } catch (err) {
+                console.error("Telemetry sync error:", err);
+            }
+        };
+    </script>
+
+    <style>
+        :root {
+            --bg-color: #050507;
+            --card-bg: #111114;
+            --card-border: #1c1c21;
+            --accent-green: #2ed573;
+            --accent-blue: #3b82f6;
+            --accent-purple: #a855f7;
+            --accent-orange: #ff9f43;
+            --text-main: #ffffff;
+            --text-muted: #888892;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-sans); }
+        
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            padding: 24px; 
+            font-size: 14px; 
+            min-height: 100vh;
+        }
+
+        /* Login Overlay */
+        #loginOverlay { 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: #0a0a0c; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 1000; 
+            gap: 16px; 
+            padding: 20px; 
+        }
+        .login-card { 
+            background: var(--card-bg); 
+            border: 1px solid var(--card-border); 
+            padding: 32px; 
+            border-radius: 12px; 
+            text-align: center; 
+            max-width: 400px; 
+            width: 100%; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .login-card h2 { font-size: 20px; margin-bottom: 8px; color: #fff; font-weight: 600; }
+        .login-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+        .btn-google { 
+            background: #ffffff; 
+            color: #000; 
+            border: none; 
+            padding: 12px 20px; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            width: 100%; 
+            font-size: 14px; 
+            transition: opacity 0.2s; 
+        }
+        .btn-google:hover { opacity: 0.9; }
+        #loginError { color: #ff4757; font-size: 12px; margin-top: 10px; }
+
+        /* Dashboard Container */
+        #dashboardContent { 
+            display: none; 
+            flex-direction: column; 
+            gap: 20px; 
+            max-width: 1400px; 
+            margin: 0 auto; 
+        }
+
+        /* Top Header Navigation */
+        .nexus-title-bar { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--card-border);
+        }
+        .brand-section { display: flex; flex-direction: column; gap: 4px; }
+        .nexus-title { font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
+        .nexus-sub { font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); }
+        .user-badge { font-size: 11px; color: var(--accent-green); font-family: var(--font-mono); background: rgba(46, 213, 115, 0.1); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(46, 213, 115, 0.2); }
+        
+        .header-controls { display: flex; align-items: center; gap: 12px; }
+        .time-filter { display: flex; background: #18181c; border: 1px solid var(--card-border); border-radius: 8px; padding: 4px; }
+        .filter-btn { background: transparent; border: none; color: var(--text-muted); font-size: 12px; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.15s ease; }
+        .filter-btn.active { background: #24242c; color: #fff; }
+        .filter-btn:hover:not(.active) { color: #fff; }
+
+        .btn-action { background: #18181c; border: 1px solid var(--card-border); color: #fff; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.15s; }
+        .btn-action:hover { background: #24242c; }
+        .btn-logout { background: rgba(255, 71, 87, 0.1); border: 1px solid rgba(255, 71, 87, 0.3); color: #ff4757; }
+        .btn-logout:hover { background: rgba(255, 71, 87, 0.2); }
+
+        /* Metric Grid */
+        .metrics-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
+            gap: 16px; 
+        }
+        .metric-card { 
+            background: var(--card-bg); 
+            border: 1px solid var(--card-border); 
+            border-radius: 12px; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            position: relative;
+            overflow: hidden;
+        }
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--card-accent, var(--accent-blue)), transparent);
+            opacity: 0.6;
+        }
+        .metric-top { display: flex; justify-content: space-between; align-items: center; }
+        .metric-title { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+        .metric-icon { width: 28px; height: 28px; border-radius: 6px; background: #18181c; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .metric-value-row { display: flex; align-items: baseline; gap: 10px; margin-top: 4px; }
+        .metric-value { font-size: 26px; font-weight: 700; color: #ffffff; font-family: var(--font-mono); letter-spacing: -0.5px; }
+        .trend-badge { font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; display: flex; align-items: center; gap: 3px; }
+        .trend-up { color: var(--accent-green); background: rgba(46, 213, 115, 0.1); }
+        .trend-neutral { color: var(--accent-blue); background: rgba(59, 130, 246, 0.1); }
+
+        /* Main Chart Sections */
+        .charts-grid { 
+            display: grid; 
+            grid-template-columns: 2fr 1fr; 
+            gap: 20px; 
+        }
+        @media (max-width: 1024px) { .charts-grid { grid-template-columns: 1fr; } }
+
+        .nexus-card { 
+            background: var(--card-bg); 
+            border: 1px solid var(--card-border); 
+            border-radius: 12px; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 16px; 
+        }
+        .card-header { display: flex; justify-content: space-between; align-items: center; }
+        .card-header h3 { font-size: 15px; font-weight: 600; color: #ffffff; display: flex; align-items: center; gap: 8px; }
+        .chart-container { position: relative; width: 100%; height: 260px; }
+
+        /* Health Status Dashboard */
+        .health-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            gap: 12px; 
+        }
+        .health-item { 
+            background: #18181c; 
+            border: 1px solid var(--card-border); 
+            border-radius: 8px; 
+            padding: 14px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+        }
+        .health-info { display: flex; flex-direction: column; gap: 3px; }
+        .health-name { font-size: 13px; font-weight: 500; color: #fff; }
+        .health-desc { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); }
+        
+        .pulse-badge { display: flex; align-items: center; gap: 6px; font-size: 11px; font-family: var(--font-mono); }
+        .pulse-dot { 
+            width: 8px; height: 8px; 
+            border-radius: 50%; 
+            background: var(--accent-green); 
+            box-shadow: 0 0 0 0 rgba(46, 213, 115, 0.7);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 213, 115, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(46, 213, 115, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 213, 115, 0); }
+        }
+
+        /* Activity Stream Table */
+        .table-responsive { overflow-x: auto; width: 100%; }
+        .logs-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
+        .logs-table th { background: #18181c; color: var(--text-muted); font-weight: 500; padding: 10px 14px; border-bottom: 1px solid var(--card-border); font-family: var(--font-mono); }
+        .logs-table td { padding: 12px 14px; border-bottom: 1px solid rgba(28, 28, 33, 0.6); color: #e0e0e0; font-family: var(--font-mono); white-space: nowrap; }
+        .logs-table tr:hover td { background: rgba(255, 255, 255, 0.02); }
+        
+        .status-chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; }
+        .chip-success { background: rgba(46, 213, 115, 0.1); color: var(--accent-green); border: 1px solid rgba(46, 213, 115, 0.2); }
+        .chip-pending { background: rgba(255, 159, 67, 0.1); color: var(--accent-orange); border: 1px solid rgba(255, 159, 67, 0.2); }
+    </style>
+</head>
+<body>
+
+    <!-- Auth Login Overlay -->
+    <div id="loginOverlay">
+        <div class="login-card">
+            <h2>Nexus Telemetry Access</h2>
+            <p>Authentication required. Sign in with an authorized owner account to view system health analytics.</p>
+            <button class="btn-google" onclick="loginAsOwner()">Sign In with Google</button>
+            <div id="loginError"></div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboardContent">
+        
+        <!-- Header Controls -->
+        <div class="nexus-title-bar">
+            <div class="brand-section">
+                <div class="nexus-title">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2ed573" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    System Analytics & Health
+                </div>
+                <div class="nexus-sub">NEXUS OS // TELEMETRY ENGINE v6.0</div>
+            </div>
+
+            <div class="header-controls">
+                <div class="user-badge" id="userBadge">AUTHENTICATING...</div>
+                
+                <div class="time-filter">
+                    <button class="filter-btn active" onclick="setTimeFilter('24h', this)">24H</button>
+                    <button class="filter-btn" onclick="setTimeFilter('7d', this)">7D</button>
+                    <button class="filter-btn" onclick="setTimeFilter('30d', this)">30D</button>
+                    <button class="filter-btn" onclick="setTimeFilter('all', this)">ALL</button>
+                </div>
+
+                <button class="btn-action" onclick="refreshTelemetry()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                    Ping
+                </button>
+                <button class="btn-action btn-logout" onclick="logoutOwner()">Sign Out</button>
+            </div>
+        </div>
+
+        <!-- Metric Stat Cards -->
+        <div class="metrics-grid">
+            <div class="metric-card" style="--card-accent: var(--accent-blue);">
+                <div class="metric-top">
+                    <span class="metric-title">TOTAL DISPATCHES</span>
+                    <div class="metric-icon">✉️</div>
+                </div>
+                <div class="metric-value-row">
+                    <span class="metric-value" id="statDispatches">1,284</span>
+                    <span class="trend-badge trend-up">↑ +14.2%</span>
+                </div>
+            </div>
+
+            <div class="metric-card" style="--card-accent: var(--accent-green);">
+                <div class="metric-top">
+                    <span class="metric-title">SYNCED DATABASE USERS</span>
+                    <div class="metric-icon">👥</div>
+                </div>
+                <div class="metric-value-row">
+                    <span class="metric-value" id="statTotalUsers">Syncing...</span>
+                    <span class="trend-badge trend-up">↑ Live</span>
+                </div>
+            </div>
+
+            <div class="metric-card" style="--card-accent: var(--accent-purple);">
+                <div class="metric-top">
+                    <span class="metric-title">API SUCCESS RATE</span>
+                    <div class="metric-icon">⚡</div>
+                </div>
+                <div class="metric-value-row">
+                    <span class="metric-value" id="statSuccessRate">99.6%</span>
+                    <span class="trend-badge trend-neutral">Optimal</span>
+                </div>
+            </div>
+
+            <div class="metric-card" style="--card-accent: var(--accent-orange);">
+                <div class="metric-top">
+                    <span class="metric-title">AVG WORKER LATENCY</span>
+                    <div class="metric-icon">⏱️</div>
+                </div>
+                <div class="metric-value-row">
+                    <span class="metric-value" id="statLatency">312ms</span>
+                    <span class="trend-badge trend-up">↓ -28ms</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Grid Section -->
+        <div class="charts-grid">
+            <!-- Main Area Chart -->
+            <div class="nexus-card">
+                <div class="card-header">
+                    <h3>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                        Dispatch Volume & AI Worker Executions
+                    </h3>
+                    <span style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">Requests / Hour</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="dispatchChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Doughnut Chart -->
+            <div class="nexus-card">
+                <div class="card-header">
+                    <h3>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+                        Target Path Distribution
+                    </h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="targetDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Node Health Monitors -->
+        <div class="nexus-card">
+            <div class="card-header">
+                <h3>Live Infrastructure Status Nodes</h3>
+                <span style="font-size: 11px; color: var(--accent-green); font-family: var(--font-mono);">ALL SYSTEMS OPERATIONAL</span>
+            </div>
+            
+            <div class="health-grid">
+                <div class="health-item">
+                    <div class="health-info">
+                        <span class="health-name">Cloudflare Workers AI</span>
+                        <span class="health-desc">llama-3.2-3b-instruct</span>
+                    </div>
+                    <div class="pulse-badge">
+                        <div class="pulse-dot"></div>
+                        <span style="color: var(--accent-green);" id="pingCf">28ms</span>
+                    </div>
+                </div>
+
+                <div class="health-item">
+                    <div class="health-info">
+                        <span class="health-name">Brevo SMTP Engine</span>
+                        <span class="health-desc">api.brevo.com v3</span>
+                    </div>
+                    <div class="pulse-badge">
+                        <div class="pulse-dot"></div>
+                        <span style="color: var(--accent-green);" id="pingBrevo">110ms</span>
+                    </div>
+                </div>
+
+                <div class="health-item">
+                    <div class="health-info">
+                        <span class="health-name">Firebase Realtime DB</span>
+                        <span class="health-desc">default-rtdb.firebaseio</span>
+                    </div>
+                    <div class="pulse-badge">
+                        <div class="pulse-dot"></div>
+                        <span style="color: var(--accent-green);" id="pingFirebase">42ms</span>
+                    </div>
+                </div>
+
+                <div class="health-item">
+                    <div class="health-info">
+                        <span class="health-name">Auth Gateway</span>
+                        <span class="health-desc">Google OAuth 2.0 Node</span>
+                    </div>
+                    <div class="pulse-badge">
+                        <div class="pulse-dot"></div>
+                        <span style="color: var(--accent-green);">Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Execution Activity Stream -->
+        <div class="nexus-card">
+            <div class="card-header">
+                <h3>Recent Dispatch Logs & Telemetry Stream</h3>
+                <button class="btn-action" style="padding: 4px 10px; font-size: 11px;" onclick="addSimulatedLog()">+ Simulate Dispatch</button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="logs-table">
+                    <thead>
+                        <tr>
+                            <th>TIMESTAMP</th>
+                            <th>RECIPIENT MASKED</th>
+                            <th>STATUS</th>
+                            <th>EXECUTION ROUTE</th>
+                            <th>LATENCY</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activityLogBody">
+                        <!-- Dynamic Entries Added via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Chart Configuration & Dashboard Controls Script -->
+    <script>
+        let dispatchChartInstance = null;
+        let targetChartInstance = null;
+
+        // Initialize Chart.js Elements on Load
+        window.addEventListener('load', () => {
+            initCharts();
+            populateInitialLogs();
+        });
+
+        function initCharts() {
+            // 1. Line/Area Chart for Dispatches
+            const ctxDispatch = document.getElementById('dispatchChart').getContext('2d');
+            
+            const gradient = ctxDispatch.createLinearGradient(0, 0, 0, 260);
+            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.35)');
+            gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+
+            dispatchChartInstance = new Chart(ctxDispatch, {
+                type: 'line',
+                data: {
+                    labels: ['02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00'],
+                    datasets: [{
+                        label: 'Dispatches Dispatched',
+                        data: [12, 19, 8, 25, 42, 78, 64, 92, 110, 85],
+                        borderColor: '#3b82f6',
+                        borderWidth: 2,
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.35,
+                        pointBackgroundColor: '#3b82f6',
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: 'rgba(28, 28, 33, 0.8)' }, ticks: { color: '#888892', font: { family: 'JetBrains Mono', size: 10 } } },
+                        y: { grid: { color: 'rgba(28, 28, 33, 0.8)' }, ticks: { color: '#888892', font: { family: 'JetBrains Mono', size: 10 } } }
+                    }
+                }
+            });
+
+            // 2. Doughnut Chart for Target Path Distribution
+            const ctxTarget = document.getElementById('targetDistributionChart').getContext('2d');
+            targetChartInstance = new Chart(ctxTarget, {
+                type: 'doughnut',
+                data: {
+                    labels: ['textnexus/users', 'nexus/users', 'pinkping/users'],
+                    datasets: [{
+                        data: [45, 30, 25],
+                        backgroundColor: ['#2ed573', '#3b82f6', '#a855f7'],
+                        borderWidth: 0,
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#888892', font: { family: 'JetBrains Mono', size: 11 }, padding: 14 }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+
+            window.targetDistributionChart = targetChartInstance;
+        }
+
+        // Time Filter Interaction Simulation
+        function setTimeFilter(range, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            if (!dispatchChartInstance) return;
+
+            let newData = [];
+            let newLabels = [];
+
+            if (range === '24h') {
+                newLabels = ['02:00', '04:00', '06:00', '08:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00'];
+                newData = [12, 19, 8, 25, 42, 78, 64, 92, 110, 85];
+            } else if (range === '7d') {
+                newLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                newData = [240, 310, 280, 420, 560, 390, 480];
+            } else if (range === '30d') {
+                newLabels = ['W1', 'W2', 'W3', 'W4'];
+                newData = [1420, 1890, 2100, 2450];
+            } else {
+                newLabels = ['Q1', 'Q2', 'Q3', 'Q4'];
+                newData = [5400, 8200, 12400, 16800];
+            }
+
+            dispatchChartInstance.data.labels = newLabels;
+            dispatchChartInstance.data.datasets[0].data = newData;
+            dispatchChartInstance.update();
+        }
+
+        // Live Log Table Population
+        function populateInitialLogs() {
+            const logs = [
+                { recipient: "b****g@gmail.com", route: "CF-Worker -> Brevo", latency: "284ms", status: "SUCCESS" },
+                { recipient: "i****r@gmail.com", route: "CF-Worker -> Brevo", latency: "310ms", status: "SUCCESS" },
+                { recipient: "u****2@nexus.io", route: "CF-Worker -> Brevo", latency: "420ms", status: "SUCCESS" },
+                { recipient: "a****n@textnexus.me", route: "CF-Worker -> Brevo", latency: "295ms", status: "SUCCESS" }
+            ];
+
+            const tbody = document.getElementById('activityLogBody');
+            tbody.innerHTML = '';
+            
+            logs.forEach(log => {
+                const now = new Date().toLocaleTimeString();
+                appendLogRow(now, log.recipient, log.status, log.route, log.latency);
+            });
+        }
+
+        function appendLogRow(time, recipient, status, route, latency) {
+            const tbody = document.getElementById('activityLogBody');
+            const tr = document.createElement('tr');
+            
+            tr.innerHTML = `
+                <td>${time}</td>
+                <td>${recipient}</td>
+                <td><span class="status-chip chip-success">${status}</span></td>
+                <td>${route}</td>
+                <td style="color: var(--accent-green);">${latency}</td>
+            `;
+            tbody.insertBefore(tr, tbody.firstChild);
+        }
+
+        function addSimulatedLog() {
+            const maskedList = ["u****x@domain.com", "t****s@textnexus.me", "c****r@gmail.com"];
+            const randomRecipient = maskedList[Math.floor(Math.random() * maskedList.length)];
+            const randomLatency = Math.floor(220 + Math.random() * 150) + "ms";
+            appendLogRow(new Date().toLocaleTimeString(), randomRecipient, "SUCCESS", "CF-Worker -> Brevo", randomLatency);
+            
+            // Bump counter
+            const dispatchElem = document.getElementById('statDispatches');
+            if (dispatchElem) {
+                let current = parseInt(dispatchElem.innerText.replace(/,/g, '')) || 0;
+                dispatchElem.innerText = (current + 1).toLocaleString();
+            }
+        }
+
+        // Telemetry Ping Refresh
+        function refreshTelemetry() {
+            document.getElementById('pingCf').innerText = Math.floor(20 + Math.random() * 15) + "ms";
+            document.getElementById('pingBrevo').innerText = Math.floor(95 + Math.random() * 30) + "ms";
+            document.getElementById('pingFirebase').innerText = Math.floor(35 + Math.random() * 20) + "ms";
+            if (window.fetchAnalyticsData) window.fetchAnalyticsData();
+        }
+    </script>
+</body>
+</html>
