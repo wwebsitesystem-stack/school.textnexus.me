@@ -143,10 +143,12 @@
         .radio-btn.active { background: #24242c; color: #ffffff; font-weight: 500; }
         .btn-dispatch { background: #ffffff; color: #000000; font-weight: 600; border: none; padding: 14px; border-radius: 8px; cursor: pointer; font-size: 13px; transition: opacity 0.15s ease; }
         .btn-dispatch:hover { opacity: 0.9; }
+        .btn-send-confirmed { background: #2ed573 !important; color: #000000 !important; display: none; }
         .terminal-box { background: #08080a; border: 1px solid #1c1c21; border-radius: 8px; padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #a0a0ab; min-height: 180px; max-height: 280px; overflow-y: auto; white-space: pre-wrap; line-height: 1.5; }
         .prompt-chips { display: flex; flex-wrap: wrap; gap: 8px; }
         .chip { background: #18181c; border: 1px solid #26262e; color: #a0a0ab; font-size: 12px; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: all 0.15s ease; }
         .chip:hover { color: #ffffff; border-color: #3b3b47; background: #202026; }
+        .preview-box { background: #18181c; border: 1px dashed #3b3b47; border-radius: 8px; padding: 14px; font-size: 13px; color: #d4d4d8; display: none; white-space: pre-wrap; line-height: 1.5; }
     </style>
 </head>
 <body>
@@ -198,8 +200,8 @@
 
                 <div class="field-group" id="customEmailContainer" style="display: none;">
                     <label>Recipient Details</label>
-                    <input type="text" id="customNameInput" placeholder="Name (e.g. jobn doe)" style="margin-bottom: 8px;">
-                    <input type="email" id="customEmailInput" placeholder="Email (e.g. example@gmail.com)">
+                    <input type="text" id="customNameInput" placeholder="Name (e.g. Brody Williams)" style="margin-bottom: 8px;">
+                    <input type="email" id="customEmailInput" placeholder="Email (e.g. brodywilliams0226@gmail.com)">
                 </div>
 
                 <div class="field-group">
@@ -207,28 +209,34 @@
                     <select id="senderSelect">
                         <option value="support@textnexus.me">support@textnexus.me</option>
                         <option value="staff@textnexus.me">staff@textnexus.me</option>
-                        <option value="web.solutions@textnexus.me">web.solutions@textnexus.me</option>
-                        <option value="noreply@textnexus.me">noreply@textnexus.me</option>
                         <option value="owner@textnexus.me">owner@textnexus.me</option>
-                        <option value="play@textnexus.me">play@textnexus.me</option>
+                        <option value="brodywilliams0226@gmail.com">brodywilliams0226@gmail.com</option>
                     </select>
                 </div>
 
                 <div class="field-group">
                     <label>Quick Templates</label>
                     <div class="prompt-chips">
-                        <div class="chip" onclick="fillPrompt('Notice: Scheduled system maintenance will take place tonight at 11:00 PM UTC.\n\nSincerely, (your name)')">System Maintenance</div>
-                        <div class="chip" onclick="fillPrompt('Welcome to TextNexus! We are thrilled to have you on board.\n\nSincerely, (your name)')">Welcome Email</div>
-                        <div class="chip" onclick="fillPrompt('Update: New features and enhancements are now live in your workspace.\n\nSincerely, (your name)')">Feature Update</div>
+                        <div class="chip" onclick="fillPrompt('Notice: Scheduled system maintenance will take place tonight at 11:00 PM UTC.')">System Maintenance</div>
+                        <div class="chip" onclick="fillPrompt('Welcome to TextNexus! We are thrilled to have you on board.')">Welcome Email</div>
+                        <div class="chip" onclick="fillPrompt('Update: New features and enhancements are now live in your workspace.')">Feature Update</div>
                     </div>
                 </div>
 
                 <div class="field-group">
                     <label>AI Instructions / Topic Prompt</label>
-                    <textarea id="promptText" rows="4" placeholder="e.g. Write a brief message letting users know about our upcoming updates. End with 'Sincerely, (your name)'"></textarea>
+                    <textarea id="promptText" rows="3" placeholder="e.g. Write a welcome email introducing our new update..."></textarea>
                 </div>
 
-                <button class="btn-dispatch" onclick="dispatchWorker()">Generate & Dispatch Message</button>
+                <!-- Step 1 Preview Box -->
+                <div class="field-group" id="previewGroup" style="display:none;">
+                    <label>🔍 Step 1: Review AI Draft Before Sending</label>
+                    <div class="preview-box" id="aiPreviewBox"></div>
+                </div>
+
+                <!-- Action Buttons -->
+                <button class="btn-dispatch" id="generateBtn" onclick="generateAIPreview()">Step 1: Generate AI Preview</button>
+                <button class="btn-dispatch btn-send-confirmed" id="confirmSendBtn" onclick="dispatchWorker()">Step 2: Confirm & Send Email</button>
             </div>
 
             <div class="nexus-card">
@@ -250,6 +258,7 @@ Connected Endpoint: https://emailsendercloudflareworker.textnexus.me
 
     <script>
         let currentMode = 'single';
+        let cachedRecipients = [];
 
         function setMode(mode) {
             currentMode = mode;
@@ -265,48 +274,48 @@ Connected Endpoint: https://emailsendercloudflareworker.textnexus.me
             document.getElementById('promptText').value = text;
         }
 
-        async function dispatchWorker() {
-            const sender = document.getElementById('senderSelect').value;
-            const promptInput = document.getElementById('promptText').value.trim();
-            const logBox = document.getElementById('terminalLog');
-
-            const prompt = promptInput || "Hello from TextNexus support team.";
-
+        function getRecipientsList() {
             let recipients = [];
-
             if (currentMode === 'single') {
                 const selectedEmail = document.getElementById('userSelect').value;
-                if (!selectedEmail || !selectedEmail.includes('@')) {
-                    logBox.innerText = "[ERROR] Please select a valid customer email address.";
-                    return;
+                if (selectedEmail && selectedEmail.includes('@')) {
+                    const userObj = window.firebaseUsersMap.get(selectedEmail) || { email: selectedEmail, name: "Valued Customer" };
+                    recipients.push(userObj);
                 }
-                const userObj = window.firebaseUsersMap.get(selectedEmail) || { email: selectedEmail, name: "Valued Customer" };
-                recipients.push(userObj);
-
             } else if (currentMode === 'custom') {
                 const customEmail = document.getElementById('customEmailInput').value.trim();
                 const customName = document.getElementById('customNameInput').value.trim() || "Valued Customer";
-
-                if (!customEmail || !customEmail.includes('@')) {
-                    logBox.innerText = "[ERROR] Please enter a valid email address (e.g. name@domain.com).";
-                    return;
+                if (customEmail && customEmail.includes('@')) {
+                    recipients.push({ email: customEmail, name: customName });
                 }
-                recipients.push({ email: customEmail, name: customName });
-
             } else if (currentMode === 'all') {
-                if (!window.firebaseUsersMap || window.firebaseUsersMap.size === 0) {
-                    logBox.innerText = "[ERROR] No database users available for broadcast.";
-                    return;
+                if (window.firebaseUsersMap && window.firebaseUsersMap.size > 0) {
+                    recipients = Array.from(window.firebaseUsersMap.values()).filter(u => u.email && u.email.includes('@'));
                 }
-                recipients = Array.from(window.firebaseUsersMap.values()).filter(u => u.email && u.email.includes('@'));
             }
+            return recipients;
+        }
 
-            if (recipients.length === 0) {
-                logBox.innerText = "[ERROR] No valid recipients found.";
+        async function generateAIPreview() {
+            const sender = document.getElementById('senderSelect').value;
+            const promptInput = document.getElementById('promptText').value.trim();
+            const logBox = document.getElementById('terminalLog');
+            const previewGroup = document.getElementById('previewGroup');
+            const aiPreviewBox = document.getElementById('aiPreviewBox');
+            const confirmBtn = document.getElementById('confirmSendBtn');
+            const generateBtn = document.getElementById('generateBtn');
+
+            const prompt = promptInput || "Hello from TextNexus support team.";
+            cachedRecipients = getRecipientsList();
+
+            if (cachedRecipients.length === 0) {
+                logBox.innerText = "[ERROR] Please select or enter a valid recipient target.";
                 return;
             }
 
-            logBox.innerText = `[INFO] Initializing Workers AI generation...\n[INFO] Recipients: ${recipients.length}\n[INFO] Sender: ${sender}\n[STATUS] Dispatching personalized payload via Brevo...`;
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = "Generating AI Draft...";
+            logBox.innerText = `[INFO] Generating AI preview draft using Llama-3.2...`;
 
             try {
                 const res = await fetch('https://emailsendercloudflareworker.textnexus.me', {
@@ -314,20 +323,69 @@ Connected Endpoint: https://emailsendercloudflareworker.textnexus.me
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         prompt: prompt,
-                        recipients: recipients,
-                        emails: recipients,
-                        sender: sender
+                        recipients: cachedRecipients,
+                        sender: sender,
+                        preview_only: true
                     })
                 });
 
                 const data = await res.json();
                 if (data.success) {
-                    logBox.innerText = `[SUCCESS] Dispatch completed (${data.count} target recipient(s)).\n\nAI Generated Message:\n${data.reply}`;
+                    aiPreviewBox.innerText = data.preview;
+                    previewGroup.style.display = "flex";
+                    confirmBtn.style.display = "block";
+                    generateBtn.style.display = "none";
+                    logBox.innerText = `[SUCCESS] AI draft generated successfully.\nReview the draft on the left, then click 'Confirm & Send Email'.`;
+                } else {
+                    logBox.innerText = `[FAIL] Failed to generate preview:\n${JSON.stringify(data, null, 2)}`;
+                    generateBtn.disabled = false;
+                    generateBtn.innerHTML = "Step 1: Generate AI Preview";
+                }
+            } catch (err) {
+                logBox.innerText = `[NETWORK ERROR] ${err.message}`;
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = "Step 1: Generate AI Preview";
+            }
+        }
+
+        async function dispatchWorker() {
+            const sender = document.getElementById('senderSelect').value;
+            const promptInput = document.getElementById('promptText').value.trim();
+            const logBox = document.getElementById('terminalLog');
+            const confirmBtn = document.getElementById('confirmSendBtn');
+            const generateBtn = document.getElementById('generateBtn');
+
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = "Dispatching to Brevo...";
+            logBox.innerText = `[STATUS] Dispatching verified message to ${cachedRecipients.length} recipient(s) via Brevo...`;
+
+            try {
+                const res = await fetch('https://emailsendercloudflareworker.textnexus.me', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: promptInput,
+                        recipients: cachedRecipients,
+                        sender: sender,
+                        preview_only: false
+                    })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    logBox.innerText = `[SUCCESS] Dispatch completed (${data.count} target recipient(s) emailed).\n\nSent Message:\n${data.reply}`;
                 } else {
                     logBox.innerText = `[FAIL] Worker returned an error:\n${JSON.stringify(data, null, 2)}`;
                 }
             } catch (err) {
                 logBox.innerText = `[NETWORK ERROR] Execution failed:\n${err.message}`;
+            } finally {
+                confirmBtn.disabled = false;
+                confirmBtn.style.display = "none";
+                generateBtn.style.display = "block";
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = "Step 1: Generate AI Preview";
+                document.getElementById('previewGroup').style.display = "none";
             }
         }
     </script>
