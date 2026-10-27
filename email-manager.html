@@ -148,7 +148,11 @@
         .prompt-chips { display: flex; flex-wrap: wrap; gap: 8px; }
         .chip { background: #18181c; border: 1px solid #26262e; color: #a0a0ab; font-size: 12px; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: all 0.15s ease; }
         .chip:hover { color: #ffffff; border-color: #3b3b47; background: #202026; }
-        .preview-box { background: #18181c; border: 1px dashed #3b3b47; border-radius: 8px; padding: 14px; font-size: 13px; color: #d4d4d8; display: none; white-space: pre-wrap; line-height: 1.5; }
+        
+        /* Interactive Draft Preview Box */
+        .preview-container { background: #0c0c0f; border: 1px solid #2ed573; border-radius: 10px; padding: 16px; display: none; flex-direction: column; gap: 10px; }
+        .preview-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1c1c21; padding-bottom: 8px; font-size: 12px; color: #2ed573; font-weight: 600; }
+        .preview-body { font-size: 13px; color: #e4e4e7; white-space: pre-wrap; line-height: 1.6; max-height: 220px; overflow-y: auto; background: #141418; padding: 12px; border-radius: 6px; border: 1px solid #26262e; }
     </style>
 </head>
 <body>
@@ -228,13 +232,18 @@
                     <textarea id="promptText" rows="3" placeholder="e.g. Write a welcome email introducing our new update..."></textarea>
                 </div>
 
-                <!-- Step 1 Preview Box -->
-                <div class="field-group" id="previewGroup" style="display:none;">
-                    <label>🔍 Step 1: Review AI Draft Before Sending</label>
-                    <div class="preview-box" id="aiPreviewBox"></div>
+                <!-- Live Generated Draft Card -->
+                <div class="field-group">
+                    <div class="preview-container" id="previewContainer">
+                        <div class="preview-header">
+                            <span>✨ Live AI Message Preview</span>
+                            <span id="previewRecipientTarget" style="color: #a0a0ab; font-weight: normal;"></span>
+                        </div>
+                        <div class="preview-body" id="aiPreviewBody"></div>
+                    </div>
                 </div>
 
-                <!-- Action Buttons -->
+                <!-- Action Controls -->
                 <button class="btn-dispatch" id="generateBtn" onclick="generateAIPreview()">Step 1: Generate AI Preview</button>
                 <button class="btn-dispatch btn-send-confirmed" id="confirmSendBtn" onclick="dispatchWorker()">Step 2: Confirm & Send Email</button>
             </div>
@@ -300,8 +309,9 @@ Connected Endpoint: https://emailsendercloudflareworker.textnexus.me
             const sender = document.getElementById('senderSelect').value;
             const promptInput = document.getElementById('promptText').value.trim();
             const logBox = document.getElementById('terminalLog');
-            const previewGroup = document.getElementById('previewGroup');
-            const aiPreviewBox = document.getElementById('aiPreviewBox');
+            const previewContainer = document.getElementById('previewContainer');
+            const aiPreviewBody = document.getElementById('aiPreviewBody');
+            const previewTarget = document.getElementById('previewRecipientTarget');
             const confirmBtn = document.getElementById('confirmSendBtn');
             const generateBtn = document.getElementById('generateBtn');
 
@@ -315,7 +325,7 @@ Connected Endpoint: https://emailsendercloudflareworker.textnexus.me
 
             generateBtn.disabled = true;
             generateBtn.innerHTML = "Generating AI Draft...";
-            logBox.innerText = `[INFO] Generating AI preview draft using Llama-3.2...`;
+            logBox.innerText = `[INFO] Requesting AI preview draft from Cloudflare Workers AI...`;
 
             try {
                 const res = await fetch('https://emailsendercloudflareworker.textnexus.me', {
@@ -331,11 +341,12 @@ Connected Endpoint: https://emailsendercloudflareworker.textnexus.me
 
                 const data = await res.json();
                 if (data.success) {
-                    aiPreviewBox.innerText = data.preview;
-                    previewGroup.style.display = "flex";
+                    aiPreviewBody.innerText = data.preview;
+                    previewTarget.innerText = `Target: ${cachedRecipients[0].name} (${cachedRecipients.length} total recipient(s))`;
+                    previewContainer.style.display = "flex";
                     confirmBtn.style.display = "block";
                     generateBtn.style.display = "none";
-                    logBox.innerText = `[SUCCESS] AI draft generated successfully.\nReview the draft on the left, then click 'Confirm & Send Email'.`;
+                    logBox.innerText = `[SUCCESS] AI Draft generated!\nReview the message box above, then click 'Step 2: Confirm & Send Email' to dispatch.`;
                 } else {
                     logBox.innerText = `[FAIL] Failed to generate preview:\n${JSON.stringify(data, null, 2)}`;
                     generateBtn.disabled = false;
@@ -356,8 +367,8 @@ Connected Endpoint: https://emailsendercloudflareworker.textnexus.me
             const generateBtn = document.getElementById('generateBtn');
 
             confirmBtn.disabled = true;
-            confirmBtn.innerHTML = "Dispatching to Brevo...";
-            logBox.innerText = `[STATUS] Dispatching verified message to ${cachedRecipients.length} recipient(s) via Brevo...`;
+            confirmBtn.innerHTML = "Dispatching via Brevo...";
+            logBox.innerText = `[STATUS] Dispatching confirmed message to ${cachedRecipients.length} recipient(s)...`;
 
             try {
                 const res = await fetch('https://emailsendercloudflareworker.textnexus.me', {
@@ -373,7 +384,7 @@ Connected Endpoint: https://emailsendercloudflareworker.textnexus.me
 
                 const data = await res.json();
                 if (data.success) {
-                    logBox.innerText = `[SUCCESS] Dispatch completed (${data.count} target recipient(s) emailed).\n\nSent Message:\n${data.reply}`;
+                    logBox.innerText = `[SUCCESS] Email successfully delivered to ${data.count} recipient(s)!\n\nDispatched Content:\n${data.reply}`;
                 } else {
                     logBox.innerText = `[FAIL] Worker returned an error:\n${JSON.stringify(data, null, 2)}`;
                 }
@@ -385,7 +396,7 @@ Connected Endpoint: https://emailsendercloudflareworker.textnexus.me
                 generateBtn.style.display = "block";
                 generateBtn.disabled = false;
                 generateBtn.innerHTML = "Step 1: Generate AI Preview";
-                document.getElementById('previewGroup').style.display = "none";
+                document.getElementById('previewContainer').style.display = "none";
             }
         }
     </script>
