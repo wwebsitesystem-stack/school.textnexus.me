@@ -165,10 +165,113 @@
         }
 
         /* =========================================
+           STATUS SPLASH SCREEN (Post-Boot Message)
+        ========================================= */
+        #status-splash {
+            position: fixed; inset: 0;
+            background: #000; z-index: 99998;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 1s var(--ease-out-expo);
+        }
+        #status-splash.splash-visible {
+            opacity: 1; pointer-events: auto;
+        }
+        #status-splash.splash-hidden {
+            opacity: 0; filter: blur(30px); transform: scale(1.1); pointer-events: none;
+        }
+
+        .splash-ambient {
+            position: absolute; inset: 0; z-index: 1; pointer-events: none;
+            overflow: hidden; filter: blur(100px); opacity: 0.4;
+        }
+        .splash-orb {
+            position: absolute; border-radius: 50%;
+            animation: float 12s ease-in-out infinite alternate;
+        }
+        .splash-orb-1 { width: 45vw; height: 45vw; background: rgba(139, 92, 246, 0.2); top: -15%; right: -10%; animation-delay: -2s; }
+        .splash-orb-2 { width: 35vw; height: 35vw; background: rgba(59, 130, 246, 0.15); bottom: -10%; left: -5%; animation-delay: -7s; }
+
+        .splash-content {
+            position: relative; z-index: 10;
+            width: 100%; max-width: 520px;
+            display: flex; flex-direction: column; align-items: center;
+            text-align: center;
+            background: var(--glass-panel);
+            backdrop-filter: blur(40px) saturate(150%);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 48px 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+            opacity: 0; transform: translateY(20px) scale(0.98);
+            transition: opacity 0.8s var(--ease-out-expo) 0.3s, transform 0.8s var(--ease-out-expo) 0.3s;
+        }
+        #status-splash.splash-visible .splash-content {
+            opacity: 1; transform: translateY(0) scale(1);
+        }
+
+        .splash-icon {
+            width: 56px; height: 56px; border-radius: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 28px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+        }
+        .splash-icon svg { width: 26px; height: 26px; stroke: var(--text-primary); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+        .splash-title {
+            font-size: 18px; font-weight: 600; letter-spacing: 0.5px;
+            color: #fff; margin-bottom: 16px; line-height: 1.5;
+        }
+
+        .splash-message {
+            font-size: 14px; font-weight: 400; line-height: 1.7;
+            color: var(--text-secondary); margin-bottom: 32px;
+        }
+
+        .splash-link {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+            color: #fff; text-decoration: none;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--glass-border);
+            padding: 10px 20px; border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+        .splash-link:hover {
+            background: var(--glass-hover);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+        }
+        .splash-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        .splash-footer {
+            margin-top: 32px;
+            font-family: var(--font-mono); font-size: 10px;
+            color: var(--text-tertiary); letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .splash-progress {
+            width: 120px; height: 2px; background: rgba(255,255,255,0.1);
+            border-radius: 2px; overflow: hidden; margin-top: 24px;
+        }
+        .splash-progress-fill {
+            height: 100%; width: 0%; background: #fff;
+            box-shadow: 0 0 8px #fff;
+            animation: splashTimer 6s linear forwards;
+        }
+        @keyframes splashTimer {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* =========================================
            HUMAN VERIFICATION GATE (Turnstile)
         ========================================= */
         #turnstile-gate {
-            position: fixed; inset: 0; z-index: 99998;
+            position: fixed; inset: 0; z-index: 99997;
             background: #000;
             display: none; align-items: center; justify-content: center;
             opacity: 0;
@@ -263,7 +366,7 @@
         .nav-item {
             display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 4px;
             border-radius: 12px; color: var(--text-secondary); font-size: 13px; font-weight: 500;
-            cursor: pointer; transition: all 0.2s ease; position: relative;
+            cursor: pointer; transition:all 0.2s ease; position: relative;
         }
         .nav-item svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
         .nav-item:hover { background: var(--glass-hover); color: var(--text-primary); }
@@ -350,6 +453,109 @@
             font-weight: 600;
             margin-left: auto;
         }
+
+        /* =========================================
+           STATUS SPLASH SCREEN (Post-Boot Message)
+        ========================================= */
+        #status-splash {
+            position: fixed; inset: 0;
+            background: #000; z-index: 99998;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 1s var(--ease-out-expo);
+        }
+        #status-splash.splash-visible {
+            opacity: 1; pointer-events: auto;
+        }
+        #status-splash.splash-hidden {
+            opacity: 0; filter: blur(30px); transform: scale(1.1); pointer-events: none;
+        }
+
+        .splash-ambient {
+            position: absolute; inset: 0; z-index: 1; pointer-events: none;
+            overflow: hidden; filter: blur(100px); opacity: 0.4;
+        }
+        .splash-orb {
+            position: absolute; border-radius: 50%;
+            animation: float 12s ease-in-out infinite alternate;
+        }
+        .splash-orb-1 { width: 45vw; height: 45vw; background: rgba(139, 92, 246, 0.2); top: -15%; right: -10%; animation-delay: -2s; }
+        .splash-orb-2 { width: 35vw; height: 35vw; background: rgba(59, 130, 246, 0.15); bottom: -10%; left: -5%; animation-delay: -7s; }
+
+        .splash-content {
+            position: relative; z-index: 10;
+            width: 100%; max-width: 520px;
+            display: flex; flex-direction: column; align-items: center;
+            text-align: center;
+            background: var(--glass-panel);
+            backdrop-filter: blur(40px) saturate(150%);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 48px 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+            opacity: 0; transform: translateY(20px) scale(0.98);
+            transition: opacity 0.8s var(--ease-out-expo) 0.3s, transform 0.8s var(--ease-out-expo) 0.3s;
+        }
+        #status-splash.splash-visible .splash-content {
+            opacity: 1; transform: translateY(0) scale(1);
+        }
+
+        .splash-icon {
+            width: 56px; height: 56px; border-radius: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 28px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+        }
+        .splash-icon svg { width: 26px; height: 26px; stroke: var(--text-primary); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+        .splash-title {
+            font-size: 18px; font-weight: 600; letter-spacing: 0.5px;
+            color: #fff; margin-bottom: 16px; line-height: 1.5;
+        }
+
+        .splash-message {
+            font-size: 14px; font-weight: 400; line-height: 1.7;
+            color: var(--text-secondary); margin-bottom: 32px;
+        }
+
+        .splash-link {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+            color: #fff; text-decoration: none;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--glass-border);
+            padding: 10px 20px; border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+        .splash-link:hover {
+            background: var(--glass-hover);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+        }
+        .splash-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        .splash-footer {
+            margin-top: 32px;
+            font-family: var(--font-mono); font-size: 10px;
+            color: var(--text-tertiary); letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .splash-progress {
+            width: 120px; height: 2px; background: rgba(255,255,255,0.1);
+            border-radius: 2px; overflow: hidden; margin-top: 24px;
+        }
+        .splash-progress-fill {
+            height: 100%; width: 0%; background: #fff;
+            box-shadow: 0 0 8px #fff;
+            animation: splashTimer 6s linear forwards;
+        }
+        @keyframes splashTimer {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -392,6 +598,32 @@
                     <div class="progress-fill" id="boot-progress-bar"></div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- POST-BOOT STATUS SPLASH -->
+    <div id="status-splash">
+        <div class="splash-ambient">
+            <div class="splash-orb splash-orb-1"></div>
+            <div class="splash-orb splash-orb-2"></div>
+        </div>
+        <div class="splash-content">
+            <div class="splash-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <h2 class="splash-title">We've currently stopped working on this site.</h2>
+            <p class="splash-message">
+                We are working on creating an AI. The demo will come out soon at 
+                <strong style="color: #fff;">demo.textnexus.me</strong>.
+            </p>
+            <a href="https://demo.textnexus.me" target="_blank" rel="noopener noreferrer" class="splash-link">
+                Visit Demo
+                <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <div class="splash-progress">
+                <div class="splash-progress-fill" id="splash-progress-fill"></div>
+            </div>
+            <div class="splash-footer">TextNexus // Status Update</div>
         </div>
     </div>
 
@@ -487,6 +719,7 @@
     <script>
         // Boot Sequence Logic
         const bootScreen = document.getElementById('boot-screen');
+        const statusSplash = document.getElementById('status-splash');
         const turnstileGate = document.getElementById('turnstile-gate');
         const appRoot = document.getElementById('app-root');
         const progressBar = document.getElementById('boot-progress-bar');
@@ -533,12 +766,23 @@
 
         function finishBoot() {
             setTimeout(() => {
+                // Hide boot screen
                 bootScreen.classList.add('boot-hidden');
+                
+                // Show the status splash after boot completes
                 setTimeout(() => {
                     bootScreen.style.display = 'none';
-                    // Show the Turnstile gate after boot completes
-                    turnstileGate.classList.add('gate-visible');
-                    initTurnstile();
+                    statusSplash.classList.add('splash-visible');
+                    
+                    // After 6 seconds, hide splash and show Turnstile gate
+                    setTimeout(() => {
+                        statusSplash.classList.add('splash-hidden');
+                        setTimeout(() => {
+                            statusSplash.style.display = 'none';
+                            turnstileGate.classList.add('gate-visible');
+                            initTurnstile();
+                        }, 800);
+                    }, 6000);
                 }, 800);
             }, 600);
         }
