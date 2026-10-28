@@ -165,93 +165,7 @@
         }
 
         /* =========================================
-           POST-BOOT STATUS SCREEN
-        ========================================= */
-        #status-screen {
-            position: fixed; inset: 0;
-            background: #000; z-index: 99998;
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none;
-            transition: opacity 1.2s var(--ease-out-expo);
-        }
-        #status-screen.visible {
-            opacity: 1; pointer-events: auto;
-        }
-
-        .status-ambient {
-            position: absolute; inset: 0; z-index: 1; pointer-events: none;
-            overflow: hidden; filter: blur(100px); opacity: 0.4;
-        }
-        .status-orb {
-            position: absolute; border-radius: 50%;
-            animation: float 12s ease-in-out infinite alternate;
-        }
-        .status-orb-1 { width: 45vw; height: 45vw; background: rgba(139, 92, 246, 0.2); top: -15%; right: -10%; animation-delay: -2s; }
-        .status-orb-2 { width: 35vw; height: 35vw; background: rgba(59, 130, 246, 0.15); bottom: -10%; left: -5%; animation-delay: -7s; }
-
-        .status-content {
-            position: relative; z-index: 10;
-            width: 100%; max-width: 560px;
-            display: flex; flex-direction: column; align-items: center;
-            text-align: center;
-            background: var(--glass-panel);
-            backdrop-filter: blur(40px) saturate(150%);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 48px 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
-            opacity: 0; transform: translateY(20px) scale(0.98);
-            transition: opacity 1s var(--ease-out-expo) 0.4s, transform 1s var(--ease-out-expo) 0.4s;
-        }
-        #status-screen.visible .status-content {
-            opacity: 1; transform: translateY(0) scale(1);
-        }
-
-        .status-icon {
-            width: 56px; height: 56px; border-radius: 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 28px;
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
-        }
-        .status-icon svg { width: 26px; height: 26px; stroke: var(--text-primary); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-
-        .status-title {
-            font-size: 18px; font-weight: 600; letter-spacing: 1px;
-            color: #fff; margin-bottom: 16px; line-height: 1.5;
-        }
-
-        .status-message {
-            font-size: 14px; font-weight: 400; line-height: 1.7;
-            color: var(--text-secondary); margin-bottom: 32px;
-        }
-
-        .status-link {
-            display: inline-flex; align-items: center; gap: 8px;
-            font-family: var(--font-mono); font-size: 12px; font-weight: 500;
-            color: #fff; text-decoration: none;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid var(--glass-border);
-            padding: 10px 20px; border-radius: 12px;
-            transition: all 0.2s ease;
-        }
-        .status-link:hover {
-            background: var(--glass-hover);
-            border-color: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
-        }
-        .status-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-
-        .status-footer {
-            margin-top: 32px;
-            font-family: var(--font-mono); font-size: 10px;
-            color: var(--text-tertiary); letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        /* =========================================
-           HUMAN VERIFICATION GATE (Turnstile) - Hidden by default now
+           HUMAN VERIFICATION GATE (Turnstile)
         ========================================= */
         #turnstile-gate {
             position: fixed; inset: 0; z-index: 99998;
@@ -481,29 +395,6 @@
         </div>
     </div>
 
-    <!-- POST-BOOT STATUS SCREEN -->
-    <div id="status-screen">
-        <div class="status-ambient">
-            <div class="status-orb status-orb-1"></div>
-            <div class="status-orb status-orb-2"></div>
-        </div>
-        <div class="status-content">
-            <div class="status-icon">
-                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-            </div>
-            <h2 class="status-title">We've currently stopped working on this site.</h2>
-            <p class="status-message">
-                We are working on creating an AI. The demo will come out soon at 
-                <strong style="color: #fff;">demo.textnexus.me</strong>.
-            </p>
-            <a href="https://demo.textnexus.me" target="_blank" rel="noopener noreferrer" class="status-link">
-                Visit Demo
-                <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            </a>
-            <div class="status-footer">TextNexus // Status Update</div>
-        </div>
-    </div>
-
     <!-- HUMAN VERIFICATION GATE -->
     <div id="turnstile-gate">
         <div class="gate-panel">
@@ -596,7 +487,8 @@
     <script>
         // Boot Sequence Logic
         const bootScreen = document.getElementById('boot-screen');
-        const statusScreen = document.getElementById('status-screen');
+        const turnstileGate = document.getElementById('turnstile-gate');
+        const appRoot = document.getElementById('app-root');
         const progressBar = document.getElementById('boot-progress-bar');
         const percentText = document.getElementById('boot-percent');
         const statusText = document.getElementById('boot-status-text');
@@ -641,13 +533,12 @@
 
         function finishBoot() {
             setTimeout(() => {
-                // Hide boot screen
                 bootScreen.classList.add('boot-hidden');
-                
-                // Show status screen instead of the main app layout
                 setTimeout(() => {
                     bootScreen.style.display = 'none';
-                    statusScreen.classList.add('visible');
+                    // Show the Turnstile gate after boot completes
+                    turnstileGate.classList.add('gate-visible');
+                    initTurnstile();
                 }, 800);
             }, 600);
         }
@@ -655,7 +546,58 @@
         // Start boot sequence after a brief delay
         setTimeout(updateBoot, 800);
 
-        // Clock logic (kept for completeness, though hidden behind status screen)
+        // Turnstile Logic
+        function initTurnstile() {
+            if (typeof turnstile !== 'undefined' && turnstile.render) {
+                turnstile.render('#turnstile-widget', {
+                    sitekey: '0x4AAAAAAFXCQ7lZ7OM2JFsT', // Replace with your actual site key
+                    theme: 'dark',
+                    callback: onTurnstileSuccess,
+                    'error-callback': onTurnstileError,
+                    'expired-callback': onTurnstileExpired
+                });
+            } else {
+                setTimeout(initTurnstile, 500);
+            }
+        }
+
+        function onTurnstileSuccess(token) {
+            const gateStatus = document.getElementById('gate-status-text');
+            gateStatus.textContent = 'Verified. Loading workspace...';
+            gateStatus.className = 'gate-status';
+            
+            setTimeout(() => {
+                turnstileGate.classList.add('gate-hidden');
+                setTimeout(() => {
+                    turnstileGate.style.display = 'none';
+                    appRoot.classList.add('loaded');
+                }, 800);
+            }, 800);
+        }
+
+        function onTurnstileError(errorCode) {
+            const gateStatus = document.getElementById('gate-status-text');
+            gateStatus.textContent = 'Verification error. Please try again.';
+            gateStatus.className = 'gate-status gate-status-error';
+            document.getElementById('gate-retry-btn').style.display = 'inline-block';
+        }
+
+        function onTurnstileExpired() {
+            const gateStatus = document.getElementById('gate-status-text');
+            gateStatus.textContent = 'Verification expired. Please retry.';
+            gateStatus.className = 'gate-status gate-status-error';
+            document.getElementById('gate-retry-btn').style.display = 'inline-block';
+        }
+
+        function retryTurnstile() {
+            document.getElementById('gate-retry-btn').style.display = 'none';
+            document.getElementById('gate-status-text').textContent = '';
+            if (typeof turnstile !== 'undefined' && turnstile.reset) {
+                turnstile.reset();
+            }
+        }
+
+        // Clock logic
         function updateClock() {
             const now = new Date();
             const clockEl = document.getElementById('hud-clock');
@@ -666,7 +608,7 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // Route loader (kept for completeness)
+        // Route loader
         function loadRoute(route, el) {
             const iframe = document.getElementById('nexus-viewport');
             if (iframe) {
@@ -686,8 +628,37 @@
             if (overlay) {
                 overlay.style.display = 'flex';
                 setTimeout(() => overlay.classList.add('active'), 10);
+                
+                const input = document.getElementById('cmd-input');
+                if (input) {
+                    input.value = '';
+                    input.focus();
+                }
             }
         }
+
+        // Close command palette on Escape or clicking outside
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const overlay = document.getElementById('cmd-overlay');
+                if (overlay && overlay.classList.contains('active')) {
+                    overlay.classList.remove('active');
+                    setTimeout(() => overlay.style.display = 'none', 200);
+                }
+            }
+            // Cmd/Ctrl + K shortcut
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                toggleCommandPalette();
+            }
+        });
+
+        document.getElementById('cmd-overlay')?.addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                e.currentTarget.classList.remove('active');
+                setTimeout(() => e.currentTarget.style.display = 'none', 200);
+            }
+        });
     </script>
 </body>
 </html>
