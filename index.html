@@ -165,10 +165,113 @@
         }
 
         /* =========================================
+           STATUS SPLASH SCREEN (Post-Boot Message)
+        ========================================= */
+        #status-splash {
+            position: fixed; inset: 0;
+            background: #000; z-index: 99998;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 1s var(--ease-out-expo);
+        }
+        #status-splash.splash-visible {
+            opacity: 1; pointer-events: auto;
+        }
+        #status-splash.splash-hidden {
+            opacity: 0; filter: blur(30px); transform: scale(1.1); pointer-events: none;
+        }
+
+        .splash-ambient {
+            position: absolute; inset: 0; z-index: 1; pointer-events: none;
+            overflow: hidden; filter: blur(100px); opacity: 0.4;
+        }
+        .splash-orb {
+            position: absolute; border-radius: 50%;
+            animation: float 12s ease-in-out infinite alternate;
+        }
+        .splash-orb-1 { width: 45vw; height: 45vw; background: rgba(139, 92, 246, 0.2); top: -15%; right: -10%; animation-delay: -2s; }
+        .splash-orb-2 { width: 35vw; height: 35vw; background: rgba(59, 130, 246, 0.15); bottom: -10%; left: -5%; animation-delay: -7s; }
+
+        .splash-content {
+            position: relative; z-index: 10;
+            width: 100%; max-width: 520px;
+            display: flex; flex-direction: column; align-items: center;
+            text-align: center;
+            background: var(--glass-panel);
+            backdrop-filter: blur(40px) saturate(150%);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 48px 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+            opacity: 0; transform: translateY(20px) scale(0.98);
+            transition: opacity 0.8s var(--ease-out-expo) 0.3s, transform 0.8s var(--ease-out-expo) 0.3s;
+        }
+        #status-splash.splash-visible .splash-content {
+            opacity: 1; transform: translateY(0) scale(1);
+        }
+
+        .splash-icon {
+            width: 56px; height: 56px; border-radius: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 28px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+        }
+        .splash-icon svg { width: 26px; height: 26px; stroke: var(--text-primary); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+        .splash-title {
+            font-size: 18px; font-weight: 600; letter-spacing: 0.5px;
+            color: #fff; margin-bottom: 16px; line-height: 1.5;
+        }
+
+        .splash-message {
+            font-size: 14px; font-weight: 400; line-height: 1.7;
+            color: var(--text-secondary); margin-bottom: 32px;
+        }
+
+        .splash-link {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+            color: #fff; text-decoration: none;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--glass-border);
+            padding: 10px 20px; border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+        .splash-link:hover {
+            background: var(--glass-hover);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+        }
+        .splash-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        .splash-footer {
+            margin-top: 32px;
+            font-family: var(--font-mono); font-size: 10px;
+            color: var(--text-tertiary); letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .splash-progress {
+            width: 120px; height: 2px; background: rgba(255,255,255,0.1);
+            border-radius: 2px; overflow: hidden; margin-top: 24px;
+        }
+        .splash-progress-fill {
+            height: 100%; width: 0%; background: #fff;
+            box-shadow: 0 0 8px #fff;
+            animation: splashTimer 6s linear forwards;
+        }
+        @keyframes splashTimer {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* =========================================
            HUMAN VERIFICATION GATE (Turnstile)
         ========================================= */
         #turnstile-gate {
-            position: fixed; inset: 0; z-index: 99998;
+            position: fixed; inset: 0; z-index: 99997;
             background: #000;
             display: none; align-items: center; justify-content: center;
             opacity: 0;
@@ -263,7 +366,7 @@
         .nav-item {
             display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 4px;
             border-radius: 12px; color: var(--text-secondary); font-size: 13px; font-weight: 500;
-            cursor: pointer; transition: all 0.2s ease; position: relative;
+            cursor: pointer; transition:all 0.2s ease; position: relative;
         }
         .nav-item svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
         .nav-item:hover { background: var(--glass-hover); color: var(--text-primary); }
@@ -350,6 +453,109 @@
             font-weight: 600;
             margin-left: auto;
         }
+
+        /* =========================================
+           STATUS SPLASH SCREEN (Post-Boot Message)
+        ========================================= */
+        #status-splash {
+            position: fixed; inset: 0;
+            background: #000; z-index: 99998;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 1s var(--ease-out-expo);
+        }
+        #status-splash.splash-visible {
+            opacity: 1; pointer-events: auto;
+        }
+        #status-splash.splash-hidden {
+            opacity: 0; filter: blur(30px); transform: scale(1.1); pointer-events: none;
+        }
+
+        .splash-ambient {
+            position: absolute; inset: 0; z-index: 1; pointer-events: none;
+            overflow: hidden; filter: blur(100px); opacity: 0.4;
+        }
+        .splash-orb {
+            position: absolute; border-radius: 50%;
+            animation: float 12s ease-in-out infinite alternate;
+        }
+        .splash-orb-1 { width: 45vw; height: 45vw; background: rgba(139, 92, 246, 0.2); top: -15%; right: -10%; animation-delay: -2s; }
+        .splash-orb-2 { width: 35vw; height: 35vw; background: rgba(59, 130, 246, 0.15); bottom: -10%; left: -5%; animation-delay: -7s; }
+
+        .splash-content {
+            position: relative; z-index: 10;
+            width: 100%; max-width: 520px;
+            display: flex; flex-direction: column; align-items: center;
+            text-align: center;
+            background: var(--glass-panel);
+            backdrop-filter: blur(40px) saturate(150%);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 48px 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+            opacity: 0; transform: translateY(20px) scale(0.98);
+            transition: opacity 0.8s var(--ease-out-expo) 0.3s, transform 0.8s var(--ease-out-expo) 0.3s;
+        }
+        #status-splash.splash-visible .splash-content {
+            opacity: 1; transform: translateY(0) scale(1);
+        }
+
+        .splash-icon {
+            width: 56px; height: 56px; border-radius: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 28px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+        }
+        .splash-icon svg { width: 26px; height: 26px; stroke: var(--text-primary); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+        .splash-title {
+            font-size: 18px; font-weight: 600; letter-spacing: 0.5px;
+            color: #fff; margin-bottom: 16px; line-height: 1.5;
+        }
+
+        .splash-message {
+            font-size: 14px; font-weight: 400; line-height: 1.7;
+            color: var(--text-secondary); margin-bottom: 32px;
+        }
+
+        .splash-link {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+            color: #fff; text-decoration: none;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--glass-border);
+            padding: 10px 20px; border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+        .splash-link:hover {
+            background: var(--glass-hover);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+        }
+        .splash-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        .splash-footer {
+            margin-top: 32px;
+            font-family: var(--font-mono); font-size: 10px;
+            color: var(--text-tertiary); letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .splash-progress {
+            width: 120px; height: 2px; background: rgba(255,255,255,0.1);
+            border-radius: 2px; overflow: hidden; margin-top: 24px;
+        }
+        .splash-progress-fill {
+            height: 100%; width: 0%; background: #fff;
+            box-shadow: 0 0 8px #fff;
+            animation: splashTimer 6s linear forwards;
+        }
+        @keyframes splashTimer {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
     </style>
 </head>
 <body>
@@ -392,6 +598,32 @@
                     <div class="progress-fill" id="boot-progress-bar"></div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- POST-BOOT STATUS SPLASH -->
+    <div id="status-splash">
+        <div class="splash-ambient">
+            <div class="splash-orb splash-orb-1"></div>
+            <div class="splash-orb splash-orb-2"></div>
+        </div>
+        <div class="splash-content">
+            <div class="splash-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <h2 class="splash-title">We've currently stopped working on this site.</h2>
+            <p class="splash-message">
+                We are working on creating an AI. The demo will come out soon at 
+                <strong style="color: #fff;">demo.textnexus.me</strong>.
+            </p>
+            <a href="https://demo.textnexus.me" target="_blank" rel="noopener noreferrer" class="splash-link">
+                Visit Demo
+                <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </a>
+            <div class="splash-progress">
+                <div class="splash-progress-fill" id="splash-progress-fill"></div>
+            </div>
+            <div class="splash-footer">TextNexus // Status Update</div>
         </div>
     </div>
 
@@ -440,6 +672,10 @@
                         <svg viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
                         Updates
                     </div>
+                     <div class="nav-item" onclick="loadRoute('ghostlink.html', this)">
+                        <svg viewBox="0 0 24 24"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="6.5"/></svg>
+                        Ghostlink
+                    </div>
                     <div class="nav-item" onclick="loadRoute('TextNexus.html', this)">
                         <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                         TextNexus
@@ -448,511 +684,228 @@
                         <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                         Game Preview
                     </div>
-                    <div class="nav-item" onclick="loadRoute('ghostlink.html', this)">
-                        <svg viewBox="0 0 24 24"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="6.5"/></svg>
-                        Ghostlink
-                    </div>
-                </div>
-
-                <div class="nav-group">
-                    <div class="nav-label">Staff (Restricted)</div>
-                    <div class="nav-item" onclick="loadRoute('email-manager.html', this)">
-                         <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                         Email Manager
-                    </div>
-                    <div class="nav-item" onclick="loadRoute('admin.html', this)">
-                        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                        Administrative Control Panel
-                    </div>
-                </div>
-            </div>
-
-            <!-- BOTTOM SECTION WITH SOCIAL MEDIA & SYSTEM TIME -->
-            <div style="display: flex; flex-direction: column; gap: 16px;">
-                <!-- SOCIAL MEDIA SECTION -->
-                <div style="border-top: 1px solid var(--glass-border); padding-top: 16px;">
-                    <div class="nav-label" style="margin-bottom: 12px;">Connect with Us</div>
-                    
-                    <!-- YouTube -->
-                    <a href="https://www.youtube.com/@Nexusofficial-f7i" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 8px; border-radius: 12px; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none;" class="social-item">
-                        <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;">
-                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                        </svg>
-                        <span>Subscribe on YouTube</span>
-                    </a>
-
-                    <!-- TikTok -->
-                    <a href="https://www.tiktok.com/@nexusofficial123" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 8px; border-radius: 12px; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none;" class="social-item">
-                        <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;">
-                            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.68v13.67a2.4 2.4 0 1 1-2.4-2.4c.29 0 .58.02.86.07V9.24a.85.85 0 0 0-.3-.07c-3.11 0-5.64 2.43-5.64 5.43s2.53 5.43 5.64 5.43S15.07 17.72 15.07 14.64c0-.26 0-.52-.02-.78A4.8 4.8 0 0 0 19.59 6.69Z"/>
-                        </svg>
-                        <span>Follow on TikTok</span>
-                    </a>
-
-                    <!-- Snapchat -->
-                    <a href="https://snapchat.com/t/2zo6NCuH" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 8px; border-radius: 12px; color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none;" class="social-item">
-                        <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;">
-                            <path d="M19.27 14.68L20.46 15.07L19.78 17.38L18.53 17.01L17.99 17.89C17.71 18.25 17.62 18.56 17.62 18.83V20.5H16.23V18.83C16.23 18.15 16.32 17.41 16.74 16.83L17.01 16.46L15.61 16.02L16.38 14.62H14.17L13.4 16.02L11.99 16.46L12.26 16.83C12.68 17.41 12.77 18.15 12.77 18.83V20.5H11.38V18.83C11.38 18.56 11.29 18.25 11.01 17.89L10.47 17.01L9.22 17.38L8.54 15.07L9.73 14.68C10.04 14.31 10.22 13.81 10.22 13.31C10.22 12.56 9.65 11.95 8.95 11.95C8.25 11.95 7.68 12.56 7.68 13.31C7.68 13.81 7.86 14.31 8.17 14.68L6.98 15.07L7.66 17.38L8.91 17.01L9.45 17.89C9.73 18.25 9.82 18.56 9.82 18.83V20.5H11.21V18.83C11.21 18.15 11.12 17.41 10.7 16.83L10.43 16.46L11.83 16.02L12.6 14.62H14.81L15.58 16.02L16.98 16.46L16.71 16.83C16.29 17.41 16.2 18.15 16.2 18.83V20.5H17.59V18.83C17.59 18.56 17.68 18.25 17.96 17.89L18.5 17.01L19.75 17.38L20.43 15.07L19.24 14.68C19.53 14.31 19.71 13.81 19.71 13.31C19.71 12.56 19.14 11.95 18.44 11.95C17.74 11.95 17.17 12.56 17.17 13.31C17.17 13.81 17.35 14.31 17.66 14.68Z"/>
-                        </svg>
-                        <span>Add on Snapchat</span>
-                    </a>
-                </div>
-
-                <!-- SYSTEM TIME -->
-                <div class="system-time">
-                    <div class="pulse-dot"></div>
-                    <span id="live-clock">SYNCING...</span>
                 </div>
             </div>
         </aside>
 
-        <!-- MAIN AREA -->
+        <!-- MAIN CONTENT AREA -->
         <main class="main-area">
-            
-            <!-- TOP HUD -->
             <header class="top-hud">
-                <div class="hud-left">
-                    <div class="cmd-button" onclick="toggleCmd()">
-                        <span>Search commands...</span>
-                        <span class="cmd-kbd">⌘K</span>
-                    </div>
+                <div class="cmd-button" onclick="toggleCommandPalette()">
+                    <span>Search commands...</span>
+                    <span class="cmd-kbd">⌘K</span>
                 </div>
-
                 <div class="hud-right">
-                    <div class="word-limit-badge" title="Maximum allowed words per message">
-                        Secure connection found.
-                    </div>
-                    <div class="auth-pill" id="auth-btn" onclick="openProfileOptions()">
-                        <span class="role-badge" id="role-badge">Guest</span>
-                        <span class="auth-text" id="auth-label">Sign In</span>
-                        <div class="auth-avatar">
-                            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        </div>
+                    <div class="system-time">
+                        <span class="pulse-dot"></span>
+                        <span id="hud-clock">00:00:00</span>
                     </div>
                 </div>
             </header>
 
-            <!-- IFRAME VIEWPORT -->
             <div class="iframe-wrapper">
-                <iframe id="nexus-viewport" src="home.html"></iframe>
+                <iframe id="nexus-viewport" src="home.html" title="Nexus Workspace Viewport"></iframe>
             </div>
-
         </main>
     </div>
 
-    <!-- COMMAND PALETTE -->
-    <div id="cmd-overlay" onclick="if(event.target===this) toggleCmd()">
+    <!-- COMMAND PALETTE OVERLAY -->
+    <div id="cmd-overlay">
         <div class="cmd-modal">
             <div class="cmd-input-area">
                 <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" class="cmd-input" id="cmd-input" placeholder="What do you need?" autocomplete="off" oninput="filterCmds()">
+                <input type="text" class="cmd-input" id="cmd-input" placeholder="Type a command or search..." autocomplete="off">
             </div>
-            <div class="cmd-results" id="cmd-results-list">
-                <div class="nav-label" style="padding: 0 4px; margin-top: 8px;">Quick Actions</div>
-                <div class="cmd-item" data-title="overview" onclick="execCmd('home.html')">
-                    <div class="cmd-item-left"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Go to Overview</div>
-                    <span class="cmd-kbd">↵</span>
-                </div>
-                <div class="cmd-item" data-title="updates changelog" onclick="execCmd('updates.html')">
-                    <div class="cmd-item-left"><svg viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Go to Updates</div>
-                    <span class="cmd-kbd">↵</span>
-                </div>
-                <div class="cmd-item" data-title="textnexus" onclick="execCmd('TextNexus.html')">
-                    <div class="cmd-item-left"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Go to TextNexus</div>
-                    <span class="cmd-kbd">↵</span>
-                </div>
-                <div class="cmd-item" data-title="telemetry dashboard" onclick="execCmd('dashboard.html')">
-                    <div class="cmd-item-left"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Go to Telemetry</div>
-                    <span class="cmd-kbd">↵</span>
-                </div>
-                <div class="cmd-item" data-title="ghostlink" onclick="execCmd('ghostlink.html')">
-                    <div class="cmd-item-left"><svg viewBox="0 0 24 24"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="6.5"/></svg> Go to GhostLink</div>
-                    <span class="cmd-kbd">↵</span>
-                </div>
-                <div class="cmd-item" data-title="ai gateway chat xkiro models" onclick="execCmd('ai-gateway.html')">
-                    <div class="cmd-item-left"><svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg> Go to AI Gateway</div>
-                    <span class="cmd-kbd">↵</span>
-                </div>
-                <div class="cmd-item" data-title="change username edit profile" onclick="execCmd(null, openUsernameModal)">
-                    <div class="cmd-item-left"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Change Display Username</div>
-                    <span class="cmd-kbd">↵</span>
-                </div>
-            </div>
+            <div class="cmd-results" id="cmd-results"></div>
         </div>
     </div>
 
-    <!-- USERNAME MODAL -->
-    <div id="username-modal" class="modal-backdrop">
-        <div class="modal-box">
-            <h3 class="modal-title">Edit Username</h3>
-            <p class="modal-subtitle">Choose a display name for TextNexus OS chat and platform activity.</p>
-            <input type="text" id="custom-username-input" class="modal-input" placeholder="Enter custom username" maxlength="24">
-            <div class="modal-btn-group">
-                <button onclick="closeUsernameModal()" class="btn-secondary">Cancel</button>
-                <button onclick="saveCustomUsername()" class="btn-primary">Save Username</button>
-            </div>
-        </div>
-    </div>
+    <script>
+        // Boot Sequence Logic
+        const bootScreen = document.getElementById('boot-screen');
+        const statusSplash = document.getElementById('status-splash');
+        const turnstileGate = document.getElementById('turnstile-gate');
+        const appRoot = document.getElementById('app-root');
+        const progressBar = document.getElementById('boot-progress-bar');
+        const percentText = document.getElementById('boot-percent');
+        const statusText = document.getElementById('boot-status-text');
 
-    <!-- PROFILE MODAL -->
-    <div id="profile-modal" class="modal-backdrop">
-        <div class="modal-box">
-            <h3 class="modal-title" id="profile-modal-title">Account Options</h3>
-            <p class="modal-subtitle" id="profile-modal-sub">Manage your active session and display settings.</p>
-            <div class="modal-btn-group" style="flex-direction: column;">
-                <button onclick="openUsernameModal(); closeProfileModal();" class="btn-secondary" style="padding: 12px;">Change Display Username</button>
-                <button onclick="confirmSignOut()" class="btn-primary" style="padding: 12px; background: #ff4d4d; color: #fff;">Sign Out</button>
-                <button onclick="closeProfileModal()" class="btn-secondary" style="padding: 10px;">Close</button>
-            </div>
-        </div>
-    </div>
+        const bootMessages = [
+            "Waking core systems...",
+            "Initializing neural pathways...",
+            "Loading interface modules...",
+            "Syncing environment variables...",
+            "Establishing secure connection...",
+            "Rendering workspace...",
+            "System ready."
+        ];
 
-    <!-- FIREBASE & LOGIC -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-        import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        let progress = 0;
+        let msgIndex = 0;
 
-        const OWNER_EMAIL = "brodywilliams0226@gmail.com";
-        const WORD_LIMIT = 35;
+        function updateBoot() {
+            if (progress <= 100) {
+                progressBar.style.width = progress + '%';
+                percentText.textContent = Math.floor(progress) + '%';
 
-        // ULTRA-MODERN BOOT SEQUENCE SCRIPT
-        window.addEventListener('load', () => {
-            const statusText = document.getElementById('boot-status-text');
-            const percentText = document.getElementById('boot-percent');
-            const progressBar = document.getElementById('boot-progress-bar');
-            
-            const logs = [
-                { p: 15, text: "Mounting VFS volumes..." },
-                { p: 32, text: "Decrypting Neural Link..." },
-                { p: 58, text: "Establishing secure uplinks..." },
-                { p: 85, text: "Initializing workspace UI..." },
-                { p: 91, text: "System ready." },
-                { p: 100, text: "Welcome to Nexus!"}
-            ];
-
-            let currentProg = 0;
-            let logIndex = 0;
-
-            const bootInterval = setInterval(() => {
-                // Ease progress growth
-                currentProg += (Math.random() * 2) + 0.5;
-                if (currentProg > 100) currentProg = 100;
-
-                // Update UI
-                progressBar.style.width = `${currentProg}%`;
-                percentText.textContent = `${Math.floor(currentProg)}%`;
-
-                // Update Log text
-                if (logIndex < logs.length && currentProg >= logs[logIndex].p) {
-                    statusText.textContent = logs[logIndex].text;
-                    logIndex++;
+                const newMsgIndex = Math.min(Math.floor((progress / 100) * bootMessages.length), bootMessages.length - 1);
+                if (newMsgIndex !== msgIndex) {
+                    msgIndex = newMsgIndex;
+                    statusText.textContent = bootMessages[msgIndex];
                 }
 
-                // Finish Boot
-                if (currentProg >= 100) {
-                    clearInterval(bootInterval);
+                // Variable speed for realism
+                const increment = Math.random() * 3 + (progress > 80 ? 0.5 : 1.5);
+                progress += increment;
 
-                    // Cinematic Fade out, then hand off to human verification
-                    setTimeout(() => {
-                        const bootScreen = document.getElementById('boot-screen');
-                        bootScreen.classList.add('boot-hidden');
-
-                        setTimeout(() => {
-                            bootScreen.style.display = 'none';
-                            showTurnstileGate();
-                        }, 1200); // Matches CSS transition duration
-                    }, 500);
-                }
-            }, 30); // Fast, fluid updates
-        });
-
-        // =========================================
-        // CLOUDFLARE TURNSTILE — HUMAN VERIFICATION
-        // =========================================
-        const TURNSTILE_SITE_KEY = '0x4AAAAAAFXCQ7lZ7OM2JFsT';
-        let turnstileWidgetId = null;
-
-        function showTurnstileGate() {
-            const gate = document.getElementById('turnstile-gate');
-            gate.classList.add('gate-visible');
-            renderTurnstileWidget();
+                const delay = Math.random() * 40 + 20;
+                setTimeout(updateBoot, delay);
+            } else {
+                progressBar.style.width = '100%';
+                percentText.textContent = '100%';
+                statusText.textContent = "System ready.";
+                finishBoot();
+            }
         }
 
-        function renderTurnstileWidget() {
-            const statusEl = document.getElementById('gate-status-text');
-            const retryBtn = document.getElementById('gate-retry-btn');
+        function finishBoot() {
+            setTimeout(() => {
+                // Hide boot screen
+                bootScreen.classList.add('boot-hidden');
+                
+                // Show the status splash after boot completes
+                setTimeout(() => {
+                    bootScreen.style.display = 'none';
+                    statusSplash.classList.add('splash-visible');
+                    
+                    // After 6 seconds, hide splash and show Turnstile gate
+                    setTimeout(() => {
+                        statusSplash.classList.add('splash-hidden');
+                        setTimeout(() => {
+                            statusSplash.style.display = 'none';
+                            turnstileGate.classList.add('gate-visible');
+                            initTurnstile();
+                        }, 800);
+                    }, 6000);
+                }, 800);
+            }, 600);
+        }
 
-            const doRender = () => {
-                turnstileWidgetId = window.turnstile.render('#turnstile-widget', {
-                    sitekey: TURNSTILE_SITE_KEY,
+        // Start boot sequence after a brief delay
+        setTimeout(updateBoot, 800);
+
+        // Turnstile Logic
+        function initTurnstile() {
+            if (typeof turnstile !== 'undefined' && turnstile.render) {
+                turnstile.render('#turnstile-widget', {
+                    sitekey: '0x4AAAAAAFXCQ7lZ7OM2JFsT', // Replace with your actual site key
                     theme: 'dark',
                     callback: onTurnstileSuccess,
                     'error-callback': onTurnstileError,
-                    'expired-callback': onTurnstileExpired,
-                    'timeout-callback': onTurnstileExpired
+                    'expired-callback': onTurnstileExpired
                 });
-            };
-
-            // api.js loads async/defer, so wait for window.turnstile to exist
-            if (window.turnstile) {
-                doRender();
             } else {
-                statusEl.textContent = 'Loading verification...';
-                const waitForTurnstile = setInterval(() => {
-                    if (window.turnstile) {
-                        clearInterval(waitForTurnstile);
-                        statusEl.textContent = '';
-                        doRender();
-                    }
-                }, 100);
+                setTimeout(initTurnstile, 500);
             }
         }
 
-        window.retryTurnstile = function() {
-            const statusEl = document.getElementById('gate-status-text');
-            const retryBtn = document.getElementById('gate-retry-btn');
-            retryBtn.style.display = 'none';
-            statusEl.classList.remove('gate-status-error');
-            statusEl.textContent = '';
-            if (turnstileWidgetId !== null && window.turnstile) {
-                window.turnstile.reset(turnstileWidgetId);
-            } else {
-                renderTurnstileWidget();
-            }
-        };
-
-        window.onTurnstileSuccess = function(token) {
-            // Token received client-side. Note: this project has no backend,
-            // so this confirms the challenge passed in-browser only — it does not
-            // call Cloudflare's siteverify endpoint. Wire the token to a server
-            // if real server-side verification is ever needed.
-            const gate = document.getElementById('turnstile-gate');
-            const appRoot = document.getElementById('app-root');
-            const statusEl = document.getElementById('gate-status-text');
-
-            statusEl.classList.remove('gate-status-error');
-            statusEl.textContent = 'Verified.';
-
+        function onTurnstileSuccess(token) {
+            const gateStatus = document.getElementById('gate-status-text');
+            gateStatus.textContent = 'Verified. Loading workspace...';
+            gateStatus.className = 'gate-status';
+            
             setTimeout(() => {
-                gate.classList.add('gate-hidden');
-                appRoot.classList.add('loaded');
+                turnstileGate.classList.add('gate-hidden');
                 setTimeout(() => {
-                    gate.style.display = 'none';
+                    turnstileGate.style.display = 'none';
+                    appRoot.classList.add('loaded');
                 }, 800);
-            }, 400);
-        };
+            }, 800);
+        }
 
-        window.onTurnstileError = function() {
-            const statusEl = document.getElementById('gate-status-text');
-            const retryBtn = document.getElementById('gate-retry-btn');
-            statusEl.classList.add('gate-status-error');
-            statusEl.textContent = 'Verification failed. Please try again.';
-            retryBtn.style.display = 'inline-block';
-        };
+        function onTurnstileError(errorCode) {
+            const gateStatus = document.getElementById('gate-status-text');
+            gateStatus.textContent = 'Verification error. Please try again.';
+            gateStatus.className = 'gate-status gate-status-error';
+            document.getElementById('gate-retry-btn').style.display = 'inline-block';
+        }
 
-        window.onTurnstileExpired = function() {
-            const statusEl = document.getElementById('gate-status-text');
-            statusEl.classList.add('gate-status-error');
-            statusEl.textContent = 'Verification expired, retrying...';
-            if (turnstileWidgetId !== null && window.turnstile) {
-                window.turnstile.reset(turnstileWidgetId);
+        function onTurnstileExpired() {
+            const gateStatus = document.getElementById('gate-status-text');
+            gateStatus.textContent = 'Verification expired. Please retry.';
+            gateStatus.className = 'gate-status gate-status-error';
+            document.getElementById('gate-retry-btn').style.display = 'inline-block';
+        }
+
+        function retryTurnstile() {
+            document.getElementById('gate-retry-btn').style.display = 'none';
+            document.getElementById('gate-status-text').textContent = '';
+            if (typeof turnstile !== 'undefined' && turnstile.reset) {
+                turnstile.reset();
             }
-        };
+        }
 
-        // LIVE CLOCK
-        setInterval(() => {
+        // Clock logic
+        function updateClock() {
             const now = new Date();
-            document.getElementById('live-clock').textContent = now.toLocaleTimeString('en-US', { hour12: false }) + ' UTC';
-        }, 1000);
-
-        // ROUTING LOGIC
-        const viewport = document.getElementById('nexus-viewport');
-        window.loadRoute = function(url, navElement = null) {
-            if (navElement) {
-                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-                navElement.classList.add('active');
-            } else {
-                document.querySelectorAll('.nav-item').forEach(el => {
-                    const onclickStr = el.getAttribute('onclick') || '';
-                    if (onclickStr.includes(url)) {
-                        el.classList.add('active');
-                    } else {
-                        el.classList.remove('active');
-                    }
-                });
+            const clockEl = document.getElementById('hud-clock');
+            if (clockEl) {
+                clockEl.textContent = now.toLocaleTimeString('en-US', { hour12: false });
             }
-            viewport.classList.add('loading');
-            setTimeout(() => {
-                viewport.src = url;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Route loader
+        function loadRoute(route, el) {
+            const iframe = document.getElementById('nexus-viewport');
+            if (iframe) {
+                iframe.classList.add('loading');
                 setTimeout(() => {
-                    viewport.classList.remove('loading');
-                    syncUserDataToIframe();
-                }, 100);
-            }, 300);
-        };
-
-        // COMMAND PALETTE LOGIC
-        const cmdOverlay = document.getElementById('cmd-overlay');
-        const cmdInput = document.getElementById('cmd-input');
-        
-        window.toggleCmd = function() {
-            const isActive = cmdOverlay.classList.contains('active');
-            if (isActive) {
-                cmdOverlay.classList.remove('active');
-                setTimeout(() => cmdOverlay.style.display = 'none', 200);
-            } else {
-                cmdOverlay.style.display = 'flex';
-                cmdOverlay.offsetHeight;
-                cmdOverlay.classList.add('active');
-                cmdInput.value = '';
-                filterCmds();
-                cmdInput.focus();
+                    iframe.src = route;
+                    iframe.onload = () => iframe.classList.remove('loading');
+                }, 300);
             }
-        };
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            if (el) el.classList.add('active');
+        }
 
-        window.execCmd = function(url, action = null) {
-            if (url) loadRoute(url);
-            if (action) action();
-            toggleCmd();
-        };
-
-        window.filterCmds = function() {
-            const term = cmdInput.value.toLowerCase().trim();
-            const items = document.querySelectorAll('.cmd-item');
-            items.forEach(item => {
-                const title = item.getAttribute('data-title') || item.textContent.toLowerCase();
-                if (!term || title.includes(term)) {
-                    item.style.display = 'flex';
-                } else {
-                    item.style.display = 'none';
+        // Command palette stub
+        function toggleCommandPalette() {
+            const overlay = document.getElementById('cmd-overlay');
+            if (overlay) {
+                overlay.style.display = 'flex';
+                setTimeout(() => overlay.classList.add('active'), 10);
+                
+                const input = document.getElementById('cmd-input');
+                if (input) {
+                    input.value = '';
+                    input.focus();
                 }
-            });
-        };
+            }
+        }
 
+        // Close command palette on Escape or clicking outside
         document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const overlay = document.getElementById('cmd-overlay');
+                if (overlay && overlay.classList.contains('active')) {
+                    overlay.classList.remove('active');
+                    setTimeout(() => overlay.style.display = 'none', 200);
+                }
+            }
+            // Cmd/Ctrl + K shortcut
             if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
                 e.preventDefault();
-                toggleCmd();
-            }
-            if (e.key === 'Escape') {
-                if (cmdOverlay.classList.contains('active')) toggleCmd();
-                closeUsernameModal();
-                closeProfileModal();
+                toggleCommandPalette();
             }
         });
 
-        // USERNAME AND MODAL HANDLERS
-        window.openProfileOptions = function() {
-            if (currentUser) {
-                document.getElementById('profile-modal').style.display = 'flex';
-            } else {
-                signInWithPopup(auth, provider).catch(err => console.error(err));
+        document.getElementById('cmd-overlay')?.addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                e.currentTarget.classList.remove('active');
+                setTimeout(() => e.currentTarget.style.display = 'none', 200);
             }
-        };
-
-        window.closeProfileModal = function() {
-            document.getElementById('profile-modal').style.display = 'none';
-        };
-
-        window.openUsernameModal = function() {
-            const currentName = localStorage.getItem('textnexus_custom_username') || (currentUser ? currentUser.displayName || currentUser.email.split('@')[0] : 'User');
-            document.getElementById('custom-username-input').value = currentName;
-            document.getElementById('username-modal').style.display = 'flex';
-        };
-
-        window.closeUsernameModal = function() {
-            document.getElementById('username-modal').style.display = 'none';
-        };
-
-        window.saveCustomUsername = function() {
-            const val = document.getElementById('custom-username-input').value.trim();
-            if (val.length > 0) {
-                localStorage.setItem('nexus_custom_username', val);
-                updateUserDisplay();
-                closeUsernameModal();
-            }
-        };
-
-        // WORD LIMIT ENFORCEMENT UTILITY
-        window.enforceWordLimit = function(text, limit = WORD_LIMIT) {
-            const words = text.trim().split(/\s+/);
-            if (words.length > limit) {
-                return words.slice(0, limit).join(' ');
-            }
-            return text;
-        };
-
-        // FIREBASE AUTHENTICATION
-        const firebaseConfig = {
-            apiKey: "AIzaSyAO_ffupJOIMPE9m4ARtaqSzC1vGDkIAco",
-            authDomain: "nexus-web-development-official.firebaseapp.com",
-            projectId: "nexus-web-development-official"
-        };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
-
-        let currentUser = null;
-        const authLabel = document.getElementById('auth-label');
-        const roleBadge = document.getElementById('role-badge');
-
-        window.confirmSignOut = function() {
-            closeProfileModal();
-            signOut(auth);
-        };
-
-        function getUserRole(email) {
-            if (email && email.toLowerCase() === OWNER_EMAIL.toLowerCase()) {
-                return "Owner";
-            }
-            return currentUser ? "User" : "Guest";
-        }
-
-        function getActiveUsername() {
-            const stored = localStorage.getItem('textnexus_custom_username');
-            if (stored) return stored;
-            if (currentUser) {
-                return currentUser.displayName || currentUser.email.split('@')[0];
-            }
-            return 'Guest';
-        }
-
-        function updateUserDisplay() {
-            const username = getActiveUsername();
-            const role = getUserRole(currentUser?.email);
-
-            authLabel.textContent = username.length > 12 ? username.substring(0, 12) + '...' : username;
-
-            roleBadge.textContent = role;
-            if (role === "Owner") {
-                roleBadge.classList.add('owner');
-            } else {
-                roleBadge.classList.remove('owner');
-            }
-
-            syncUserDataToIframe();
-        }
-
-        function syncUserDataToIframe() {
-            try {
-                if (viewport && viewport.contentWindow) {
-                    viewport.contentWindow.postMessage({
-                        type: 'TEXTNEXUS_USER_STATE',
-                        username: getActiveUsername(),
-                        role: getUserRole(currentUser?.email),
-                        isOwner: getUserRole(currentUser?.email) === 'Owner',
-                        wordLimit: WORD_LIMIT,
-                        email: currentUser?.email || null
-                    }, '*');
-                }
-            } catch (e) {
-                console.warn('Iframe message sync notice:', e);
-            }
-        }
-
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            updateUserDisplay();
         });
     </script>
 </body>
