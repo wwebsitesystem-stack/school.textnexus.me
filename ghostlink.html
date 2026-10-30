@@ -3,7 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GhostLink</title>
+    <title>GhostLink - Free Proxy Browser</title>
+    <meta name="description" content="GhostLink is a free proxy browser. Access any website anonymously and securely.">
+    <meta name="keywords" content="ghostlink, proxy, browser, anonymous browsing, unblock websites">
+    <meta name="author" content="GhostLink">
+    
+    <!-- Open Graph Tags for Social Media & Discord Embeds -->
+    <meta property="og:title" content="GhostLink - Free Proxy Browser">
+    <meta property="og:description" content="Access any website anonymously with GhostLink.">
+    <meta property="og:url" content="https://immcrab.github.io/urban-octo-winner">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="GhostLink - Free Proxy Browser">
+    <meta name="twitter:description" content="Access any website anonymously with GhostLink.">
+    <meta name="twitter:image" content="https://raw.githubusercontent.com/immcrab/urban-octo-winner/main/og-image.png">
     <script defer src="https://cloud.umami.is/script.js" data-website-id="cd4687b2-c160-4e0c-8b26-5df67d4ea39a"></script>
     <!--- Supabase for total visits --->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.js"></script>
@@ -99,7 +114,13 @@
                     });
             } else {
                 frame.removeAttribute('srcdoc');
-                if (!targetUrl.startsWith('http')) targetUrl = 'https://' + targetUrl;
+                if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://') && !targetUrl.startsWith('file://')) {
+                    try {
+                        targetUrl = new URL(targetUrl, location.href).href;
+                    } catch (e) {
+                        targetUrl = 'https://' + targetUrl;
+                    }
+                }
                 frame.src = `${targetUrl}${targetUrl.includes('?') ? '&' : '?'}accent=${encodeURIComponent(accent)}&bg=${encodeURIComponent(bg)}`;
             }
         }
@@ -2231,14 +2252,8 @@
         /* --- END PROXY CSS --- */
 
     </style>
-<meta name="google-adsense-account" content="ca-pub-3679522337620689">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3679522337620689" crossorigin="anonymous"></script>
-<script>window.addEventListener("load",function(){(adsbygoogle=window.adsbygoogle||[]).push({google_ad_client:"ca-pub-3679522337620689",enable_page_level_ads:true});});</script>
 </head>
 <body>
-<ins class="adsbygoogle" style="display:block;margin:12px auto" data-ad-client="ca-pub-3679522337620689" data-ad-slot="0000000000" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});</script>
-<ins class="adsbygoogle" style="display:block;margin:12px auto" data-ad-client="ca-pub-3679522337620689" data-ad-slot="0000000000" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});</script>
-
 
     <aside class="sidebar" id="main-sidebar">
         <div class="logo-box" onclick="openReadmeModal()" title="View README" style="cursor:pointer;">◈</div>
@@ -2257,13 +2272,10 @@
 
     <div class="social-hud" id="social-hud">
         <div class="social-container">
-            <a href="https://discord.gg/dKs2sUNUXd" target="_blank" class="social-icon" title="Discord">
-                <svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.06.06 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.419-2.157 2.419z"/></svg>
-            </a>
-            <a href="https://github.com/virtuan4-max/ghostlinkhub" target="_blank" class="social-icon" title="GitHub">
+            <a href="https://github.com/immcrab/urban-octo-winner" target="_blank" class="social-icon" title="GitHub">
                 <svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
             </a>
-            <a href="https://github.com/virtuan4-max" target="_blank" class="dev-avatar" style="background-image: url('https://avatars.githubusercontent.com/u/233476218?v=4');" title="Developer"></a></div>
+            <a href="https://www.youtube.com/@imcrab.online" target="_blank" class="dev-avatar" style="background-image: url('https://avatars.githubusercontent.com/u/233476218?v=4');" title="YouTube"></a></div>
         </div>
     </div>
 
@@ -3336,9 +3348,8 @@
       navigate(isUrl ? (/^https?:\/\//.test(q) ? q : 'https://' + q) : engine + encodeURIComponent(q));
     };
     const DEFAULT_SHORTCUTS = [
-      { label: 'YouTube',   url: 'https://youtube.com',   viewBox: '0 0 16 16', svg: '<path d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.009.104c-.05.572-.124 1.14-.235 1.558a2.01 2.01 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.01 2.01 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31 31 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.01 2.01 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A100 100 0 0 1 7.858 2zM6.4 5.209v4.818l4.157-2.408z"/>' },
-      { label: 'GitHub',    url: 'https://github.com',    viewBox: '0 0 24 24', svg: '<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>' },
-      { label: 'Discord',   url: 'https://discord.com',   viewBox: '0 0 24 24', svg: '<path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.03.056a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>' },
+      { label: 'YouTube',   url: 'https://www.youtube.com/@imcrab.online',   viewBox: '0 0 16 16', svg: '<path d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.009.104c-.05.572-.124 1.14-.235 1.558a2.01 2.01 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.01 2.01 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31 31 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.01 2.01 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A100 100 0 0 1 7.858 2zM6.4 5.209v4.818l4.157-2.408z"/>' },
+      { label: 'GitHub',    url: 'https://github.com/immcrab/urban-octo-winner',    viewBox: '0 0 24 24', svg: '<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>' },
       { label: 'Twitter',   url: 'https://twitter.com',   viewBox: '0 0 24 24', svg: '<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.259 5.633L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>' },
       { label: 'Reddit',    url: 'https://reddit.com',    viewBox: '0 0 16 16', svg: '<path d="M6.167 8a.83.83 0 0 0-.83.83c0 .459.372.84.83.831a.831.831 0 0 0 0-1.661m1.843 3.647c.315 0 1.403-.038 1.976-.611a.23.23 0 0 0 0-.306.213.213 0 0 0-.306 0c-.353.363-1.126.487-1.67.487-.545 0-1.308-.124-1.671-.487a.213.213 0 0 0-.306 0 .213.213 0 0 0 0 .306c.564.563 1.652.61 1.977.61zm.992-2.807c0 .458.373.83.831.83s.83-.381.83-.83a.831.831 0 0 0-1.66 0z"/><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.828-1.165c-.315 0-.602.124-.812.325-.801-.573-1.9-.945-3.121-.993l.534-2.501 1.738.372a.83.83 0 1 0 .83-.869.83.83 0 0 0-.744.468l-1.938-.41a.2.2 0 0 0-.153.028.2.2 0 0 0-.086.134l-.592 2.788c-1.24.038-2.358.41-3.17.992-.21-.2-.496-.324-.81-.324a1.163 1.163 0 0 0-.478 2.224q-.03.17-.029.353c0 1.795 2.091 3.256 4.669 3.256s4.668-1.451 4.668-3.256c0-.114-.01-.238-.029-.353.401-.181.688-.592.688-1.069 0-.65-.525-1.165-1.165-1.165"/>' },
       { label: 'Instagram', url: 'https://instagram.com', viewBox: '0 0 16 16', svg: '<path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.919c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334"/>' },
@@ -3516,6 +3527,7 @@
             { id: 'home', name: 'Home', svg: `<svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>` },
             { id: 'games', name: 'Games', svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 7C4 7 2 8.5 2 11c0 2 .5 3.8 1.5 5.2C4.4 17.5 5.3 18 6.2 18c.7 0 1.3-.3 2.1-.8l.8-.6C9.7 16.2 10.8 16 12 16s2.3.2 2.9.6l.8.6c.8.5 1.4.8 2.1.8.9 0 1.8-.5 2.7-1.8C21.5 14.8 22 13 22 11c0-2.5-2-4-3.5-4H5.5z"/><path d="M8.5 7V5.5A.5.5 0 0 1 9 5h6a.5.5 0 0 1 .5.5V7"/><line x1="7" y1="10.5" x2="7" y2="13.5"/><line x1="5.5" y1="12" x2="8.5" y2="12"/><circle cx="15.5" cy="10.5" r=".75" fill="currentColor"/><circle cx="17.5" cy="12.5" r=".75" fill="currentColor"/></svg>` },
             { id: 'ai', name: 'AI Terminal', svg: `<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><line x1="10" y1="9" x2="10" y2="15"/><line x1="14" y1="9" x2="14" y2="15"/></svg>` },
+            { id: 'lucide', name: 'Lucide', svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18"/></svg>` },
             { id: 'proxy', name: 'Proxy', svg: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>` },
             { id: 'customapps', name: 'Custom Apps', svg: `<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><path d="M3 14h7v7H3z"/></svg>` },
             { id: 'marketplace', name: 'Marketplace', svg: `<svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>` },
@@ -3529,9 +3541,16 @@
         if (!shortcuts.custom) shortcuts.custom = [];
         
         let navOrder = JSON.parse(localStorage.getItem('ghostlink_nav_order')) || {
-            top: ['home', 'games', 'ai', 'proxy'],
+            top: ['home', 'games', 'ai', 'lucide', 'proxy'],
             bottom: ['customapps', 'marketplace', 'settings']
         };
+
+        navOrder.top = navOrder.top.filter(id => id !== 'gnmath');
+        navOrder.bottom = navOrder.bottom.filter(id => id !== 'gnmath');
+
+        if (!navOrder.top.includes('lucide') && !navOrder.bottom.includes('lucide')) {
+            navOrder.top.splice(3, 0, 'lucide');
+        }
 
         // --- SUPABASE SETUP 
         const SUPABASE_URL = 'https://npvjxyxnmdcncupbwdsx.supabase.co';
@@ -3658,6 +3677,8 @@
                 sendThemeToIframe();
                 loadIntoFrame(`${baseUrl}${fileMap[page]}?v=${new Date().getTime()}`);
                 sendThemeToIframe();
+            } else if (page === 'lucide') {
+                loadIntoFrame('Lucide/index.html');
             }
         }
 
@@ -6310,9 +6331,8 @@
 
         /* ─── SHORTCUTS TAB ─── */
         const DEFAULT_NT_SHORTCUTS = [
-            { label: 'YouTube',   url: 'https://youtube.com',   viewBox: '0 0 16 16', svg: '<path d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.009.104c-.05.572-.124 1.14-.235 1.558a2.01 2.01 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.01 2.01 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31 31 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.01 2.01 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A100 100 0 0 1 7.858 2zM6.4 5.209v4.818l4.157-2.408z"/>' },
-            { label: 'GitHub',    url: 'https://github.com',    viewBox: '0 0 24 24', svg: '<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>' },
-            { label: 'Discord',   url: 'https://discord.com',   viewBox: '0 0 24 24', svg: '<path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.03.056a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>' },
+            { label: 'YouTube',   url: 'https://www.youtube.com/@imcrab.online',   viewBox: '0 0 16 16', svg: '<path d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.009.104c-.05.572-.124 1.14-.235 1.558a2.01 2.01 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.01 2.01 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31 31 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.01 2.01 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A100 100 0 0 1 7.858 2zM6.4 5.209v4.818l4.157-2.408z"/>' },
+            { label: 'GitHub',    url: 'https://github.com/immcrab/urban-octo-winner',    viewBox: '0 0 24 24', svg: '<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>' },
             { label: 'Twitter',   url: 'https://twitter.com',   viewBox: '0 0 24 24', svg: '<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.259 5.633L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>' },
             { label: 'Reddit',    url: 'https://reddit.com',    viewBox: '0 0 16 16', svg: '<path d="M6.167 8a.83.83 0 0 0-.83.83c0 .459.372.84.83.831a.831.831 0 0 0 0-1.661m1.843 3.647c.315 0 1.403-.038 1.976-.611a.23.23 0 0 0 0-.306.213.213 0 0 0-.306 0c-.353.363-1.126.487-1.67.487-.545 0-1.308-.124-1.671-.487a.213.213 0 0 0-.306 0 .213.213 0 0 0 0 .306c.564.563 1.652.61 1.977.61zm.992-2.807c0 .458.373.83.831.83s.83-.381.83-.83a.831.831 0 0 0-1.66 0z"/><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.828-1.165c-.315 0-.602.124-.812.325-.801-.573-1.9-.945-3.121-.993l.534-2.501 1.738.372a.83.83 0 1 0 .83-.869.83.83 0 0 0-.744.468l-1.938-.41a.2.2 0 0 0-.153.028.2.2 0 0 0-.086.134l-.592 2.788c-1.24.038-2.358.41-3.17.992-.21-.2-.496-.324-.81-.324a1.163 1.163 0 0 0-.478 2.224q-.03.17-.029.353c0 1.795 2.091 3.256 4.669 3.256s4.668-1.451 4.668-3.256c0-.114-.01-.238-.029-.353.401-.181.688-.592.688-1.069 0-.65-.525-1.165-1.165-1.165"/>' },
             { label: 'Instagram', url: 'https://instagram.com', viewBox: '0 0 16 16', svg: '<path d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.9 3.9 0 0 0-1.417.923A3.9 3.9 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.9 3.9 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.9 3.9 0 0 0-.923-1.417A3.9 3.9 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.998 0zm-.717 1.442h.718c2.136 0 2.389.007 3.232.046.78.035 1.204.166 1.486.275.373.145.64.319.92.599s.453.546.598.92c.11.281.24.705.275 1.485.039.843.047 1.096.047 3.231s-.008 2.389-.047 3.232c-.035.78-.166 1.203-.275 1.485a2.5 2.5 0 0 1-.599.919c-.28.28-.546.453-.92.598-.28.11-.704.24-1.485.276-.843.038-1.096.047-3.232.047s-2.39-.009-3.233-.047c-.78-.036-1.203-.166-1.485-.276a2.5 2.5 0 0 1-.92-.598 2.5 2.5 0 0 1-.6-.919c-.109-.281-.24-.705-.275-1.485-.038-.843-.046-1.096-.046-3.233s.008-2.388.046-3.231c.036-.78.166-1.204.276-1.486.145-.373.319-.64.599-.92s.546-.453.92-.598c.282-.11.705-.24 1.485-.276.738-.034 1.024-.044 2.515-.045zm4.988 1.328a.96.96 0 1 0 0 1.92.96.96 0 0 0 0-1.92m-4.27 1.122a4.109 4.109 0 1 0 0 8.217 4.109 4.109 0 0 0 0-8.217m0 1.441a2.667 2.667 0 1 1 0 5.334 2.667 2.667 0 0 1 0-5.334"/>' },
@@ -7019,7 +7039,7 @@
                                 <code style="background:rgba(255,255,255,0.07);padding:1px 4px;border-radius:3px;">sw.js</code> and
                                 <code style="background:rgba(255,255,255,0.07);padding:1px 4px;border-radius:3px;">bareworker.js</code>
                                 must be in the root of the site.
-                                Get them from the <a href="https://github.com/virtuan4-max/ghostlinkhub" target="_blank" rel="noopener"
+                                Get them from the <a href="https://github.com/immcrab/urban-octo-winner" target="_blank" rel="noopener"
                                 style="color:var(--accent);text-decoration:underline;">GhostLink GitHub</a> or contact the site owner.
                             </p>
                         </div>
@@ -7064,7 +7084,7 @@
                                         Make sure <code style="background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;">sw.js</code>
                                         and <code style="background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;">bareworker.js</code>
                                         are in the root of your site. Download them from the
-                                        <a href="https://github.com/virtuan4-max/ghostlinkhub" target="_blank" rel="noopener"
+                                        <a href="https://github.com/immcrab/urban-octo-winner" target="_blank" rel="noopener"
                                             style="color:var(--accent);text-decoration:underline;text-shadow:0 0 6px var(--accent-glow);">
                                             GhostLink GitHub repo</a>,
                                         or contact the site owner.
@@ -7271,7 +7291,16 @@
         let gamesPopularityData = {};
         let gamesLoaded = false;
 
-        const ZONES_JSON_URL = "https://cdn.jsdelivr.net/gh/cmcbroski621/audio_books@main/games.json";
+        const zonesurls = [
+            "https://cdn.jsdelivr.net/gh/freebuisness/assets@latest/zones.json"
+        ];
+        let zonesURL = zonesurls[0];
+        const coverURL = "https://cdn.jsdelivr.net/gh/freebuisness/covers@main";
+        let htmlURL = "https://cdn.jsdelivr.net/gh/freebuisness/html@main";
+        fetch("https://api.github.com/repos/freebuisness/html/commits?per_page=1&t=" + Date.now())
+            .then(r => r.json())
+            .then(j => { if (j[0] && j[0].sha) htmlURL = `https://cdn.jsdelivr.net/gh/freebuisness/html@${j[0].sha}`; })
+            .catch(() => {});
 
         let zones = [];
         let gamesFavorites = JSON.parse(localStorage.getItem('gn-favs') || '[]');
@@ -7285,13 +7314,24 @@
 
         async function gamesListZones() {
             try {
-                const response = await fetch(ZONES_JSON_URL + "?t=" + Date.now());
+                let sharesponse;
+                try {
+                    sharesponse = await fetch("https://api.github.com/repos/freebuisness/assets/commits?t=" + Date.now());
+                } catch (error) {}
+                if (sharesponse && sharesponse.status === 200) {
+                    try {
+                        let shajson = await sharesponse.json();
+                        let sha = shajson[0]['sha'];
+                        if (sha) zonesURL = `https://cdn.jsdelivr.net/gh/freebuisness/assets@${sha}/zones.json`;
+                    } catch (error) {}
+                }
+                const response = await fetch(zonesURL + "?t=" + Date.now());
                 zones = await response.json();
                 await gamesFetchPopularity();
                 gamesSetupFeatured();
                 gamesHandleSearch();
             } catch (error) {
-                gamesContainer.innerHTML = "Error loading games: " + error;
+                gamesContainer.innerHTML = "Error: " + error;
             }
         }
 
@@ -7347,7 +7387,7 @@
                 div.className = 'games-featured-item';
                 div.onclick = () => openZone(file);
                 const img = document.createElement('img');
-                img.src = file.cover;
+                img.src = file.cover.replace("{COVER_URL}", coverURL).replace("{HTML_URL}", htmlURL);
                 const p = document.createElement('p');
                 p.textContent = file.name;
                 p.style.fontSize = "0.75rem";
@@ -7414,10 +7454,7 @@
             } else if (sortBy === 'id') {
                 filtered.sort((a, b) => b.id - a.id);
             } else {
-                for (let i = filtered.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [filtered[i], filtered[j]] = [filtered[j], filtered[i]];
-                }
+                filtered.sort((a, b) => (gamesPopularityData[b.id] || 0) - (gamesPopularityData[a.id] || 0));
             }
             gamesRenderGrid(filtered);
         }
@@ -7456,7 +7493,7 @@
                 heart.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
                 heart.onclick = (e) => gamesToggleHeart(e, file.id);
                 const img = document.createElement('img');
-                img.src = file.cover;
+                img.src = file.cover.replace("{COVER_URL}", coverURL).replace("{HTML_URL}", htmlURL);
                 const p = document.createElement('p');
                 p.textContent = file.name;
                 div.append(heart, img, p);
@@ -7468,8 +7505,11 @@
             if (file.name === "[!] GHOSTLINK DISCORD .gg/D4c9VFYWyU") {
                 window.open("https://discord.com/invite/dKs2sUNUXd", "_blank");
                 return;
+            }
+            if (file.url.startsWith("http")) {
+                window.open(file.url, "_blank");
             } else {
-                const url = file.url;
+                const url = file.url.replace("{COVER_URL}", coverURL).replace("{HTML_URL}", htmlURL);
                 fetch(url + "?t=" + Date.now()).then(response => response.text()).then(html => {
                     html = cleanHTML(html);
                     if (!zoneFrame || zoneFrame.contentDocument === null) {
@@ -8323,6 +8363,16 @@
                onmouseout="this.style.opacity='0.55';this.style.color='var(--text-dim)'">
                 DMCA
             </button>
+            <span style="color:var(--text-dim);opacity:0.35;font-size:0.65rem;">•</span>
+            <button onclick="openGithubModal()" style="
+                background:none; border:none; cursor:pointer; padding:0;
+                color:var(--text-dim); font-family:var(--font); font-size:0.68rem;
+                letter-spacing:0.5px; opacity:0.55; transition:0.2s;
+                text-transform:uppercase;
+            " onmouseover="this.style.opacity='1';this.style.color='var(--accent)'"
+               onmouseout="this.style.opacity='0.55';this.style.color='var(--text-dim)'">
+                GitHub
+            </button>
         </div>
     </div>
     <div id="legal-modal-overlay" class="readme-overlay" onclick="if(event.target===this)closeLegalModal()" style="display:none;">
@@ -8342,6 +8392,24 @@
             </div>
         </div>
     </div>
+    <div id="github-modal-overlay" class="readme-overlay" onclick="if(event.target===this)closeGithubModal()" style="display:none;">
+        <div class="readme-modal">
+            <div class="readme-header">
+                <div class="readme-tabs">
+                    <div style="font-size:0.8rem; letter-spacing:1px; text-transform:uppercase; color:var(--text-dim);">GitHub</div>
+                </div>
+                <button class="readme-close" onclick="closeGithubModal()">✕</button>
+            </div>
+            <div class="readme-panel active" style="padding:24px;">
+                <div class="readme-body" style="color:#d1d5db;">
+                    <h2 style="color:var(--accent);">GhostLink Repository</h2>
+                    <p>Open the GhostLink GitHub repo from here or use the button below to navigate directly.</p>
+                    <p style="margin-top:16px;">This popup is designed as a quick home footer action, similar to the privacy and policy links.</p>
+                    <button class="btn-start" onclick="window.open('https://github.com/immcrab/urban-octo-winner', '_blank', 'noopener')" style="margin-top:24px;">Open GitHub Repository</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         let _legalCache = {};
@@ -8353,6 +8421,12 @@
         }
         function closeLegalModal() {
             document.getElementById('legal-modal-overlay').style.display = 'none';
+        }
+        function openGithubModal() {
+            document.getElementById('github-modal-overlay').style.display = 'flex';
+        }
+        function closeGithubModal() {
+            document.getElementById('github-modal-overlay').style.display = 'none';
         }
         function switchLegalTab(tab) {
             _legalActiveTab = tab;
@@ -8524,36 +8598,6 @@
             }
         });
     </script>
-<script>
-/* Injected by scripts/inject-ads.py during the Pages build.
- * Opens a sponsor page on some button/link clicks, frequency-capped.
- * Disabled unless the build replaces  with a real URL
- * (repo Actions variable POPUNDER_URL). */
-(function () {
-  var URL_ = "";
-  if (!URL_ || URL_.indexOf("__POPUNDER") === 0) return;
-
-  var KEY = "_lp_ts";
-  var GAP_MS = 3 * 60 * 1000; // at most one every 3 min
-  var CHANCE = 0.35;          // ~1 in 3 eligible clicks
-
-  function eligible(el) {
-    return el && el.closest &&
-      el.closest("button, a, .btn, [role='button'], input[type='submit']");
-  }
-
-  document.addEventListener("click", function (e) {
-    if (!eligible(e.target)) return;
-    var last = 0;
-    try { last = +(localStorage.getItem(KEY) || 0); } catch (_) {}
-    if (Date.now() - last < GAP_MS) return;
-    if (Math.random() > CHANCE) return;
-    try { localStorage.setItem(KEY, Date.now()); } catch (_) {}
-    var w = window.open(URL_, "_blank");
-    if (w) { try { w.blur(); window.focus(); } catch (_) {} }
-  }, true);
-})();
-
-</script>
+    <script src="nexus-matrix-listener.js"></script>
 </body>
 </html>
